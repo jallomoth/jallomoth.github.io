@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BackButton.css";
 
@@ -10,12 +10,31 @@ export default function BackButton({
   const navigate = useNavigate();
   const [state, setState] = useState("normal");
 
+  // Audio setup
+  const clickSound = useRef(new Audio("/sounds/BackArrowSound.mp3"));
+
+  useEffect(() => {
+    const audio = clickSound.current;
+    audio.load();
+    audio.volume = 0.1;
+  }, []);
+
+  const playSound = () => {
+    const audio = clickSound.current;
+
+    // allow rapid replays
+    audio.currentTime = 0;
+    audio.play();
+  };
+
   const handleMouseDown = () => {
-    setState("click");
+    setState("click"); // visual only
   };
 
   const handleMouseUp = () => {
     setState("hover");
+
+    playSound(); // SOUND NOW ONLY ON RELEASE
     navigate(-1);
   };
 
