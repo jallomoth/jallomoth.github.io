@@ -58,7 +58,7 @@ export default function ParallaxBackground() {
         inset: 0,
         backgroundImage: "url('/background/space.png')",
         backgroundRepeat: "repeat",
-        backgroundSize: "clamp(1100px, 60vw, 2400px) clamp(1100px, 60vw, 2400px)",
+        backgroundSize: "60vw 60vw",
         zIndex: -1,
         pointerEvents: "none",
       }}

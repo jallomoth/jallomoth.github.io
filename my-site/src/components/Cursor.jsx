@@ -8,7 +8,7 @@ export default function Cursor() {
   const scale = useRef(1);
 
   useEffect(() => {
-    // 📱 Disable on touch devices
+    // Disable on touch devices
     if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
       return;
     }
@@ -19,7 +19,7 @@ export default function Cursor() {
     };
 
     const handleDown = () => {
-      scale.current = 0.7; // shrink on click
+      scale.current = 0.85; // shrink on click
     };
 
     const handleUp = () => {
@@ -70,12 +70,14 @@ export default function Cursor() {
       alt="cursor"
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        width: "48px",
+        top: "1.3vw",
+        left: "0.65vw",
+        width: "3.5vw",
         pointerEvents: "none",
         zIndex: 9999,
         willChange: "transform",
+        display: "block",
+        opacity: 1,
       }}
     />
   );

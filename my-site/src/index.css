@@ -1,3 +1,7 @@
+html {
+  cursor: none !important;
+}
+
 :root {
   --text: #6b6375;
   --bg: #000;
@@ -8,15 +12,53 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+
+*:hover,
+*:active,
+*:focus,
+*:focus-visible {
+  cursor: none !important;
+}
+
+input,
+textarea,
+button,
+select,
+a,
+[role="button"],
+[onclick],
+[onmousedown],
+[onmouseup] {
+  cursor: none !important;
+}
+
+input:hover,
+input:focus,
+textarea:hover,
+textarea:focus,
+button:hover,
+button:active,
+select:hover,
+a:hover,
+[role="button"]:hover,
+[onclick]:hover,
+[onmousedown]:hover,
+[onmouseup]:hover {
+  cursor: none !important;
+}
+
 body {
   margin: 0;
   background: var(--bg);
   overflow: hidden;
-  cursor: none;
+  cursor: none !important;
 }
 
 #root {
-  position: relative;
   z-index: 1;
-  min-height: 100vh;
 }

@@ -1,0 +1,29 @@
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: none !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.15s ease;
+}
+
+.back-button:focus {
+  outline: none;
+}
+
+.back-button-image {
+  width: 5vw;
+  height: 5vw;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
