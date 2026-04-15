@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useAudio } from "./AudioContext";
 import "./Logo.css";
 
 export default function Logo() {
@@ -16,11 +17,12 @@ export default function Logo() {
   const velocity = useRef({ x: 0, y: 0 });
 
   const soundRef = useRef(null);
+  const { effectiveVolume } = useAudio();
 
   useEffect(() => {
     // preload sound
     const audio = new Audio("/sounds/snap.mp3");
-    audio.volume = 0.2;
+    audio.volume = effectiveVolume * 0.4; // base volume 0.4, scaled by global
     soundRef.current = audio;
 
     const handleMouseMove = (e) => {
@@ -93,6 +95,12 @@ export default function Logo() {
       cancelAnimationFrame(frame);
     };
   }, []);
+
+  useEffect(() => {
+    if (soundRef.current) {
+      soundRef.current.volume = effectiveVolume * 0.4;
+    }
+  }, [effectiveVolume]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();

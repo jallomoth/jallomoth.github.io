@@ -53,6 +53,9 @@
   opacity: 1;
 
   animation: snapFade 0.5s ease-out forwards;
+
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 @keyframes snapFade {

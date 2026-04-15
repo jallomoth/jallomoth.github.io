@@ -1,0 +1,125 @@
+/* Container (top-right) */
+.volume-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Speaker icon */
+.volume-icon {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.volume-icon:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+}
+
+/* Slider container (hidden by default) */
+.volume-slider {
+  margin-top: 10px;
+
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+
+  pointer-events: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* subtle glass background */
+  padding: 10px 6px;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+}
+
+/* Show on hover */
+.volume-slider.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 🔥 Vertical slider */
+.volume-slider input {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 6px;       /* track thickness */
+  height: 120px;    /* slider height */
+
+  writing-mode: vertical-lr;
+  direction: rtl; /* bottom = 0, top = 1 */
+
+  cursor: pointer;
+  background: transparent;
+}
+
+/* Track */
+.volume-slider input::-webkit-slider-runnable-track {
+  width: 6px;
+  height: 100%;
+
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+/* Thumb */
+.volume-slider input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+
+  background: white;
+
+  margin-top: -5px; /* centers thumb */
+
+  cursor: pointer;
+
+  /* glow effect */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+
+  transition: transform 0.15s ease;
+}
+
+/* Thumb hover */
+.volume-slider input::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Firefox support */
+.volume-slider input::-moz-range-track {
+  width: 6px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.volume-slider input::-moz-range-thumb {
+  width: 40px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}

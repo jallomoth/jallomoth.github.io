@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAudio } from "./AudioContext";
 import "./BackButton.css";
 
 export default function BackButton({
@@ -9,6 +10,7 @@ export default function BackButton({
 }) {
   const navigate = useNavigate();
   const [state, setState] = useState("normal");
+  const { effectiveVolume } = useAudio();
 
   // Audio setup
   const clickSound = useRef(new Audio("/sounds/BackArrowSound.mp3"));
@@ -16,8 +18,14 @@ export default function BackButton({
   useEffect(() => {
     const audio = clickSound.current;
     audio.load();
-    audio.volume = 0.1;
+    audio.volume = effectiveVolume * 0.2; // base 0.2
   }, []);
+
+  useEffect(() => {
+    if (clickSound.current) {
+      clickSound.current.volume = effectiveVolume * 0.2;
+    }
+  }, [effectiveVolume]);
 
   const playSound = () => {
     const audio = clickSound.current;

@@ -2,6 +2,7 @@ import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import Cursor from './components/Cursor';
 import ParallaxBackground from './components/ParallaxBackground';
+import VolumeControl from './components/VolumeControl';
 import Home from './pages/Home';
 import FoolsErrand from './pages/FoolsErrand';
 import ArtGallery from './pages/ArtGallery';
@@ -15,6 +16,7 @@ function App() {
     <>
       <ParallaxBackground />
       <Cursor />
+      <VolumeControl />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/fools-errand" element={<FoolsErrand />} />
