@@ -8,50 +8,55 @@ export default function Cursor() {
   const scale = useRef(1);
   const visible = useRef(false);
 
+  const currentImage = useRef("/cursor/cursor.png");
+
   useEffect(() => {
     // Disable on touch devices
     if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
       return;
     }
 
-const move = (e) => {
-  const x = e.clientX;
-  const y = e.clientY;
+    // default state
+    window.isGrabbing = false;
 
-  mouse.current.x = x;
-  mouse.current.y = y;
+    const move = (e) => {
+      const x = e.clientX;
+      const y = e.clientY;
 
-  // if touching edge, assume leaving immediately
-  if (
-    x <= 10 ||
-    y <= 10 ||
-    x >= window.innerWidth - 10 ||
-    y >= window.innerHeight - 10
-  ) {
-    visible.current = false;
-  } else {
-    visible.current = true;
-  }
-};
+      mouse.current.x = x;
+      mouse.current.y = y;
+
+      if (
+        x <= 10 ||
+        y <= 10 ||
+        x >= window.innerWidth - 10 ||
+        y >= window.innerHeight - 10
+      ) {
+        visible.current = false;
+      } else {
+        visible.current = true;
+      }
+    };
 
     const handleDown = () => {
-      scale.current = 0.85; // shrink on click
+      scale.current = 0.85;
     };
 
     const handleUp = () => {
       scale.current = 1;
+      window.isGrabbing = false; // release grab globally
     };
 
     const handleBlur = () => {
-      visible.current = false; // leaving browser window
+      visible.current = false;
     };
 
     const handleFocus = () => {
-      visible.current = true; // coming back
+      visible.current = true;
     };
 
     const handleLeave = () => {
-      visible.current = false; // leaving document area
+      visible.current = false;
     };
 
     window.addEventListener("mousemove", move);
@@ -60,7 +65,6 @@ const move = (e) => {
 
     window.addEventListener("blur", handleBlur);
     window.addEventListener("focus", handleFocus);
-
     document.addEventListener("mouseleave", handleLeave);
 
     let frame;
@@ -70,7 +74,17 @@ const move = (e) => {
       pos.current.x += (mouse.current.x - pos.current.x) * 0.15;
       pos.current.y += (mouse.current.y - pos.current.y) * 0.15;
 
+      // SWITCH CURSOR IMAGE BASED ON GLOBAL STATE
+      const nextImage = window.isGrabbing
+        ? "/cursor/CursorGrab.png"
+        : "/cursor/cursor.png";
+
       if (cursorRef.current) {
+        if (currentImage.current !== nextImage) {
+          cursorRef.current.src = nextImage;
+          currentImage.current = nextImage;
+        }
+
         cursorRef.current.style.transform = `
           translate(${pos.current.x}px, ${pos.current.y}px)
           translate(-50%, -50%)
@@ -92,42 +106,40 @@ const move = (e) => {
 
       window.removeEventListener("blur", handleBlur);
       window.removeEventListener("focus", handleFocus);
-
       document.removeEventListener("mouseleave", handleLeave);
 
       cancelAnimationFrame(frame);
     };
   }, []);
 
-  // Don't render on mobile
   if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
     return null;
   }
 
-return (
-  <img
-    ref={cursorRef}
-    src="/cursor/cursor.png"
-    alt="cursor"
-    draggable={false} // prevents drag ghost
-    onDragStart={(e) => e.preventDefault()} // extra safety
-    className="custom-cursor" // needed for CSS
-    style={{
-      position: "fixed",
-      top: "1.3vw",
-      left: "0.65vw",
-      width: "3.5vw",
-      pointerEvents: "none",
-      zIndex: 9999,
-      willChange: "transform",
-      display: "block",
-      opacity: 0,
-      transition: "opacity 0.15s ease",
+  return (
+    <img
+      ref={cursorRef}
+      src="/cursor/cursor.png"
+      alt="cursor"
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      className="custom-cursor"
+      style={{
+        position: "fixed",
+        top: "1.2vw",
+        left: "0.65vw",
+        width: "3.5vw",
+        pointerEvents: "none",
+        zIndex: 9999,
+        willChange: "transform",
+        display: "block",
+        opacity: 0,
+        transition: "opacity 0.15s ease",
 
-      userSelect: "none",          // prevents highlight
-      WebkitUserSelect: "none",    // Safari/Chrome
-      WebkitUserDrag: "none",      // disables image drag
-    }}
-  />
-);
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        WebkitUserDrag: "none",
+      }}
+    />
+  );
 }

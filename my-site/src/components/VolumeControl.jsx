@@ -27,6 +27,8 @@ export default function VolumeControl() {
           max="1"
           step="0.01"
           value={volume}
+          onMouseDown={() => (window.isGrabbing = true)}
+          onMouseUp={() => (window.isGrabbing = false)}
           onChange={(e) => setVolume(parseFloat(e.target.value))}
         />
       </div>

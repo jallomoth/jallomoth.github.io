@@ -19,12 +19,15 @@ export default function Logo() {
   const soundRef = useRef(null);
   const { effectiveVolume } = useAudio();
 
+  // preload sound
   useEffect(() => {
-    // preload sound
     const audio = new Audio("/sounds/snap.mp3");
-    audio.volume = effectiveVolume * 0.4; // base volume 0.4, scaled by global
+    audio.volume = effectiveVolume;
     soundRef.current = audio;
+  }, []);
 
+  // drag + physics + snap
+  useEffect(() => {
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
@@ -39,7 +42,9 @@ export default function Logo() {
       if (isDragging.current) {
         isDragging.current = false;
 
-        // distance from center
+        // release grab cursor globally
+        window.isGrabbing = false;
+
         const distance = Math.sqrt(
           pos.current.x * pos.current.x +
           pos.current.y * pos.current.y
@@ -48,6 +53,12 @@ export default function Logo() {
         const THRESHOLD = 500;
 
         if (distance > THRESHOLD && soundRef.current) {
+          const strength = Math.min(distance / 300, 1);
+
+          // combine global volume + intensity
+          soundRef.current.volume =
+            effectiveVolume * (0.4 + strength * 0.6);
+
           soundRef.current.currentTime = 0;
           soundRef.current.play().catch(() => {});
         }
@@ -94,18 +105,23 @@ export default function Logo() {
       window.removeEventListener("mouseup", handleMouseUp);
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [effectiveVolume]);
 
+  // keep sound volume in sync with slider
   useEffect(() => {
     if (soundRef.current) {
-      soundRef.current.volume = effectiveVolume * 0.4;
+      soundRef.current.volume = effectiveVolume;
     }
   }, [effectiveVolume]);
 
+  // mouse down (start drag + effects)
   const handleMouseDown = (e) => {
     e.preventDefault();
 
     isDragging.current = true;
+
+    // enable grab cursor
+    window.isGrabbing = true;
 
     dragOffset.current.x = e.clientX - pos.current.x;
     dragOffset.current.y = e.clientY - pos.current.y;
@@ -113,7 +129,7 @@ export default function Logo() {
     mouse.current.x = e.clientX;
     mouse.current.y = e.clientY;
 
-    // spawn click effect instantly
+    // spawn click effect
     const id = Date.now();
 
     setEffects((prev) => [
@@ -129,6 +145,19 @@ export default function Logo() {
       setEffects((prev) => prev.filter((e) => e.id !== id));
     }, 500);
   };
+
+  // prevent stuck grab if mouse released outside
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      window.isGrabbing = false;
+    };
+
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+
+    return () => {
+      window.removeEventListener("mouseup", handleGlobalMouseUp);
+    };
+  }, []);
 
   return (
     <>
@@ -148,7 +177,9 @@ export default function Logo() {
         <img
           src="/logo/JallogoHover.png"
           draggable={false}
-          className={`logo-img logo-hover ${hovered ? "fade-in" : "fade-out"}`}
+          className={`logo-img logo-hover ${
+            hovered ? "fade-in" : "fade-out"
+          }`}
           alt="Logo Hover"
         />
       </div>
