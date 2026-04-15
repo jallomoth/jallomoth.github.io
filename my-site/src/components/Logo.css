@@ -46,8 +46,8 @@
   pointer-events: none;
   z-index: 9998;
 
-  width: 70px;
-  height: 70px;
+  width: 3vw;
+  height: 3vw;
 
   transform: translate(-50%, -50%);
   opacity: 1;
