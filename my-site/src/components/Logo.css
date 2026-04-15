@@ -2,16 +2,23 @@
   position: fixed;
   top: 10%;
   left: 50%;
+
   transform: translate(-50%, -50%);
 
   width: 60vw;
   height: auto;
 
   z-index: 10;
-  pointer-events: auto; /* IMPORTANT: allows hover */
+  pointer-events: auto;
+
+  cursor: grab;
 }
 
-/* Stack images on top of each other */
+.logo-container:active {
+  cursor: grabbing;
+}
+
+/* Stack images */
 .logo-img {
   position: absolute;
   width: 100%;
@@ -21,9 +28,12 @@
   left: 0;
 
   transition: opacity 0.4s ease;
+
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* Default states */
+/* fade states */
 .fade-in {
   opacity: 1;
 }

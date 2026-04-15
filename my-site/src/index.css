@@ -62,3 +62,12 @@ body {
 #root {
   z-index: 1;
 }
+
+.custom-cursor {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+
+  /* removes weird click flash on some browsers */
+  -webkit-tap-highlight-color: transparent;
+}
