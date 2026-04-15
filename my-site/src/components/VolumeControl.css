@@ -1,8 +1,8 @@
 /* Container (top-right) */
 .volume-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 40px;
+  right: 40px;
 
   z-index: 1000;
 
@@ -13,8 +13,8 @@
 
 /* Speaker icon */
 .volume-icon {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   cursor: pointer;
 
   user-select: none;
@@ -57,13 +57,13 @@
   pointer-events: auto;
 }
 
-/* 🔥 Vertical slider */
+/* Vertical slider */
 .volume-slider input {
   -webkit-appearance: none;
   appearance: none;
 
-  width: 6px;       /* track thickness */
-  height: 120px;    /* slider height */
+  width: 12px;       /* track thickness */
+  height: 220px;     /* slider height */
 
   writing-mode: vertical-lr;
   direction: rtl; /* bottom = 0, top = 1 */
@@ -74,7 +74,7 @@
 
 /* Track */
 .volume-slider input::-webkit-slider-runnable-track {
-  width: 6px;
+  width: 16px;
   height: 100%;
 
   background: rgba(255, 255, 255, 0.2);
@@ -86,7 +86,7 @@
   -webkit-appearance: none;
 
   width: 16px;
-  height: 16px;
+  height: 22px;
   border-radius: 50%;
 
   background: white;
@@ -108,7 +108,7 @@
 
 /* Firefox support */
 .volume-slider input::-moz-range-track {
-  width: 6px;
+  width: 12px;
   height: 100%;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
@@ -116,7 +116,7 @@
 
 .volume-slider input::-moz-range-thumb {
   width: 40px;
-  height: 16px;
+  height: 22px;
   border-radius: 50%;
   background: white;
   border: none;
