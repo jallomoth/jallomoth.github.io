@@ -71,3 +71,10 @@ body {
   /* removes weird click flash on some browsers */
   -webkit-tap-highlight-color: transparent;
 }
+
+img {
+  -webkit-user-drag: none;
+
+  user-select: none;
+  -webkit-user-select: none;
+}

@@ -77,7 +77,7 @@ export default function Cursor() {
       // SWITCH CURSOR IMAGE BASED ON GLOBAL STATE
       const nextImage = window.isGrabbing
         ? "/cursor/CursorGrab.png"
-        : "/cursor/cursor.png";
+        : "/cursor/Cursor.png";
 
       if (cursorRef.current) {
         if (currentImage.current !== nextImage) {
@@ -119,7 +119,7 @@ export default function Cursor() {
   return (
     <img
       ref={cursorRef}
-      src="/cursor/cursor.png"
+      src="/cursor/Cursor.png"
       alt="cursor"
       draggable={false}
       onDragStart={(e) => e.preventDefault()}

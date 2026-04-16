@@ -7,7 +7,7 @@
   width: 60vw;
   height: auto;
 
-  z-index: 10;
+  z-index: 9998;
   pointer-events: auto;
 
   cursor: grab;

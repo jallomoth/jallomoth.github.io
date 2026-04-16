@@ -11,8 +11,8 @@
 
 /* ICON */
 .volume-icon {
-  width: 60px;
-  height: 60px;
+  width: 4vw;
+  height: 4vw;
   cursor: pointer;
 
   user-select: none;
@@ -27,7 +27,7 @@
 
 /* SLIDER CONTAINER */
 .volume-slider {
-  margin-top: 0px;
+  margin-top: 1vw;
 
   opacity: 0;
   transform: translateY(-10px);
@@ -47,8 +47,8 @@
 /* TRACK WRAPPER */
 .slider-track {
   position: relative;
-  width: 40px;
-  height: 220px;
+  width: 4vw;
+  height: 9vw;
 
   display: flex;
   justify-content: center;
@@ -72,7 +72,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
 
-  width: 80px;
+  width: 5vw;
   height: auto;
 
   pointer-events: auto;

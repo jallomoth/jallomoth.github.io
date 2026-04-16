@@ -1,5 +1,4 @@
 import NavButton from "./NavButton";
-import "./ButtonGrid.css";
 
 export default function ButtonRow({ buttons }) {
   return (

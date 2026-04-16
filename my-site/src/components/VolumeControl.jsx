@@ -15,13 +15,37 @@ export default function VolumeControl() {
 
   const sliderRef = useRef(null);
 
-  const TOP_PADDING = 20;
-  const BOTTOM_PADDING = 20;
+  // -----------------------------
+  // VW → PX RESPONSIVE PADDING
+  // -----------------------------
+  const TOP_PADDING_VW = 1.0;
+  const BOTTOM_PADDING_VW = 1.2;
+
+  const [padding, setPadding] = useState({
+    top: 0,
+    bottom: 0,
+  });
+
+  useEffect(() => {
+    const updatePadding = () => {
+      setPadding({
+        top: (window.innerWidth * TOP_PADDING_VW) / 100,
+        bottom: (window.innerWidth * BOTTOM_PADDING_VW) / 100,
+      });
+    };
+
+    updatePadding();
+    window.addEventListener("resize", updatePadding);
+
+    return () => window.removeEventListener("resize", updatePadding);
+  }, []);
+
+  const TOP_PADDING = padding.top;
+  const BOTTOM_PADDING = padding.bottom;
 
   // -----------------------------
   // VOLUME CALCULATION
   // -----------------------------
-
   const updateVolumeFromMouse = (clientY) => {
     const rect = sliderRef.current.getBoundingClientRect();
 
@@ -62,9 +86,9 @@ export default function VolumeControl() {
   }, [dragging]);
 
   // -----------------------------
-  // THUMB POSITION
+  // THUMB POSITION (VW-AWARE)
   // -----------------------------
-  const thumbPosition = `calc(${TOP_PADDING}px + ${(1 - volume) * (100)}% - ${
+  const thumbPosition = `calc(${TOP_PADDING}px + ${(1 - volume) * 100}% - ${
     (1 - volume) * (TOP_PADDING + BOTTOM_PADDING)
   }px)`;
 

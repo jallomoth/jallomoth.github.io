@@ -13,13 +13,14 @@ function chunkButtons(buttons) {
 
 export default function ButtonGrid() {
   const buttons = [
-    { label: "Fool's Errand", to: "/fools-errand", image: "/images/fools-errand.png" },
-    { label: "Art Gallery", to: "/art-gallery", image: "/images/art-gallery.png" },
-    { label: "Patreon", to: "https://www.patreon.com/Jallomoth", image: "/images/patreon.png" },
-    { label: "Youtube", to: "https://youtube.com/@jallomoth", image: "/images/youtube.png" },
-    { label: "Jalloseum", to: "/jalloseum", image: "/images/jalloseum.png" },
-    { label: "About", to: "/about", image: "/images/about.png" },
-    { label: "Commissions", to: "/commissions", image: "/images/commissions.png" },
+    { label: "Fool's Errand", alt: "Fool's Errand", to: "/fools-errand", image: "/icons/Fools-Errand.png" },
+    { label: "Jalloseum", alt: "Jalloseum", to: "/jalloseum", image: "/icons/Jalloseum.png" },
+    { label: "Art Gallery", alt: "Art Gallery", to: "/art-gallery", image: "/icons/Art-Gallery.png" },
+    { label: "Commissions", alt: "Commissions", to: "/commissions", image: "/icons/Commissions.png" },
+    { label: "YouTube", alt: "YouTube", to: "https://youtube.com/@jallomoth", image: "/icons/YouTube.png" },
+    { label: "Community", alt: "Community", to: "/community", image: "/icons/Community.png" },
+    { label: "Patreon", alt: "Patreon", to: "https://www.patreon.com/Jallomoth", image: "/icons/Patreon.png" },
+    { label: "Backstage", alt: "Backstage", to: "/backstage", image: "/icons/Backstage.png" },
   ];
 
   const rows = chunkButtons(buttons);

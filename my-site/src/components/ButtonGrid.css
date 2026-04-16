@@ -1,62 +1,64 @@
-/* BUTTON GRID CONFIGURATION */
-/* Adjust these values to change button size and spacing */
-
 :root {
-  --button-size: 300px;
-  --button-gap: 40px;
-  --row-gap: 60px;
+  --button-size: 2vw;
+  --button-gap: 4vw;
+  --row-gap: 4vw;
 }
 
 .button-grid {
   position: fixed;
-  top: 40%;
+  top: 37%;
   left: 50%;
   transform: translateX(-50%);
 
   display: flex;
   flex-direction: column;
   gap: var(--row-gap);
-  justify-content: center;
   align-items: center;
-
-  max-width: min(200vw, calc(4 * (var(--button-size) + var(--button-gap))) + 3 * var(--button-gap));
-  z-index: 15;
+  padding: 0 1rem;
 }
 
+/* rows */
 .button-row {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: center;
   gap: var(--button-gap);
-  flex-wrap: nowrap;
-  width: fit-content;
-  margin: 0 0;
 }
 
+/* slots */
 .button-row > * {
   width: var(--button-size);
   height: var(--button-size);
-  min-width: var(--button-size);
-
-  align-self: center;
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 1000px) {
-  :root {
-    --button-size: 150px;
-    --button-gap: 20px;
-    --row-gap: 24px;
-  }
-}
-
-@media (max-width: 650px) {
-  :root {
-    --button-size: 120px;
-    --button-gap: 16px;
-    --row-gap: 20px;
-  }
-
+@media (max-width: 720px) {
   .button-grid {
-    top: 45%;
+    top: 32%;
+    gap: 3rem;
   }
+
+  .button-row {
+    gap: 3vw;
+  }
+}
+
+/* NORMAL ACTIVE DIM */
+.button-grid:has(.active-button)
+  .nav-button:not(.active-button) {
+  opacity: 0.4;
+  transform: scale(0.95);
+  filter: grayscale(40%);
+}
+
+/* DRAG MODE (LOCKED STATE) */
+.button-grid.dragging .nav-button {
+  opacity: 0.3;
+  transform: scale(0.9);
+  filter: grayscale(60%);
+}
+
+.button-grid.dragging .nav-button.active-button {
+  opacity: 1;
+  transform: translateY(-1vw) scale(1.1);
+  filter: none;
 }
