@@ -13,7 +13,7 @@ export default function BackButton({
   const { effectiveVolume } = useAudio();
 
   // Audio setup
-  const clickSound = useRef(new Audio("/sounds/BackArrowSound.mp3"));
+  const clickSound = useRef(new Audio("/sounds/click.mp3"));
 
   useEffect(() => {
     const audio = clickSound.current;

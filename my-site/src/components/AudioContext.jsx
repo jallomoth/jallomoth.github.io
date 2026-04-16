@@ -17,6 +17,20 @@ export function AudioProvider({ children }) {
   const effectiveVolume = muted ? 0 : volume;
 
   useEffect(() => {
+    const sounds = [
+      "/music/home.mp3",
+      "/sounds/snap.mp3",
+      "/sounds/click.mp3",
+    ];
+
+    sounds.forEach((src) => {
+      const audio = new Audio(src);
+      audio.preload = "auto";
+      audio.load();
+    });
+  }, []);
+
+  useEffect(() => {
     effectiveVolumeRef.current = effectiveVolume;
   }, [effectiveVolume]);
 
@@ -61,7 +75,7 @@ export function AudioProvider({ children }) {
         if (currentVolume >= target) {
           clearInterval(fade);
         }
-      }, 10);
+      }, 5);
     };
 
     const startAudio = () => {
