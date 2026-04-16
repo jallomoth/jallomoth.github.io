@@ -109,7 +109,6 @@ export default function VolumeControl() {
         onMouseLeave={() => setIconHovered(false)}
         onMouseDown={() => {
           setIconPressed(true);
-          window.isGrabbing = true;
         }}
       />
 
