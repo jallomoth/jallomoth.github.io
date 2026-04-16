@@ -22,6 +22,9 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
   const src = isActive && hoverImage ? hoverImage : image;
   const altText = alt || label || "Navigation button";
 
+  // threshold
+  const DRAG_THRESHOLD = 80;
+
   const navigateTo = () => {
     if (isExternal) {
       window.location.assign(to);
@@ -43,7 +46,6 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
       pos.current.x = mouse.current.x - dragOffset.current.x;
       pos.current.y = mouse.current.y - dragOffset.current.y;
 
-      // broadcast position globally
       window.draggedButtonPos = {
         x: mouse.current.x,
         y: mouse.current.y,
@@ -61,9 +63,21 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
 
         setHovered(false);
 
-        setTimeout(() => {
-          navigateTo();
-        }, 180);
+        // -----------------------------
+        // DISTANCE CHECK
+        // -----------------------------
+        const distance = Math.sqrt(
+          pos.current.x * pos.current.x +
+          pos.current.y * pos.current.y
+        );
+
+        const shouldNavigate = distance < DRAG_THRESHOLD;
+
+        if (shouldNavigate) {
+          setTimeout(() => {
+            navigateTo();
+          }, 180);
+        }
       }
     };
 
@@ -90,7 +104,6 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
         velocity.current.y = 0;
       }
 
-      // MAGNETIC PUSH (only if NOT dragging this one)
       if (!isDragging.current && window.draggedButtonPos) {
         const rect = containerRef.current.getBoundingClientRect();
 
@@ -150,7 +163,7 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
   };
 
   // -----------------------------
-  // HOVER CONTROL (DISABLED DURING DRAG)
+  // HOVER CONTROL
   // -----------------------------
   const handleEnter = () => {
     if (!window.isDraggingButton) setHovered(true);
