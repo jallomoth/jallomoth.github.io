@@ -1,6 +1,6 @@
 :root {
-  --button-size: 2vw;
-  --button-gap: 4vw;
+  --button-size: 8vw;
+  --button-gap: 5vw;
   --row-gap: 4vw;
 }
 
@@ -28,7 +28,7 @@
 /* slots */
 .button-row > * {
   width: var(--button-size);
-  height: var(--button-size);
+  min-height: var(--button-size);
 }
 
 @media (max-width: 720px) {

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NavButton.css";
 
-export default function NavButton({ image, hoverImage, to, alt, label }) {
+export default function NavButton({ image, hoverImage, to, alt, label, textImage }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
 
@@ -197,12 +197,22 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
       onKeyDown={handleKeyDown}
     >
       <div className={`nav-button ${isActive ? "active-button" : ""}`}>
-        <img
-          src={src}
-          className="nav-button-image"
-          alt={altText}
-          draggable="false"
-        />
+        <div className={`icon-container ${isActive ? "active-icon" : ""}`}>
+          <img
+            src={src}
+            className="nav-button-image"
+            alt={altText}
+            draggable="false"
+          />
+        </div>
+        {textImage && (
+          <img
+            src={textImage}
+            className="text-image"
+            alt=""
+            draggable="false"
+          />
+        )}
       </div>
     </div>
   );

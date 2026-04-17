@@ -16,12 +16,10 @@
 
 .nav-button {
   width: 100%;
-  height: 100%;
-  aspect-ratio: 1 / 1;
-
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 0.5vw;
 
   border-radius: 40px;
 
@@ -31,8 +29,17 @@
 }
 
 .nav-button.active-button {
-  transform: translateY(-1vw) scale(1.1);
   opacity: 1;
+}
+
+.icon-container {
+  width: var(--button-size);
+  height: var(--button-size);
+  transition: transform 0.25s ease;
+}
+
+.active-icon {
+  transform: translateY(-1vw) scale(1.1);
 }
 
 .nav-button-image {
@@ -45,6 +52,15 @@
   user-select: none;
 }
 
-.nav-button.active-button .nav-button-image {
+.active-icon .nav-button-image {
   transform: scale(1.03);
+}
+
+.text-image {
+  width: var(--button-size);
+  object-fit: contain;
+  transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+
+  -webkit-user-drag: none;
+  user-select: none;
 }
