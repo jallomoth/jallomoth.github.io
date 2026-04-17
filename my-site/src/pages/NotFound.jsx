@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import Logo from "../components/Logo";
 import ParallaxBackground from "../components/ParallaxBackground";
 
-// 🔥 IMPORT ALL MEDIA FILES FROM FOLDER
+// IMPORT ALL MEDIA FILES FROM FOLDER
 const mediaModules = import.meta.glob(
-  "../assets/404/*.{png,jpg,jpeg,gif,webp,mp4,webm}",
+  "../assets/404/**/*.{png,jpg,jpeg,gif,webp,mp4,webm,PNG,JPG,JPEG,GIF,WEBP,MP4,WEBM,mov}",
   { eager: true }
 );
 
