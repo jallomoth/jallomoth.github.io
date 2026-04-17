@@ -5,10 +5,11 @@ import ParallaxBackground from './components/ParallaxBackground';
 import VolumeControl from './components/VolumeControl';
 import Home from './pages/Home';
 import FoolsErrand from './pages/FoolsErrand';
-import ArtGallery from './pages/ArtGallery';
 import Jalloseum from './pages/Jalloseum';
-import About from './pages/About';
+import ArtGallery from './pages/ArtGallery';
 import Commissions from './pages/Commissions';
+import Community from './pages/Community';
+import Backstage from './pages/Backstage';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -20,10 +21,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/fools-errand" element={<FoolsErrand />} />
-        <Route path="/art-gallery" element={<ArtGallery />} />
         <Route path="/jalloseum" element={<Jalloseum />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/art-gallery" element={<ArtGallery />} />
         <Route path="/commissions" element={<Commissions />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/backstage" element={<Backstage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
