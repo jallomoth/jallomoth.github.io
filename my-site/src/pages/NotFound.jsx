@@ -2,20 +2,24 @@ import { useMemo, useState } from "react";
 import Logo from "../components/Logo";
 import ParallaxBackground from "../components/ParallaxBackground";
 
-export default function NotFound() {
-  const mediaList = [
-    "/404/bdumbudbump.mp4",
-    "/404/charo.gif",
-    "/404/momachu.jpg",
-    "/404/breaking-bad.jpg",
-  ];
+// 🔥 IMPORT ALL MEDIA FILES FROM FOLDER
+const mediaModules = import.meta.glob(
+  "../assets/404/*.{png,jpg,jpeg,gif,webp,mp4,webm}",
+  { eager: true }
+);
 
+// convert to usable URLs
+const mediaList = Object.values(mediaModules).map((mod) => mod.default);
+
+export default function NotFound() {
   const selectedMedia = useMemo(() => {
     const index = Math.floor(Math.random() * mediaList.length);
     return mediaList[index];
   }, []);
 
-  const isVideo = selectedMedia.endsWith(".mp4");
+  const isVideo =
+    selectedMedia.endsWith(".mp4") || selectedMedia.endsWith(".webm");
+
   const [videoError, setVideoError] = useState(false);
 
   // -----------------------------
@@ -46,14 +50,10 @@ export default function NotFound() {
 
   return (
     <>
-      {/* -----------------------------
-          PARALLAX BACKGROUND
-      ----------------------------- */}
+      {/* BACKGROUND */}
       <ParallaxBackground />
 
-      {/* -----------------------------
-          MEDIA CONTAINER
-      ----------------------------- */}
+      {/* MEDIA */}
       <div style={mediaContainerStyle}>
         {isVideo && !videoError ? (
           <video
@@ -67,7 +67,7 @@ export default function NotFound() {
           />
         ) : (
           <img
-            src={isVideo ? "/404/momachu.jpg" : selectedMedia}
+            src={selectedMedia}
             alt=""
             draggable={false}
             style={mediaStyle}
@@ -78,9 +78,7 @@ export default function NotFound() {
       {/* LOGO */}
       <Logo top="2vh" width="40vw" />
 
-      {/* -----------------------------
-          CONTENT (TOP-POSITIONED)
-      ----------------------------- */}
+      {/* TEXT */}
       <div
         style={{
           position: "fixed",
@@ -105,8 +103,9 @@ export default function NotFound() {
             WebkitTextStroke: "0.2vh black",
           }}
         >
-          404 ERROR<br />
-          ermm dafuq ... (╯°□°)╯︵ ┻━┻
+          404 ERROR (╯°□°)╯︵ ┻━┻
+          <br />
+          erm ... dafuq ?
         </h1>
       </div>
     </>
