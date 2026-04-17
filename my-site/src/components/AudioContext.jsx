@@ -69,13 +69,13 @@ export function AudioProvider({ children }) {
           return;
         }
 
-        currentVolume = Math.min(currentVolume + 0.001, target);
+        currentVolume = Math.min(currentVolume + 1, target);
         audioRef.current.volume = currentVolume;
 
         if (currentVolume >= target) {
           clearInterval(fade);
         }
-      }, 5);
+      }, 0);
     };
 
     const startAudio = () => {
