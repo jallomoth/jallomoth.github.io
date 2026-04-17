@@ -71,8 +71,12 @@ export default function Cursor() {
 
     const animate = () => {
       // Smooth follow
-      pos.current.x += (mouse.current.x - pos.current.x) * 0.15;
-      pos.current.y += (mouse.current.y - pos.current.y) * 0.15;
+      // pos.current.x += (mouse.current.x - pos.current.x) * 0.1;
+      // pos.current.y += (mouse.current.y - pos.current.y) * 0.1;
+
+      // Direct follow
+      pos.current.x = mouse.current.x;
+      pos.current.y = mouse.current.y;
 
       // SWITCH CURSOR IMAGE BASED ON GLOBAL STATE
       const nextImage = window.isGrabbing

@@ -85,20 +85,24 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
     window.addEventListener("mouseup", handleMouseUp);
 
     let frame;
+    let lastTime = performance.now();
 
-    const animate = () => {
+    const animate = (currentTime) => {
+      const deltaTime = (currentTime - lastTime) / (1000 / 60); // Normalize to 60fps
+      lastTime = currentTime;
+
       if (!isDragging.current) {
-        const spring = 0.08;
+        const spring = 0.16;
         const damping = 0.8;
 
-        velocity.current.x += (0 - pos.current.x) * spring;
-        velocity.current.y += (0 - pos.current.y) * spring;
+        velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
+        velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
 
-        velocity.current.x *= damping;
-        velocity.current.y *= damping;
+        velocity.current.x *= Math.pow(damping, deltaTime);
+        velocity.current.y *= Math.pow(damping, deltaTime);
 
-        pos.current.x += velocity.current.x;
-        pos.current.y += velocity.current.y;
+        pos.current.x += velocity.current.x * deltaTime;
+        pos.current.y += velocity.current.y * deltaTime;
       } else {
         velocity.current.x = 0;
         velocity.current.y = 0;
@@ -120,8 +124,8 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
         if (dist < RADIUS) {
           const force = (RADIUS - dist) / RADIUS;
 
-          pos.current.x += (dx / dist) * force * 20;
-          pos.current.y += (dy / dist) * force * 20;
+          pos.current.x += (dx / dist) * force * 20 * deltaTime;
+          pos.current.y += (dy / dist) * force * 20 * deltaTime;
         }
       }
 
@@ -134,7 +138,7 @@ export default function NavButton({ image, hoverImage, to, alt, label }) {
       frame = requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(lastTime);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);

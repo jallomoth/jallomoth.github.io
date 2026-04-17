@@ -16,19 +16,23 @@ export default function ParallaxBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     let frame;
+    let lastTime = performance.now();
 
-    const animate = () => {
+    const animate = (currentTime) => {
+      const deltaTime = (currentTime - lastTime) / (1000 / 60); // Normalize to 60fps
+      lastTime = currentTime;
+
       // Acceleration toward mouse direction
-      velocity.current.x += (target.current.x * 0.6 - velocity.current.x) * 0.02;
-      velocity.current.y += (target.current.y * 0.6 - velocity.current.y) * 0.02;
+      velocity.current.x += (target.current.x * 0.6 - velocity.current.x) * 0.1 * deltaTime;
+      velocity.current.y += (target.current.y * 0.6 - velocity.current.y) * 0.1 * deltaTime;
 
       // Apply movement
-      pos.current.x += velocity.current.x;
-      pos.current.y += velocity.current.y;
+      pos.current.x += velocity.current.x * deltaTime;
+      pos.current.y += velocity.current.y * deltaTime;
 
       // Friction (momentum decay)
-      velocity.current.x *= 0.5;
-      velocity.current.y *= 0.5;
+      velocity.current.x *= Math.pow(0.5, deltaTime);
+      velocity.current.y *= Math.pow(0.5, deltaTime);
 
       if (bgRef.current) {
         const strength = window.innerWidth * 0.015;
@@ -42,7 +46,7 @@ export default function ParallaxBackground() {
       frame = requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(lastTime);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);

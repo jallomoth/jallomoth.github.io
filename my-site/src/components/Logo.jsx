@@ -69,20 +69,24 @@ export default function Logo() {
     window.addEventListener("mouseup", handleMouseUp);
 
     let frame;
+    let lastTime = performance.now();
 
-    const animate = () => {
+    const animate = (currentTime) => {
+      const deltaTime = (currentTime - lastTime) / (1000 / 60); // Normalize to 60fps
+      lastTime = currentTime;
+
       if (!isDragging.current) {
-        const spring = 0.08;
+        const spring = 0.16;
         const damping = 0.8;
 
-        velocity.current.x += (0 - pos.current.x) * spring;
-        velocity.current.y += (0 - pos.current.y) * spring;
+        velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
+        velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
 
-        velocity.current.x *= damping;
-        velocity.current.y *= damping;
+        velocity.current.x *= Math.pow(damping, deltaTime);
+        velocity.current.y *= Math.pow(damping, deltaTime);
 
-        pos.current.x += velocity.current.x;
-        pos.current.y += velocity.current.y;
+        pos.current.x += velocity.current.x * deltaTime;
+        pos.current.y += velocity.current.y * deltaTime;
       } else {
         velocity.current.x = 0;
         velocity.current.y = 0;
@@ -98,7 +102,7 @@ export default function Logo() {
       frame = requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(lastTime);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
