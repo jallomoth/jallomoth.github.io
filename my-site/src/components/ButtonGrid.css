@@ -1,5 +1,5 @@
 :root {
-  --button-size: 8vw;
+  --button-size: 9vw;
   --button-gap: 5vw;
   --row-gap: 4vw;
 }
@@ -43,22 +43,53 @@
 }
 
 /* NORMAL ACTIVE DIM */
-.button-grid:has(.active-button)
-  .nav-button:not(.active-button) {
+.button-grid:has(.active-icon)
+  .icon-container:not(.active-icon) {
+  opacity: 0.4;
+  filter: grayscale(40%);
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.button-grid:has(.active-icon)
+  .icon-container:not(.active-icon) .icon-visual {
+  transform: translateY(0) scale(0.95);
+  transition: transform 0.25s ease;
+}
+
+.button-grid:has(.active-icon)
+  .text-container:not(.active-text) {
   opacity: 0.4;
   transform: scale(0.95);
   filter: grayscale(40%);
+  transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
 }
 
 /* DRAG MODE (LOCKED STATE) */
-.button-grid.dragging .nav-button {
+.button-grid.dragging .icon-container {
   opacity: 0.3;
-  transform: scale(0.9);
   filter: grayscale(60%);
+  transition: opacity 0.25s ease, filter 0.25s ease;
 }
 
-.button-grid.dragging .nav-button.active-button {
+.button-grid.dragging .icon-container .icon-visual {
+  transform: translateY(0) scale(0.95);
+  transition: transform 0.25s ease;
+}
+
+.button-grid.dragging .text-container {
+  opacity: 0.3;
+  transform: scale(0.95);
+  filter: grayscale(60%);
+  transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+}
+
+.button-grid.dragging .icon-container.active-icon {
   opacity: 1;
-  transform: translateY(-1vw) scale(1.1);
   filter: none;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.button-grid.dragging .icon-container.active-icon .icon-visual {
+  transform: translateY(-1vw) scale(1.1);
+  transition: transform 0.25s ease;
 }

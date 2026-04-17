@@ -7,6 +7,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   const [draggingState, setDraggingState] = useState(false);
 
   const containerRef = useRef(null);
+  const iconRef = useRef(null);
   const navigate = useNavigate();
 
   const isDragging = useRef(false);
@@ -50,6 +51,17 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         x: mouse.current.x,
         y: mouse.current.y,
       };
+
+      if (iconRef.current) {
+        iconRef.current.style.setProperty(
+          "--translate-x",
+          `${pos.current.x}px`
+        );
+        iconRef.current.style.setProperty(
+          "--translate-y",
+          `${pos.current.y}px`
+        );
+      }
     };
 
     const handleMouseUp = () => {
@@ -88,12 +100,12 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     let lastTime = performance.now();
 
     const animate = (currentTime) => {
-      const deltaTime = (currentTime - lastTime) / (1000 / 60); // Normalize to 60fps
+      const deltaTime = (currentTime - lastTime) / (1000 / 60);
       lastTime = currentTime;
 
       if (!isDragging.current) {
-        const spring = 0.16;
-        const damping = 0.8;
+        const spring = 0.2;
+        const damping = 0.7;
 
         velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
         velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
@@ -109,7 +121,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       }
 
       if (!isDragging.current && window.draggedButtonPos) {
-        const rect = containerRef.current.getBoundingClientRect();
+        const rect = iconRef.current.getBoundingClientRect();
 
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
@@ -129,10 +141,23 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         }
       }
 
-      if (containerRef.current) {
-        containerRef.current.style.transform = `
-          translate(${pos.current.x}px, ${pos.current.y}px)
-        `;
+      if (iconRef.current) {
+        let translateY = 0;
+
+        if (window.isDraggingButton) {
+          // During dragging
+          if (isActive) {
+            translateY = -1;
+          }
+        } else {
+          // Normal state
+          if (isActive) {
+            translateY = -1;
+          }
+        }
+
+        iconRef.current.style.setProperty('--translate-x', `${pos.current.x}px`);
+        iconRef.current.style.setProperty('--translate-y', `${pos.current.y}px`);
       }
 
       frame = requestAnimationFrame(animate);
@@ -164,6 +189,9 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
     mouse.current.x = e.clientX;
     mouse.current.y = e.clientY;
+
+    velocity.current.x = 0;
+    velocity.current.y = 0;
   };
 
   // -----------------------------
@@ -191,13 +219,16 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       role="button"
       tabIndex={0}
       aria-label={altText}
-      onMouseDown={handleMouseDown}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
       onKeyDown={handleKeyDown}
     >
-      <div className={`nav-button ${isActive ? "active-button" : ""}`}>
-        <div className={`icon-container ${isActive ? "active-icon" : ""}`}>
+      <div
+        ref={iconRef}
+        className={`icon-container ${isActive ? "active-icon" : ""}`}
+        onMouseDown={handleMouseDown}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+      >
+        <div className="icon-visual">
           <img
             src={src}
             className="nav-button-image"
@@ -205,15 +236,22 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
             draggable="false"
           />
         </div>
-        {textImage && (
+      </div>
+      {textImage && (
+        <div
+          className={`text-container ${isActive ? "active-text" : ""}`}
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+          onClick={navigateTo}
+        >
           <img
             src={textImage}
             className="text-image"
             alt=""
             draggable="false"
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
