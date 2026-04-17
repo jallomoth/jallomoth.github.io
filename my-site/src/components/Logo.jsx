@@ -2,7 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { useAudio } from "./AudioContext";
 import "./Logo.css";
 
-export default function Logo() {
+export default function Logo({
+  top = "10%",
+  left = "50%",
+  width = "60vw",
+  center = true,
+}) {
   const [hovered, setHovered] = useState(false);
   const [effects, setEffects] = useState([]);
 
@@ -19,6 +24,32 @@ export default function Logo() {
   const soundRef = useRef(null);
   const { effectiveVolume } = useAudio();
 
+  // -----------------------------
+  // POPUP SCALE CALC
+  // -----------------------------
+  const getPopupSize = () => {
+    // base reference = 60vw logo → 3vw popup
+    const baseLogo = 60;
+    const basePopup = 3;
+
+    if (width.includes("vw")) {
+      const value = parseFloat(width);
+      const scale = value / baseLogo;
+      return `${basePopup * scale}vw`;
+    }
+
+    // fallback for px
+    if (width.includes("px")) {
+      const value = parseFloat(width);
+      const scale = value / 600; // assume ~600px = 60vw baseline
+      return `${basePopup * scale}vw`;
+    }
+
+    return "3vw";
+  };
+
+  const popupSize = getPopupSize();
+
   // preload sound
   useEffect(() => {
     const audio = new Audio("/sounds/snap.mp3");
@@ -26,7 +57,7 @@ export default function Logo() {
     soundRef.current = audio;
   }, []);
 
-  // drag + physics + snap
+  // physics
   useEffect(() => {
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
@@ -41,8 +72,6 @@ export default function Logo() {
     const handleMouseUp = () => {
       if (isDragging.current) {
         isDragging.current = false;
-
-        // release grab cursor globally
         window.isGrabbing = false;
 
         const distance = Math.sqrt(
@@ -55,7 +84,6 @@ export default function Logo() {
         if (distance > THRESHOLD && soundRef.current) {
           const strength = Math.min(distance / 300, 1);
 
-          // combine global volume + intensity
           soundRef.current.volume =
             effectiveVolume * (0.4 + strength * 0.6);
 
@@ -72,7 +100,10 @@ export default function Logo() {
     let lastTime = performance.now();
 
     const animate = (currentTime) => {
-      const deltaTime = (currentTime - lastTime) / (1000 / 60); // Normalize to 60fps
+      const deltaTime = Math.min(
+        (currentTime - lastTime) / (1000 / 60),
+        2
+      );
       lastTime = currentTime;
 
       if (!isDragging.current) {
@@ -94,7 +125,7 @@ export default function Logo() {
 
       if (containerRef.current) {
         containerRef.current.style.transform = `
-          translate(-50%, -50%)
+          ${center ? "translate(-50%, -50%)" : ""}
           translate(${pos.current.x}px, ${pos.current.y}px)
         `;
       }
@@ -109,22 +140,18 @@ export default function Logo() {
       window.removeEventListener("mouseup", handleMouseUp);
       cancelAnimationFrame(frame);
     };
-  }, [effectiveVolume]);
+  }, [effectiveVolume, center]);
 
-  // keep sound volume in sync with slider
   useEffect(() => {
     if (soundRef.current) {
       soundRef.current.volume = effectiveVolume;
     }
   }, [effectiveVolume]);
 
-  // mouse down (start drag + effects)
   const handleMouseDown = (e) => {
     e.preventDefault();
 
     isDragging.current = true;
-
-    // enable grab cursor
     window.isGrabbing = true;
 
     dragOffset.current.x = e.clientX - pos.current.x;
@@ -133,7 +160,6 @@ export default function Logo() {
     mouse.current.x = e.clientX;
     mouse.current.y = e.clientY;
 
-    // spawn click effect
     const id = Date.now();
 
     setEffects((prev) => [
@@ -150,17 +176,14 @@ export default function Logo() {
     }, 500);
   };
 
-  // prevent stuck grab if mouse released outside
   useEffect(() => {
     const handleGlobalMouseUp = () => {
       window.isGrabbing = false;
     };
 
     window.addEventListener("mouseup", handleGlobalMouseUp);
-
-    return () => {
+    return () =>
       window.removeEventListener("mouseup", handleGlobalMouseUp);
-    };
   }, []);
 
   return (
@@ -168,6 +191,7 @@ export default function Logo() {
       <div
         ref={containerRef}
         className="logo-container"
+        style={{ top, left, width }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onMouseDown={handleMouseDown}
@@ -188,7 +212,6 @@ export default function Logo() {
         />
       </div>
 
-      {/* click effects */}
       {effects.map((effect) => (
         <img
           key={effect.id}
@@ -197,6 +220,8 @@ export default function Logo() {
           style={{
             left: effect.x,
             top: effect.y,
+            width: popupSize,
+            height: popupSize,
           }}
           alt=""
         />

@@ -1,15 +1,10 @@
 .logo-container {
   position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 
-  width: 60vw;
   height: auto;
-
   z-index: 9998;
-  pointer-events: auto;
 
+  pointer-events: auto;
   cursor: grab;
 }
 
@@ -45,9 +40,6 @@
   position: fixed;
   pointer-events: none;
   z-index: 9998;
-
-  width: 3vw;
-  height: 3vw;
 
   transform: translate(-50%, -50%);
   opacity: 1;
