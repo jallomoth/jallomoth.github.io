@@ -1,5 +1,8 @@
-html {
+html,
+body {
   cursor: none !important;
+  height: auto;
+  overflow-y: auto;
 }
 
 :root {
@@ -55,7 +58,6 @@ a:hover,
 body {
   margin: 0;
   background: var(--bg);
-  overflow: hidden;
   cursor: none !important;
 }
 

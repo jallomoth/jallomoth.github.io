@@ -1,0 +1,124 @@
+:root {
+  --ui-top-space: 8vw;      /* total fade zone */
+  --gallery-offset: 1vw;    /* spacing below UI */
+  --ui-side-space: 5vw;
+}
+
+/* -----------------------------
+   SCROLL CONTAINER
+----------------------------- */
+
+.gallery-scroll {
+  position: fixed;
+  inset: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-top: calc(var(--ui-top-space) + var(--gallery-offset));
+
+  /* 🔥 OFFSET FADE TO START BELOW UI */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ui-top-space) - 1vw),
+    rgba(0, 0, 0, 0.6) var(--ui-top-space),
+    black calc(var(--ui-top-space) + 1vw),
+    black 100%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ui-top-space) - 1vw),
+    rgba(0, 0, 0, 0.6) var(--ui-top-space),
+    black calc(var(--ui-top-space) + 1vw),
+    black 100%
+  );
+}
+
+/* -----------------------------
+   GALLERY
+----------------------------- */
+
+.gallery-container {
+  column-count: 4;
+  column-gap: 2vw;
+
+  width: 90%;
+  margin: 0 auto 4vw auto;
+
+  padding-left: var(--ui-side-space);
+  padding-right: var(--ui-side-space);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .gallery-container {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 800px) {
+  .gallery-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 500px) {
+  .gallery-container {
+    column-count: 1;
+  }
+}
+
+/* -----------------------------
+   ITEMS
+----------------------------- */
+
+.gallery-item {
+  break-inside: avoid;
+  margin-bottom: 2vw;
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.gallery-item.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* -----------------------------
+   IMAGE
+----------------------------- */
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+
+  border-radius: 14px;
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.03);
+  filter: brightness(1.1);
+}
+
+/* -----------------------------
+   TEXT
+----------------------------- */
+
+.gallery-item p {
+  margin-top: 0.6vw;
+  text-align: center;
+  font-size: 0.9vw;
+  color: #ffffffcc;
+  font-family: "Arial", sans-serif;
+}
