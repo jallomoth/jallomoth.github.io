@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // Store the current path (without trailing slash) for the SPA to use
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/' && !currentPath.endsWith('.html')) {
+            sessionStorage.redirect = currentPath;
+            // Redirect to the index.html
+            window.location.replace('/index.html');
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

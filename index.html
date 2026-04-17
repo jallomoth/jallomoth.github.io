@@ -39,10 +39,22 @@
     <link rel="preload" href="/back/BackArrowSelect.png" as="image">
 
     <title>Jallomoth</title>
-    <script type="module" crossorigin src="/assets/index-D0ec3bok.js"></script>
+    <script type="module" crossorigin src="/assets/index-CJntIBR8.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-DrqjAfXv.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Handle GitHub Pages SPA routing for 404 redirects
+      (function() {
+        const redirect = sessionStorage.redirect;
+        if (redirect) {
+          delete sessionStorage.redirect;
+          // Remove trailing slash for consistency
+          const cleanPath = redirect.endsWith('/') && redirect !== '/' ? redirect.slice(0, -1) : redirect;
+          window.history.replaceState(null, null, cleanPath);
+        }
+      })();
+    </script>
   </body>
 </html>
