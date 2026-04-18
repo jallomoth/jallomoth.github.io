@@ -1,6 +1,6 @@
 :root {
-  --ui-top-space: 8vw;      /* total fade zone */
-  --gallery-offset: 1vw;    /* spacing below UI */
+  --ui-top-space: 8vw;
+  --gallery-offset: 1vw;
   --ui-side-space: 5vw;
 }
 
@@ -17,7 +17,6 @@
 
   padding-top: calc(var(--ui-top-space) + var(--gallery-offset));
 
-  /* OFFSET FADE TO START BELOW UI */
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
@@ -52,7 +51,6 @@
   padding-right: var(--ui-side-space);
 }
 
-/* Responsive */
 @media (max-width: 1200px) {
   .gallery-container {
     column-count: 3;
@@ -80,34 +78,80 @@
   margin-bottom: 2vw;
 
   opacity: 0;
-  transform: translateY(20px) scale(0.95);
 
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translate3d(0, 20px, 0) scale(0.95);
+
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease;
+
+  will-change: transform;
 }
 
 .gallery-item.show {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* LIFT (container only now) */
+.gallery-item:hover {
+  transform: translate3d(0, -0.6vw, 0) scale(1.02);
+
+  box-shadow:
+    0 1vw 2vw rgba(0, 0, 0, 0.35),
+    0 0.2vw 0.6vw rgba(0, 0, 0, 0.25);
 }
 
 /* -----------------------------
-   IMAGE
+   TILT SYSTEM
+----------------------------- */
+
+.tilt-outer {
+  width: 100%;
+  perspective: 800px;
+}
+
+.tilt-inner {
+  width: 100%;
+  height: auto;
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  /* CRITICAL: base transform */
+  transform: rotateX(0deg) rotateY(0deg) scale(1) translateZ(0);
+
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.25s ease;
+
+  will-change: transform;
+}
+
+/* -----------------------------
+   IMAGE (FIXED SMOOTH SCALE)
 ----------------------------- */
 
 .gallery-item img {
   width: 100%;
   height: auto;
 
+  display: block;
   border-radius: 14px;
 
   user-select: none;
   -webkit-user-drag: none;
 
-  transition: transform 0.25s ease, filter 0.25s ease;
+  transform: translateZ(0);
+
+  /* IMPORTANT: remove scale from here */
+  transition: filter 0.25s ease;
 }
 
-.gallery-item:hover img {
-  transform: scale(1.03);
+/* hover brightness only (scale handled by wrapper now) */
+.gallery-item:hover .tilt-inner {
+  transform: scale(1.05) translateZ(0);
   filter: brightness(1.1);
 }
 
@@ -121,6 +165,12 @@
   font-size: 0.9vw;
   color: #ffffffcc;
   font-family: "Arial", sans-serif;
+
+  transition: color 0.25s ease;
+}
+
+.gallery-item:hover p {
+  color: #ffffff;
 }
 
 /* -----------------------------
@@ -129,15 +179,16 @@
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
+  backdrop-filter: blur(6px);
 }
 
 .modal-content {
@@ -150,23 +201,37 @@
   position: absolute;
   object-fit: contain;
   border-radius: 14px;
-  transition: top 0.5s ease, left 0.5s ease, width 0.5s ease, height 0.5s ease;
+
+  transition:
+    top 0.5s ease,
+    left 0.5s ease,
+    width 0.5s ease,
+    height 0.5s ease;
+
   z-index: 1001;
 }
+
+/* -----------------------------
+   CLOSE BUTTON
+----------------------------- */
 
 .close-button {
   position: fixed;
   top: 2vh;
   right: 5.5vw;
+
   background: none;
   border: none;
+
   cursor: pointer;
-  padding: 0;
+
   width: 150px;
   height: 150px;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
   z-index: 1002;
 }
 
@@ -174,12 +239,11 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
 
   user-select: none;
-  -webkit-user-select: none;
   -webkit-user-drag: none;
 }
 
@@ -202,8 +266,4 @@
 
 .close-button:active .close-icon.press {
   opacity: 1;
-}
-
-.close-button::before {
-  content: "×";
 }

@@ -48,20 +48,20 @@ const images = Object.entries(imageModules)
     return a.fileName.localeCompare(b.fileName);
   });
 
-/* -----------------------------
-   COMPONENT
------------------------------ */
-
 export default function ArtGallery() {
   const [visibleCount, setVisibleCount] = useState(0);
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [finalImagePosition, setFinalImagePosition] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const itemRefs = useRef([]);
 
-  // CASCADE LOAD
+  /* -----------------------------
+     CASCADE LOAD
+  ----------------------------- */
   useEffect(() => {
     let i = 0;
 
@@ -75,98 +75,134 @@ export default function ArtGallery() {
     return () => clearInterval(interval);
   }, []);
 
-  // MASONRY HEIGHT CALC
-  useEffect(() => {
-    const resizeAll = () => {
-      itemRefs.current.forEach((el) => {
-        if (!el) return;
+  /* -----------------------------
+     3D TILT
+  ----------------------------- */
+  const handleMouseMove = (e, index) => {
+    const el = itemRefs.current[index];
+    if (!el) return;
 
-        const rowHeight = 10; // must match CSS
-        const rowGap = 16; // approx 1vw fallback
+    const rect = el.getBoundingClientRect();
 
-        const height = el.querySelector("img")?.getBoundingClientRect().height || 0;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-        const span = Math.ceil((height + rowGap) / rowHeight);
+    const midX = rect.width / 2;
+    const midY = rect.height / 2;
 
-        el.style.gridRowEnd = `span ${span}`;
-      });
-    };
+    const rotateY = ((x - midX) / midX) * 8;
+    const rotateX = ((midY - y) / midY) * 8;
 
-    // run after images load
-    setTimeout(resizeAll, 100);
+    const inner = el.querySelector(".tilt-inner");
 
-    window.addEventListener("resize", resizeAll);
-    return () => window.removeEventListener("resize", resizeAll);
-  }, []);
-
-  const handleImageClick = (img, index) => {
-    const imgElement = itemRefs.current[index]?.querySelector("img");
-    if (imgElement) {
-      const rect = imgElement.getBoundingClientRect();
-      const naturalWidth = imgElement.naturalWidth || rect.width;
-      const naturalHeight = imgElement.naturalHeight || rect.height;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const maxWidth = viewportWidth * 0.9;
-      const maxHeight = viewportHeight * 0.9;
-      const aspectRatio = naturalWidth / naturalHeight;
-
-      let targetWidth = naturalWidth;
-      let targetHeight = naturalHeight;
-
-      if (targetWidth > maxWidth) {
-        targetWidth = maxWidth;
-        targetHeight = targetWidth / aspectRatio;
-      }
-
-      if (targetHeight > maxHeight) {
-        targetHeight = maxHeight;
-        targetWidth = targetHeight * aspectRatio;
-      }
-
-      const targetLeft = (viewportWidth - targetWidth) / 2;
-      const targetTop = (viewportHeight - targetHeight) / 2;
-
-      setImagePosition({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-      });
-      setFinalImagePosition({
-        top: targetTop,
-        left: targetLeft,
-        width: targetWidth,
-        height: targetHeight,
-      });
-      setSelectedImage(img);
-      setSelectedIndex(index);
-      setTimeout(() => setIsModalOpen(true), 10);
+    if (inner) {
+      inner.style.transform = `
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        scale(1.05)
+        translateZ(0)
+      `;
     }
+  };
+
+  const handleMouseLeave = (index) => {
+    const el = itemRefs.current[index];
+    if (!el) return;
+
+    const inner = el.querySelector(".tilt-inner");
+
+    if (inner) {
+      inner.style.transform = `
+        rotateX(0deg)
+        rotateY(0deg)
+        scale(1)
+        translateZ(0)
+      `;
+    }
+  };
+
+  /* -----------------------------
+     CLICK → MODAL
+  ----------------------------- */
+  const handleImageClick = (img, index) => {
+    const el = itemRefs.current[index];
+    if (!el) return;
+
+    const imgElement = el.querySelector("img");
+    if (!imgElement) return;
+
+    const rect = imgElement.getBoundingClientRect();
+
+    const naturalWidth = imgElement.naturalWidth || rect.width;
+    const naturalHeight = imgElement.naturalHeight || rect.height;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const maxW = vw * 0.9;
+    const maxH = vh * 0.9;
+
+    const ratio = naturalWidth / naturalHeight;
+
+    let targetW = naturalWidth;
+    let targetH = naturalHeight;
+
+    if (targetW > maxW) {
+      targetW = maxW;
+      targetH = targetW / ratio;
+    }
+
+    if (targetH > maxH) {
+      targetH = maxH;
+      targetW = targetH * ratio;
+    }
+
+    setImagePosition({
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    });
+
+    setFinalImagePosition({
+      top: (vh - targetH) / 2,
+      left: (vw - targetW) / 2,
+      width: targetW,
+      height: targetH,
+    });
+
+    setSelectedImage(img);
+    setSelectedIndex(index);
+
+    setTimeout(() => setIsModalOpen(true), 10);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  // Effect to handle modal close after animation
   useEffect(() => {
     if (selectedImage && !isModalOpen) {
-      const timer = setTimeout(() => {
+      const t = setTimeout(() => {
         setSelectedImage(null);
         setImagePosition(null);
         setSelectedIndex(null);
       }, 500);
-      return () => clearTimeout(timer);
+
+      return () => clearTimeout(t);
     }
   }, [isModalOpen, selectedImage]);
 
-  const modalStyle = imagePosition
-    ? isModalOpen && finalImagePosition
-      ? finalImagePosition
-      : imagePosition
-    : {};
+  const modalStyle =
+    imagePosition && finalImagePosition
+      ? isModalOpen
+        ? finalImagePosition
+        : imagePosition
+      : {};
 
+  /* -----------------------------
+     RENDER
+  ----------------------------- */
   return (
     <>
       <Logo top="1.5vw" left="50%" width="20vw" center />
@@ -181,46 +217,57 @@ export default function ArtGallery() {
               className={`gallery-item ${
                 index < visibleCount ? "show" : ""
               }`}
-              style={{
-                transitionDelay: `${index * 40}ms`,
-              }}
+              style={{ transitionDelay: `${index * 40}ms` }}
+              onMouseMove={(e) => handleMouseMove(e, index)}
+              onMouseLeave={() => handleMouseLeave(index)}
             >
-              <img 
-                src={img.src} 
-                alt={img.label} 
-                draggable="false" 
-                onClick={() => handleImageClick(img, index)}
-                style={{ 
-                  cursor: 'pointer',
-                  opacity: selectedIndex === index ? 0 : 1,
-                  transition: 'opacity 0.3s ease'
-                }}
-              />
+              {/* ✅ FIXED CLICK + TILT */}
+              <div className="tilt-outer">
+                <div
+                  className="tilt-inner"
+                  onClick={() => handleImageClick(img, index)}
+                  style={{
+                    cursor: "pointer",
+                    opacity: selectedIndex === index ? 0 : 1,
+                  }}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.label}
+                    draggable="false"
+                  />
+                </div>
+              </div>
+
               <p>{img.label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Modal Overlay */}
+      {/* MODAL */}
       {selectedImage && imagePosition && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <img 
-              src={selectedImage.src} 
-              alt={selectedImage.label} 
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={selectedImage.src}
+              alt={selectedImage.label}
               className="modal-image"
               style={{
-                top: `${modalStyle.top}px`,
-                left: `${modalStyle.left}px`,
-                width: `${modalStyle.width}px`,
-                height: `${modalStyle.height}px`,
+                top: modalStyle.top,
+                left: modalStyle.left,
+                width: modalStyle.width,
+                height: modalStyle.height,
               }}
             />
+
             <button className="close-button" onClick={handleCloseModal}>
-              <img src="/x/x.png" alt="Close" className="close-icon default" />
-              <img src="/x/x-hover.png" alt="Close" className="close-icon hover" />
-              <img src="/x/x-press.png" alt="Close" className="close-icon press" />
+              <img src="/x/x.png" className="close-icon default" />
+              <img src="/x/x-hover.png" className="close-icon hover" />
+              <img src="/x/x-press.png" className="close-icon press" />
             </button>
           </div>
         </div>
