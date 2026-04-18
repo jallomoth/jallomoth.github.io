@@ -266,9 +266,9 @@ export default function ArtGallery() {
             />
 
             <button className="close-button" onClick={handleCloseModal}>
-              <img src="/x/x.png" className="close-icon default" />
-              <img src="/x/x-hover.png" className="close-icon hover" />
-              <img src="/x/x-press.png" className="close-icon press" />
+              <img src="/x/x.png" className="close-icon default" draggable={false} />
+              <img src="/x/x-hover.png" className="close-icon hover" draggable={false} />
+              <img src="/x/x-press.png" className="close-icon press" draggable={false} />
             </button>
           </div>
         </div>

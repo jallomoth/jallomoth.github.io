@@ -252,6 +252,10 @@
 
   position: absolute;
   inset: 0;
+
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 .close-icon.hover,
