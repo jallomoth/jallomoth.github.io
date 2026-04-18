@@ -1,6 +1,6 @@
 :root {
   --ui-top-space: 8vw;
-  --gallery-offset: 1vw;
+  --gallery-offset: 2vw;
   --ui-side-space: 5vw;
 }
 
@@ -83,8 +83,7 @@
 
   transition:
     opacity 0.4s ease,
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.4s ease;
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
   will-change: transform;
 }
@@ -94,43 +93,37 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* LIFT (container only now) */
-.gallery-item:hover {
-  transform: translate3d(0, -0.6vw, 0) scale(1.02);
-
-  box-shadow:
-    0 1vw 2vw rgba(0, 0, 0, 0.35),
-    0 0.2vw 0.6vw rgba(0, 0, 0, 0.25);
-}
-
 /* -----------------------------
    TILT SYSTEM
 ----------------------------- */
 
 .tilt-outer {
   width: 100%;
-  perspective: 800px;
+  perspective: 900px;
 }
 
 .tilt-inner {
   width: 100%;
   height: auto;
 
-  border-radius: 14px;
-  overflow: hidden;
+  transform-style: preserve-3d;
 
-  /* CRITICAL: base transform */
   transform: rotateX(0deg) rotateY(0deg) scale(1) translateZ(0);
 
   transition:
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
     filter 0.25s ease;
 
   will-change: transform;
 }
 
+.gallery-item:hover .tilt-inner {
+  transform: scale(1.05) translateZ(0);
+  filter: brightness(1.1);
+}
+
 /* -----------------------------
-   IMAGE (FIXED SMOOTH SCALE)
+   IMAGE
 ----------------------------- */
 
 .gallery-item img {
@@ -138,21 +131,9 @@
   height: auto;
 
   display: block;
-  border-radius: 14px;
 
   user-select: none;
   -webkit-user-drag: none;
-
-  transform: translateZ(0);
-
-  /* IMPORTANT: remove scale from here */
-  transition: filter 0.25s ease;
-}
-
-/* hover brightness only (scale handled by wrapper now) */
-.gallery-item:hover .tilt-inner {
-  transform: scale(1.05) translateZ(0);
-  filter: brightness(1.1);
 }
 
 /* -----------------------------
@@ -174,22 +155,40 @@
 }
 
 /* -----------------------------
-   MODAL
+   MODAL OVERLAY
 ----------------------------- */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
 
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+
+  z-index: 9998;
 
   display: flex;
   justify-content: center;
   align-items: center;
 
+  transition:
+    background 0.4s ease,
+    backdrop-filter 0.4s ease;
+}
+
+.modal-overlay.open {
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(6px);
 }
+
+.modal-overlay.closing {
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+}
+
+/* -----------------------------
+   MODAL CONTENT
+----------------------------- */
 
 .modal-content {
   position: relative;
@@ -200,13 +199,12 @@
 .modal-image {
   position: absolute;
   object-fit: contain;
-  border-radius: 14px;
 
   transition:
-    top 0.5s ease,
-    left 0.5s ease,
-    width 0.5s ease,
-    height 0.5s ease;
+    top 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 
   z-index: 1001;
 }
@@ -233,7 +231,24 @@
   align-items: center;
 
   z-index: 1002;
+
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
+
+/* fade in when open */
+.modal-overlay.open .close-button {
+  opacity: 1;
+}
+
+/* fade out when closing */
+.modal-overlay.closing .close-button {
+  opacity: 0;
+}
+
+/* -----------------------------
+   CLOSE ICON STATES
+----------------------------- */
 
 .close-icon {
   width: 100%;

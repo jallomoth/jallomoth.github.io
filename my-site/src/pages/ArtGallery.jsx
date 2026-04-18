@@ -5,17 +5,6 @@ import BackButton from "../components/BackButton";
 import "./ArtGallery.css";
 
 /* -----------------------------
-   ORDER
------------------------------ */
-const IMAGE_ORDER = [
-  "G4vj9YFWgAAUlRO",
-  "apesin",
-  "apesrt",
-  "apestl",
-  "971572",
-];
-
-/* -----------------------------
    LOAD IMAGES
 ----------------------------- */
 const imageModules = import.meta.glob(
@@ -23,30 +12,22 @@ const imageModules = import.meta.glob(
   { eager: true }
 );
 
-const images = Object.entries(imageModules)
-  .map(([path, mod]) => {
-    const fileName = path.split("/").pop().split(".")[0];
+const images = Object.entries(imageModules).map(([path, mod]) => {
+  const fileName = path.split("/").pop().split(".")[0];
 
-    const label = fileName
-      .replace(/[-_]/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+  const label = fileName
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 
-    return {
-      src: mod.default,
-      label,
-      fileName,
-    };
-  })
-  .sort((a, b) => {
-    const aIndex = IMAGE_ORDER.indexOf(a.fileName);
-    const bIndex = IMAGE_ORDER.indexOf(b.fileName);
+  return {
+    src: mod.default,
+    label,
+  };
+});
 
-    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-    if (aIndex !== -1) return -1;
-    if (bIndex !== -1) return 1;
-
-    return a.fileName.localeCompare(b.fileName);
-  });
+/* -----------------------------
+   COMPONENT
+----------------------------- */
 
 export default function ArtGallery() {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -54,10 +35,13 @@ export default function ArtGallery() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [finalImagePosition, setFinalImagePosition] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const itemRefs = useRef([]);
+  const tiltRefs = useRef([]);
+  const tiltState = useRef({}); // per-index tilt data
 
   /* -----------------------------
      CASCADE LOAD
@@ -68,7 +52,6 @@ export default function ArtGallery() {
     const interval = setInterval(() => {
       i++;
       setVisibleCount(i);
-
       if (i >= images.length) clearInterval(interval);
     }, 60);
 
@@ -76,65 +59,79 @@ export default function ArtGallery() {
   }, []);
 
   /* -----------------------------
-     3D TILT
+     LERP LOOP
   ----------------------------- */
-  const handleMouseMove = (e, index) => {
-    const el = itemRefs.current[index];
+  useEffect(() => {
+    let frame;
+
+    const animate = () => {
+      Object.keys(tiltState.current).forEach((key) => {
+        const state = tiltState.current[key];
+        const el = tiltRefs.current[key];
+        if (!state || !el) return;
+
+        // lerp toward target
+        state.currentX += (state.targetX - state.currentX) * 0.12;
+        state.currentY += (state.targetY - state.currentY) * 0.12;
+
+        el.style.transform = `
+          rotateX(${state.currentX}deg)
+          rotateY(${state.currentY}deg)
+          scale(1.05)
+          translateZ(0)
+        `;
+      });
+
+      frame = requestAnimationFrame(animate);
+    };
+
+    animate();
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  /* -----------------------------
+     TILT HANDLERS
+  ----------------------------- */
+  const handleTilt = (e, index) => {
+    const el = tiltRefs.current[index];
     if (!el) return;
 
     const rect = el.getBoundingClientRect();
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
 
-    const midX = rect.width / 2;
-    const midY = rect.height / 2;
+    const rotateY = (x - 0.5) * 14;
+    const rotateX = (0.5 - y) * 14;
 
-    const rotateY = ((x - midX) / midX) * 8;
-    const rotateX = ((midY - y) / midY) * 8;
-
-    const inner = el.querySelector(".tilt-inner");
-
-    if (inner) {
-      inner.style.transform = `
-        rotateX(${rotateX}deg)
-        rotateY(${rotateY}deg)
-        scale(1.05)
-        translateZ(0)
-      `;
+    if (!tiltState.current[index]) {
+      tiltState.current[index] = {
+        currentX: 0,
+        currentY: 0,
+        targetX: 0,
+        targetY: 0,
+      };
     }
+
+    tiltState.current[index].targetX = rotateX;
+    tiltState.current[index].targetY = rotateY;
   };
 
-  const handleMouseLeave = (index) => {
-    const el = itemRefs.current[index];
-    if (!el) return;
+  const resetTilt = (index) => {
+    if (!tiltState.current[index]) return;
 
-    const inner = el.querySelector(".tilt-inner");
-
-    if (inner) {
-      inner.style.transform = `
-        rotateX(0deg)
-        rotateY(0deg)
-        scale(1)
-        translateZ(0)
-      `;
-    }
+    tiltState.current[index].targetX = 0;
+    tiltState.current[index].targetY = 0;
   };
 
   /* -----------------------------
-     CLICK → MODAL
+     IMAGE CLICK
   ----------------------------- */
   const handleImageClick = (img, index) => {
-    const el = itemRefs.current[index];
-    if (!el) return;
+    const imgEl = itemRefs.current[index]?.querySelector("img");
+    if (!imgEl) return;
 
-    const imgElement = el.querySelector("img");
-    if (!imgElement) return;
-
-    const rect = imgElement.getBoundingClientRect();
-
-    const naturalWidth = imgElement.naturalWidth || rect.width;
-    const naturalHeight = imgElement.naturalHeight || rect.height;
+    const rect = imgEl.getBoundingClientRect();
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -142,20 +139,23 @@ export default function ArtGallery() {
     const maxW = vw * 0.9;
     const maxH = vh * 0.9;
 
-    const ratio = naturalWidth / naturalHeight;
+    const aspect = rect.width / rect.height;
 
-    let targetW = naturalWidth;
-    let targetH = naturalHeight;
+    let w = rect.width;
+    let h = rect.height;
 
-    if (targetW > maxW) {
-      targetW = maxW;
-      targetH = targetW / ratio;
+    if (w > maxW) {
+      w = maxW;
+      h = w / aspect;
     }
 
-    if (targetH > maxH) {
-      targetH = maxH;
-      targetW = targetH * ratio;
+    if (h > maxH) {
+      h = maxH;
+      w = h * aspect;
     }
+
+    const left = (vw - w) / 2;
+    const top = (vh - h) / 2;
 
     setImagePosition({
       top: rect.top,
@@ -165,44 +165,39 @@ export default function ArtGallery() {
     });
 
     setFinalImagePosition({
-      top: (vh - targetH) / 2,
-      left: (vw - targetW) / 2,
-      width: targetW,
-      height: targetH,
+      top,
+      left,
+      width: w,
+      height: h,
     });
 
     setSelectedImage(img);
-    setSelectedIndex(index);
 
-    setTimeout(() => setIsModalOpen(true), 10);
+    requestAnimationFrame(() => {
+      setIsModalOpen(true);
+    });
   };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  useEffect(() => {
-    if (selectedImage && !isModalOpen) {
-      const t = setTimeout(() => {
-        setSelectedImage(null);
-        setImagePosition(null);
-        setSelectedIndex(null);
-      }, 500);
-
-      return () => clearTimeout(t);
-    }
-  }, [isModalOpen, selectedImage]);
-
-  const modalStyle =
-    imagePosition && finalImagePosition
-      ? isModalOpen
-        ? finalImagePosition
-        : imagePosition
-      : {};
 
   /* -----------------------------
-     RENDER
+     CLOSE MODAL
   ----------------------------- */
+  const handleCloseModal = () => {
+    setIsClosing(true);
+    setIsModalOpen(false);
+
+    setTimeout(() => {
+      setSelectedImage(null);
+      setImagePosition(null);
+      setFinalImagePosition(null);
+      setIsClosing(false);
+    }, 500);
+  };
+
+  const modalStyle =
+    isModalOpen && finalImagePosition
+      ? finalImagePosition
+      : imagePosition || {};
+
   return (
     <>
       <Logo top="1.5vw" left="50%" width="20vw" center />
@@ -218,23 +213,25 @@ export default function ArtGallery() {
                 index < visibleCount ? "show" : ""
               }`}
               style={{ transitionDelay: `${index * 40}ms` }}
-              onMouseMove={(e) => handleMouseMove(e, index)}
-              onMouseLeave={() => handleMouseLeave(index)}
             >
-              {/* ✅ FIXED CLICK + TILT */}
-              <div className="tilt-outer">
+              <div
+                className="tilt-outer"
+                onMouseMove={(e) => handleTilt(e, index)}
+                onMouseLeave={() => resetTilt(index)}
+              >
                 <div
                   className="tilt-inner"
-                  onClick={() => handleImageClick(img, index)}
-                  style={{
-                    cursor: "pointer",
-                    opacity: selectedIndex === index ? 0 : 1,
-                  }}
+                  ref={(el) => (tiltRefs.current[index] = el)}
                 >
                   <img
                     src={img.src}
                     alt={img.label}
                     draggable="false"
+                    onClick={() => handleImageClick(img, index)}
+                    style={{
+                      cursor: "pointer",
+                      opacity: selectedImage === img ? 0 : 1,
+                    }}
                   />
                 </div>
               </div>
@@ -245,16 +242,19 @@ export default function ArtGallery() {
         </div>
       </div>
 
-      {/* MODAL */}
-      {selectedImage && imagePosition && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
+      {(selectedImage || isClosing) && imagePosition && (
+        <div
+          className={`modal-overlay ${
+            isModalOpen ? "open" : "closing"
+          }`}
+          onClick={handleCloseModal}
+        >
           <div
             className="modal-content"
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={selectedImage.src}
-              alt={selectedImage.label}
+              src={selectedImage?.src}
               className="modal-image"
               style={{
                 top: modalStyle.top,
