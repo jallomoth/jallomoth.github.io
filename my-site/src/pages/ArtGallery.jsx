@@ -5,6 +5,17 @@ import BackButton from "../components/BackButton";
 import "./ArtGallery.css";
 
 /* -----------------------------
+   ORDER
+----------------------------- */
+const IMAGE_ORDER = [
+  "G4vj9YFWgAAUlRO",
+  "apesin",
+  "apesrt",
+  "apestl",
+  "971572",
+];
+
+/* -----------------------------
    LOAD IMAGES
 ----------------------------- */
 const imageModules = import.meta.glob(
@@ -12,22 +23,30 @@ const imageModules = import.meta.glob(
   { eager: true }
 );
 
-const images = Object.entries(imageModules).map(([path, mod]) => {
-  const fileName = path.split("/").pop().split(".")[0];
+const images = Object.entries(imageModules)
+  .map(([path, mod]) => {
+    const fileName = path.split("/").pop().split(".")[0];
 
-  const label = fileName
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    const label = fileName
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
 
-  return {
-    src: mod.default,
-    label,
-  };
-});
+    return {
+      src: mod.default,
+      label,
+      fileName,
+    };
+  })
+  .sort((a, b) => {
+    const aIndex = IMAGE_ORDER.indexOf(a.fileName);
+    const bIndex = IMAGE_ORDER.indexOf(b.fileName);
 
-/* -----------------------------
-   COMPONENT
------------------------------ */
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+
+    return a.fileName.localeCompare(b.fileName);
+  });
 
 export default function ArtGallery() {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -35,20 +54,16 @@ export default function ArtGallery() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [finalImagePosition, setFinalImagePosition] = useState(null);
-
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
 
   const itemRefs = useRef([]);
-  const tiltRefs = useRef([]);
-  const tiltState = useRef({}); // per-index tilt data
 
   /* -----------------------------
      CASCADE LOAD
   ----------------------------- */
   useEffect(() => {
     let i = 0;
-
     const interval = setInterval(() => {
       i++;
       setVisibleCount(i);
@@ -59,103 +74,87 @@ export default function ArtGallery() {
   }, []);
 
   /* -----------------------------
-     LERP LOOP
+     3D TILT
   ----------------------------- */
-  useEffect(() => {
-    let frame;
-
-    const animate = () => {
-      Object.keys(tiltState.current).forEach((key) => {
-        const state = tiltState.current[key];
-        const el = tiltRefs.current[key];
-        if (!state || !el) return;
-
-        // lerp toward target
-        state.currentX += (state.targetX - state.currentX) * 0.12;
-        state.currentY += (state.targetY - state.currentY) * 0.12;
-
-        el.style.transform = `
-          rotateX(${state.currentX}deg)
-          rotateY(${state.currentY}deg)
-          scale(1.05)
-          translateZ(0)
-        `;
-      });
-
-      frame = requestAnimationFrame(animate);
-    };
-
-    animate();
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  /* -----------------------------
-     TILT HANDLERS
-  ----------------------------- */
-  const handleTilt = (e, index) => {
-    const el = tiltRefs.current[index];
+  const handleMouseMove = (e, index) => {
+    const el = itemRefs.current[index];
     if (!el) return;
+
+    const inner = el.querySelector(".tilt-inner");
+    if (!inner) return;
 
     const rect = el.getBoundingClientRect();
 
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-    const rotateY = (x - 0.5) * 14;
-    const rotateX = (0.5 - y) * 14;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
 
-    if (!tiltState.current[index]) {
-      tiltState.current[index] = {
-        currentX: 0,
-        currentY: 0,
-        targetX: 0,
-        targetY: 0,
-      };
-    }
+    const rotateY = ((x - centerX) / centerX) * 8;
+    const rotateX = -((y - centerY) / centerY) * 8;
 
-    tiltState.current[index].targetX = rotateX;
-    tiltState.current[index].targetY = rotateY;
+    inner.style.transform = `
+      rotateX(${rotateX}deg)
+      rotateY(${rotateY}deg)
+      scale(1.05)
+    `;
   };
 
-  const resetTilt = (index) => {
-    if (!tiltState.current[index]) return;
+  const handleMouseLeave = (index) => {
+    const el = itemRefs.current[index];
+    if (!el) return;
 
-    tiltState.current[index].targetX = 0;
-    tiltState.current[index].targetY = 0;
+    const inner = el.querySelector(".tilt-inner");
+    if (!inner) return;
+
+    inner.style.transform = `
+      rotateX(0deg)
+      rotateY(0deg)
+      scale(1)
+    `;
   };
 
   /* -----------------------------
-     IMAGE CLICK
+     CLICK IMAGE (SEAMLESS + GROW)
   ----------------------------- */
   const handleImageClick = (img, index) => {
-    const imgEl = itemRefs.current[index]?.querySelector("img");
-    if (!imgEl) return;
+    const imgElement = itemRefs.current[index]?.querySelector("img");
+    if (!imgElement) return;
 
-    const rect = imgEl.getBoundingClientRect();
+    // instant hide (prevents initial flicker)
+    imgElement.style.opacity = "0";
 
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const rect = imgElement.getBoundingClientRect();
 
-    const maxW = vw * 0.9;
-    const maxH = vh * 0.9;
+    const naturalWidth = imgElement.naturalWidth || rect.width;
+    const naturalHeight = imgElement.naturalHeight || rect.height;
 
-    const aspect = rect.width / rect.height;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-    let w = rect.width;
-    let h = rect.height;
+    const maxWidth = viewportWidth * 0.9;
+    const maxHeight = viewportHeight * 0.9;
 
-    if (w > maxW) {
-      w = maxW;
-      h = w / aspect;
+    const aspectRatio = naturalWidth / naturalHeight;
+
+    const SCALE_UP = 1.2;
+
+    let targetWidth = naturalWidth * SCALE_UP;
+    let targetHeight = naturalHeight * SCALE_UP;
+
+    if (targetWidth > maxWidth) {
+      targetWidth = maxWidth;
+      targetHeight = targetWidth / aspectRatio;
     }
 
-    if (h > maxH) {
-      h = maxH;
-      w = h * aspect;
+    if (targetHeight > maxHeight) {
+      targetHeight = maxHeight;
+      targetWidth = targetHeight * aspectRatio;
     }
 
-    const left = (vw - w) / 2;
-    const top = (vh - h) / 2;
+    const targetLeft = (viewportWidth - targetWidth) / 2;
+    const targetTop = (viewportHeight - targetHeight) / 2;
 
     setImagePosition({
       top: rect.top,
@@ -165,38 +164,43 @@ export default function ArtGallery() {
     });
 
     setFinalImagePosition({
-      top,
-      left,
-      width: w,
-      height: h,
+      top: targetTop,
+      left: targetLeft,
+      width: targetWidth,
+      height: targetHeight,
     });
 
     setSelectedImage(img);
+    setSelectedIndex(index);
 
-    requestAnimationFrame(() => {
-      setIsModalOpen(true);
-    });
+    setTimeout(() => setIsModalOpen(true), 10);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   /* -----------------------------
-     CLOSE MODAL
+     CLEANUP AFTER CLOSE
   ----------------------------- */
-  const handleCloseModal = () => {
-    setIsClosing(true);
-    setIsModalOpen(false);
+  useEffect(() => {
+    if (selectedImage && !isModalOpen) {
+      const timer = setTimeout(() => {
+        setSelectedImage(null);
+        setImagePosition(null);
+        setSelectedIndex(null);
+      }, 500);
 
-    setTimeout(() => {
-      setSelectedImage(null);
-      setImagePosition(null);
-      setFinalImagePosition(null);
-      setIsClosing(false);
-    }, 500);
-  };
+      return () => clearTimeout(timer);
+    }
+  }, [isModalOpen, selectedImage]);
 
   const modalStyle =
-    isModalOpen && finalImagePosition
-      ? finalImagePosition
-      : imagePosition || {};
+    imagePosition
+      ? isModalOpen && finalImagePosition
+        ? finalImagePosition
+        : imagePosition
+      : {};
 
   return (
     <>
@@ -213,16 +217,11 @@ export default function ArtGallery() {
                 index < visibleCount ? "show" : ""
               }`}
               style={{ transitionDelay: `${index * 40}ms` }}
+              onMouseMove={(e) => handleMouseMove(e, index)}
+              onMouseLeave={() => handleMouseLeave(index)}
             >
-              <div
-                className="tilt-outer"
-                onMouseMove={(e) => handleTilt(e, index)}
-                onMouseLeave={() => resetTilt(index)}
-              >
-                <div
-                  className="tilt-inner"
-                  ref={(el) => (tiltRefs.current[index] = el)}
-                >
+              <div className="tilt-outer">
+                <div className="tilt-inner">
                   <img
                     src={img.src}
                     alt={img.label}
@@ -230,7 +229,12 @@ export default function ArtGallery() {
                     onClick={() => handleImageClick(img, index)}
                     style={{
                       cursor: "pointer",
-                      opacity: selectedImage === img ? 0 : 1,
+
+                      // CRITICAL: keep hidden while modal active
+                      opacity:
+                        selectedIndex === index && selectedImage ? 0 : 1,
+
+                      transition: "none",
                     }}
                   />
                 </div>
@@ -242,25 +246,22 @@ export default function ArtGallery() {
         </div>
       </div>
 
-      {(selectedImage || isClosing) && imagePosition && (
+      {/* MODAL */}
+      {selectedImage && imagePosition && (
         <div
-          className={`modal-overlay ${
-            isModalOpen ? "open" : "closing"
-          }`}
+          className={`modal-overlay ${isModalOpen ? "open" : "closing"}`}
           onClick={handleCloseModal}
         >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <img
-              src={selectedImage?.src}
+              src={selectedImage.src}
+              alt={selectedImage.label}
               className="modal-image"
               style={{
-                top: modalStyle.top,
-                left: modalStyle.left,
-                width: modalStyle.width,
-                height: modalStyle.height,
+                top: `${modalStyle.top}px`,
+                left: `${modalStyle.left}px`,
+                width: `${modalStyle.width}px`,
+                height: `${modalStyle.height}px`,
               }}
             />
 
