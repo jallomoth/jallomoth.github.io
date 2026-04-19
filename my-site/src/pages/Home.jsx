@@ -5,6 +5,10 @@ import ButtonGrid from "../components/ButtonGrid";
 import { useAudio } from "../components/AudioContext";
 
 export default function Home() {
+    useEffect(() => {
+      document.title = "Jallomoth";
+    }, []);
+
   const { startMusic, stopMusic } = useAudio();
 
   useEffect(() => {

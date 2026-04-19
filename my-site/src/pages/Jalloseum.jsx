@@ -1,8 +1,13 @@
+import { useEffect } from "react";
 import '../App.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
 
 export default function Jalloseum() {
+  useEffect(() => {
+    document.title = "Jallomoth — Jalloseum";
+  }, []);
+
   return (
     <>
       <Logo top="1.5vw" left="50%" width="20vw" center={true} />

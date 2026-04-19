@@ -16,7 +16,7 @@ const images = Object.entries(imageModules)
   .map(([path, mod]) => {
     const fileName = path.split("/").pop().split(".")[0];
 
-    // ✅ robust folder detection
+    // robust folder detection
     const parts = path.split("/");
     const folder = parts[parts.length - 2]?.toLowerCase() || "";
 
@@ -84,6 +84,10 @@ const groupedImages = Object.entries(
 });
 
 export default function ArtGallery() {
+  useEffect(() => {
+    document.title = "Jallomoth — Art Gallery";
+  }, []);
+
   const [visibleCount, setVisibleCount] = useState(0);
 
   const [selectedImage, setSelectedImage] = useState(null);

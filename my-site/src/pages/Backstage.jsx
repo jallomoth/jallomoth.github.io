@@ -1,8 +1,13 @@
+import { useEffect } from "react";
 import '../App.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
 
-export default function ArtGallery() {
+export default function Backstage() {
+  useEffect(() => {
+    document.title = "Jallomoth — Backstage";
+  }, []);
+
   return (
     <>
       <Logo top="1.5vw" left="50%" width="20vw" center={true} />
