@@ -5,17 +5,6 @@ import BackButton from "../components/BackButton";
 import "./ArtGallery.css";
 
 /* -----------------------------
-   ORDER
------------------------------ */
-const IMAGE_ORDER = [
-  "G4vj9YFWgAAUlRO",
-  "apesin",
-  "apesrt",
-  "apestl",
-  "971572",
-];
-
-/* -----------------------------
    LOAD IMAGES
 ----------------------------- */
 const imageModules = import.meta.glob(
@@ -27,7 +16,31 @@ const images = Object.entries(imageModules)
   .map(([path, mod]) => {
     const fileName = path.split("/").pop().split(".")[0];
 
-    const label = fileName
+    // ✅ robust folder detection
+    const parts = path.split("/");
+    const folder = parts[parts.length - 2]?.toLowerCase() || "";
+
+    let section = "Unknown";
+
+    if (folder === "hall of fame") {
+      section = "Hall of Fame";
+    } else if (
+      folder === "fools errand" ||
+      folder === "fool's errand"
+    ) {
+      section = "Fool's Errand";
+    } else {
+      const match = path.match(/gallery\/(\d{4})\//);
+      if (match) section = match[1];
+    }
+
+    // clean filename
+    const cleanName = fileName
+      .replace(/\(.*?\)/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const label = cleanName
       .replace(/[-_]/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -35,18 +48,40 @@ const images = Object.entries(imageModules)
       src: mod.default,
       label,
       fileName,
+      section,
     };
   })
-  .sort((a, b) => {
-    const aIndex = IMAGE_ORDER.indexOf(a.fileName);
-    const bIndex = IMAGE_ORDER.indexOf(b.fileName);
+  .sort((a, b) => a.fileName.localeCompare(b.fileName));
 
-    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-    if (aIndex !== -1) return -1;
-    if (bIndex !== -1) return 1;
+/* -----------------------------
+   GROUP + SORT SECTIONS
+----------------------------- */
+const groupedImages = Object.entries(
+  images.reduce((acc, img) => {
+    if (!acc[img.section]) acc[img.section] = [];
+    acc[img.section].push(img);
+    return acc;
+  }, {})
+).sort((a, b) => {
+  const order = {
+    "Hall of Fame": 0,
+    "Fool's Errand": 2,
+  };
 
-    return a.fileName.localeCompare(b.fileName);
-  });
+  const aKey = a[0];
+  const bKey = b[0];
+
+  const aPriority = order[aKey] ?? 1;
+  const bPriority = order[bKey] ?? 1;
+
+  // priority sort
+  if (aPriority !== bPriority) {
+    return aPriority - bPriority;
+  }
+
+  // year sort (descending)
+  return bKey.localeCompare(aKey);
+});
 
 export default function ArtGallery() {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -68,7 +103,7 @@ export default function ArtGallery() {
       i++;
       setVisibleCount(i);
       if (i >= images.length) clearInterval(interval);
-    }, 60);
+    }, 20);
 
     return () => clearInterval(interval);
   }, []);
@@ -116,13 +151,12 @@ export default function ArtGallery() {
   };
 
   /* -----------------------------
-     CLICK IMAGE (SEAMLESS + GROW)
+     CLICK IMAGE
   ----------------------------- */
   const handleImageClick = (img, index) => {
     const imgElement = itemRefs.current[index]?.querySelector("img");
     if (!imgElement) return;
 
-    // instant hide (prevents initial flicker)
     imgElement.style.opacity = "0";
 
     const rect = imgElement.getBoundingClientRect();
@@ -130,18 +164,16 @@ export default function ArtGallery() {
     const naturalWidth = imgElement.naturalWidth || rect.width;
     const naturalHeight = imgElement.naturalHeight || rect.height;
 
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
-    const maxWidth = viewportWidth * 0.9;
-    const maxHeight = viewportHeight * 0.9;
+    const maxWidth = vw * 0.9;
+    const maxHeight = vh * 0.9;
 
     const aspectRatio = naturalWidth / naturalHeight;
 
-    const SCALE_UP = 1.2;
-
-    let targetWidth = naturalWidth * SCALE_UP;
-    let targetHeight = naturalHeight * SCALE_UP;
+    let targetWidth = naturalWidth * 1.2;
+    let targetHeight = naturalHeight * 1.2;
 
     if (targetWidth > maxWidth) {
       targetWidth = maxWidth;
@@ -153,19 +185,10 @@ export default function ArtGallery() {
       targetWidth = targetHeight * aspectRatio;
     }
 
-    const targetLeft = (viewportWidth - targetWidth) / 2;
-    const targetTop = (viewportHeight - targetHeight) / 2;
-
-    setImagePosition({
-      top: rect.top,
-      left: rect.left,
-      width: rect.width,
-      height: rect.height,
-    });
-
+    setImagePosition(rect);
     setFinalImagePosition({
-      top: targetTop,
-      left: targetLeft,
+      top: (vh - targetHeight) / 2,
+      left: (vw - targetWidth) / 2,
       width: targetWidth,
       height: targetHeight,
     });
@@ -176,13 +199,8 @@ export default function ArtGallery() {
     setTimeout(() => setIsModalOpen(true), 10);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleCloseModal = () => setIsModalOpen(false);
 
-  /* -----------------------------
-     CLEANUP AFTER CLOSE
-  ----------------------------- */
   useEffect(() => {
     if (selectedImage && !isModalOpen) {
       const timer = setTimeout(() => {
@@ -202,52 +220,66 @@ export default function ArtGallery() {
         : imagePosition
       : {};
 
+  /* -----------------------------
+     RENDER
+  ----------------------------- */
+
+  let globalIndex = 0;
+
   return (
     <>
-      <Logo top="1.5vw" left="50%" width="25vw" center />
+      <Logo top="1vw" left="50%" width="35vw" center />
       <BackButton />
 
       <div className="gallery-scroll">
-        <div className="gallery-container">
-          {images.map((img, index) => (
-            <div
-              key={index}
-              ref={(el) => (itemRefs.current[index] = el)}
-              className={`gallery-item ${
-                index < visibleCount ? "show" : ""
-              }`}
-              style={{ transitionDelay: `${index * 40}ms` }}
-              onMouseMove={(e) => handleMouseMove(e, index)}
-              onMouseLeave={() => handleMouseLeave(index)}
-            >
-              <div className="tilt-outer">
-                <div className="tilt-inner">
-                  <img
-                    src={img.src}
-                    alt={img.label}
-                    draggable="false"
-                    loading="lazy"
-                    onClick={() => handleImageClick(img, index)}
-                    style={{
-                      cursor: "pointer",
+        {groupedImages.map(([section, imgs]) => (
+          <div key={section} className="gallery-section">
+            <h2 className="gallery-year">{section}</h2>
 
-                      // CRITICAL: keep hidden while modal active
-                      opacity:
-                        selectedIndex === index && selectedImage ? 0 : 1,
+            <div className="gallery-container">
+              {imgs.map((img) => {
+                const index = globalIndex++;
 
-                      transition: "none",
-                    }}
-                  />
-                </div>
-              </div>
+                return (
+                  <div
+                    key={index}
+                    ref={(el) => (itemRefs.current[index] = el)}
+                    className={`gallery-item ${
+                      index < visibleCount ? "show" : ""
+                    }`}
+                    style={{ transitionDelay: `${index * 15}ms` }}
+                    onMouseMove={(e) => handleMouseMove(e, index)}
+                    onMouseLeave={() => handleMouseLeave(index)}
+                  >
+                    <div className="tilt-outer">
+                      <div className="tilt-inner">
+                        <img
+                          src={img.src}
+                          alt={img.label}
+                          draggable="false"
+                          loading="lazy"
+                          onClick={() => handleImageClick(img, index)}
+                          style={{
+                            cursor: "pointer",
+                            opacity:
+                              selectedIndex === index && selectedImage
+                                ? 0
+                                : 1,
+                            transition: "none",
+                          }}
+                        />
+                      </div>
+                    </div>
 
-              <p>{img.label}</p>
+                    <p>{img.label}</p>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
-      {/* MODAL */}
       {selectedImage && imagePosition && (
         <div
           className={`modal-overlay ${isModalOpen ? "open" : "closing"}`}
