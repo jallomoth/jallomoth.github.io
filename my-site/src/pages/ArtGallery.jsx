@@ -23,12 +23,12 @@ const images = Object.entries(imageModules)
     let section = "Unknown";
 
     if (folder === "hall of fame") {
-      section = "Hall of Fame";
+      section = "Hall of Fame !";
     } else if (
       folder === "fools errand" ||
       folder === "fool's errand"
     ) {
-      section = "Fool's Errand";
+      section = "Fool's Errand !";
     } else {
       const match = path.match(/gallery\/(\d{4})\//);
       if (match) section = match[1];
@@ -64,8 +64,8 @@ const groupedImages = Object.entries(
   }, {})
 ).sort((a, b) => {
   const order = {
-    "Hall of Fame": 0,
-    "Fool's Errand": 2,
+    "Hall of Fame !": 0,
+    "Fool's Errand !": 2,
   };
 
   const aKey = a[0];
