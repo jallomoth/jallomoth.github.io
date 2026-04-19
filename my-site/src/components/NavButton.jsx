@@ -26,9 +26,12 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   // threshold
   const DRAG_THRESHOLD = 80;
 
+  /* -----------------------------
+     FIXED NAVIGATION
+  ----------------------------- */
   const navigateTo = () => {
     if (isExternal) {
-      window.location.assign(to);
+      window.open(to, "_blank", "noopener,noreferrer");
     } else {
       navigate(to);
     }
