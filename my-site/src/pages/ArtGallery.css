@@ -123,15 +123,32 @@
 ----------------------------- */
 
 .gallery-item p {
-  margin-top: 0.6vw;
+  margin-top: 1vw;
   text-align: center;
-  font-size: 0.9vw;
-  color: #ffffffcc;
+  font-size: 1.5vw;
+  color: #b3a1ff;
+  /* color: white; */
+  /* text-shadow:
+    0 0 6px rgba(255,255,255,0.6),
+    0 0 12px rgba(255,255,255,0.3); */
 
-  transition: color 0.25s ease;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+
+  transform: scale(1);
+  opacity: 0.8;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    color 0.25s ease;
 }
 
 .gallery-item:hover p {
+  transform: scale(1.05);
+  opacity: 1;
   color: #ffffff;
 }
 

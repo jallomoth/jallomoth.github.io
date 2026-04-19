@@ -39,7 +39,7 @@
 .click-effect {
   position: fixed;
   pointer-events: none;
-  z-index: 9997;
+  z-index: 10000;
 
   transform: translate(-50%, -50%);
   opacity: 1;

@@ -1,10 +1,55 @@
-import { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 
 const AudioContext = createContext();
 
 export function AudioProvider({ children }) {
-  const [volume, setVolume] = useState(0.5);
-  const [muted, setMuted] = useState(false);
+  /* -----------------------------
+     PERSISTED STATE (SAFE)
+  ----------------------------- */
+
+  const [volume, setVolume] = useState(() => {
+    if (typeof window === "undefined") return 0.5;
+
+    const saved = parseFloat(localStorage.getItem("volume"));
+    if (isNaN(saved)) return 0.5;
+
+    return Math.max(0, Math.min(1, saved));
+  });
+
+  const [muted, setMuted] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    const saved = localStorage.getItem("muted");
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+
+  /* -----------------------------
+     SAVE TO LOCALSTORAGE
+  ----------------------------- */
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("volume", volume);
+    }
+  }, [volume]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("muted", JSON.stringify(muted));
+    }
+  }, [muted]);
+
+  /* -----------------------------
+     OTHER STATE
+  ----------------------------- */
+
   const [musicPlaying, setMusicPlaying] = useState(false);
 
   const audioRef = useRef(null);
@@ -15,6 +60,10 @@ export function AudioProvider({ children }) {
   const toggleMute = useCallback(() => setMuted((prev) => !prev), []);
 
   const effectiveVolume = muted ? 0 : volume;
+
+  /* -----------------------------
+     PRELOAD SOUNDS
+  ----------------------------- */
 
   useEffect(() => {
     const sounds = [
@@ -30,6 +79,10 @@ export function AudioProvider({ children }) {
     });
   }, []);
 
+  /* -----------------------------
+     SYNC REFS
+  ----------------------------- */
+
   useEffect(() => {
     effectiveVolumeRef.current = effectiveVolume;
   }, [effectiveVolume]);
@@ -37,6 +90,10 @@ export function AudioProvider({ children }) {
   useEffect(() => {
     musicPlayingRef.current = musicPlaying;
   }, [musicPlaying]);
+
+  /* -----------------------------
+     CLEANUP LISTENERS
+  ----------------------------- */
 
   const cleanupInteractionListeners = useCallback(() => {
     if (interactionStartRef.current) {
@@ -46,6 +103,10 @@ export function AudioProvider({ children }) {
       interactionStartRef.current = null;
     }
   }, []);
+
+  /* -----------------------------
+     START MUSIC
+  ----------------------------- */
 
   const startMusic = useCallback(() => {
     if (audioRef.current || musicPlayingRef.current) return;
@@ -87,6 +148,7 @@ export function AudioProvider({ children }) {
       if (!audioRef.current || musicPlayingRef.current) return;
 
       audio.muted = false;
+
       audio
         .play()
         .then(() => {
@@ -95,7 +157,7 @@ export function AudioProvider({ children }) {
           fadeIn();
         })
         .catch((err) => {
-          console.error('Failed to play audio:', err);
+          console.error("Failed to play audio:", err);
         });
     };
 
@@ -105,17 +167,25 @@ export function AudioProvider({ children }) {
     window.addEventListener("keydown", startAudio, { once: true });
     window.addEventListener("touchstart", startAudio, { once: true });
 
-    audio.addEventListener('error', (e) => {
-      console.error('Audio load error:', e);
-      cleanupInteractionListeners();
-    }, { once: true });
+    audio.addEventListener(
+      "error",
+      (e) => {
+        console.error("Audio load error:", e);
+        cleanupInteractionListeners();
+      },
+      { once: true }
+    );
 
     audio.play().catch(() => {
-      // autoplay blocked; wait for user interaction
+      // autoplay blocked
     });
 
     audio.load();
   }, [cleanupInteractionListeners]);
+
+  /* -----------------------------
+     STOP MUSIC
+  ----------------------------- */
 
   const stopMusic = useCallback(() => {
     cleanupInteractionListeners();
@@ -130,12 +200,19 @@ export function AudioProvider({ children }) {
     setMusicPlaying(false);
   }, [cleanupInteractionListeners]);
 
-  // sync volume
+  /* -----------------------------
+     SYNC VOLUME TO AUDIO
+  ----------------------------- */
+
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = effectiveVolume;
     }
   }, [effectiveVolume]);
+
+  /* -----------------------------
+     CONTEXT
+  ----------------------------- */
 
   return (
     <AudioContext.Provider
@@ -154,6 +231,10 @@ export function AudioProvider({ children }) {
     </AudioContext.Provider>
   );
 }
+
+/* -----------------------------
+   HOOK
+----------------------------- */
 
 export function useAudio() {
   return useContext(AudioContext);

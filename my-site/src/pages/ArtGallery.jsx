@@ -204,7 +204,7 @@ export default function ArtGallery() {
 
   return (
     <>
-      <Logo top="1.5vw" left="50%" width="20vw" center />
+      <Logo top="1.5vw" left="50%" width="25vw" center />
       <BackButton />
 
       <div className="gallery-scroll">
@@ -226,6 +226,7 @@ export default function ArtGallery() {
                     src={img.src}
                     alt={img.label}
                     draggable="false"
+                    loading="lazy"
                     onClick={() => handleImageClick(img, index)}
                     style={{
                       cursor: "pointer",

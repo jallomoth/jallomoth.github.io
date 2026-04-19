@@ -8,7 +8,6 @@ body {
 :root {
   --text: #6b6375;
   --bg: #000;
-  font-family: system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
