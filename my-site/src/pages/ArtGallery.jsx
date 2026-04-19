@@ -22,12 +22,12 @@ const images = Object.entries(imageModules)
     let section = "Unknown";
 
     if (folder === "hall of fame") {
-      section = "Hall of Fame !";
+      section = "Hall of Fame";
     } else if (
       folder === "fools errand" ||
       folder === "fool's errand"
     ) {
-      section = "Fool's Errand !";
+      section = "Fool's Errand";
     } else {
       const match = path.match(/gallery\/(\d{4})\//);
       if (match) section = match[1];
@@ -57,8 +57,8 @@ const groupedImages = Object.entries(
   }, {})
 ).sort((a, b) => {
   const order = {
-    "Hall of Fame !": 0,
-    "Fool's Errand !": 2,
+    "Hall of Fame": 0,
+    "Fool's Errand": 2,
   };
 
   const aPriority = order[a[0]] ?? 1;
@@ -101,38 +101,79 @@ export default function ArtGallery() {
   }, []);
 
   /* -----------------------------
-     SCROLL TO SECTION
+     3D TILT (RESTORED)
   ----------------------------- */
-const scrollToSection = (section) => {
-  const container = scrollRef.current;
-  const target = sectionRefs.current[section];
+  const handleMouseMove = (e, index) => {
+    const el = itemRefs.current[index];
+    if (!el) return;
 
-  if (!container || !target) return;
+    const inner = el.querySelector(".tilt-inner");
+    if (!inner) return;
 
-  const containerRect = container.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
 
-  // get CSS variable (vw → px)
-  const uiTopSpace = getComputedStyle(document.documentElement)
-    .getPropertyValue("--ui-top-space");
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-  const offsetPx =
-    (parseFloat(uiTopSpace) / 100) * window.innerWidth;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
 
-  const scrollTop =
-    targetRect.top -
-    containerRect.top +
-    container.scrollTop -
-    offsetPx;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    const rotateX = -((y - centerY) / centerY) * 8;
 
-  container.scrollTo({
-    top: scrollTop,
-    behavior: "smooth",
-  });
-};
+    inner.style.transform = `
+      rotateX(${rotateX}deg)
+      rotateY(${rotateY}deg)
+      scale(1.05)
+    `;
+  };
+
+  const handleMouseLeave = (index) => {
+    const el = itemRefs.current[index];
+    if (!el) return;
+
+    const inner = el.querySelector(".tilt-inner");
+    if (!inner) return;
+
+    inner.style.transform = `
+      rotateX(0deg)
+      rotateY(0deg)
+      scale(1)
+    `;
+  };
 
   /* -----------------------------
-     IMAGE CLICK (unchanged)
+     SCROLL TO SECTION
+  ----------------------------- */
+  const scrollToSection = (section) => {
+    const container = scrollRef.current;
+    const target = sectionRefs.current[section];
+
+    if (!container || !target) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    const uiTopSpace = getComputedStyle(document.documentElement)
+      .getPropertyValue("--ui-top-space");
+
+    const offsetPx =
+      (parseFloat(uiTopSpace) / 100) * window.innerWidth;
+
+    const scrollTop =
+      targetRect.top -
+      containerRect.top +
+      container.scrollTop -
+      offsetPx;
+
+    container.scrollTo({
+      top: scrollTop,
+      behavior: "smooth",
+    });
+  };
+
+  /* -----------------------------
+     IMAGE CLICK
   ----------------------------- */
   const handleImageClick = (img, index) => {
     const imgElement = itemRefs.current[index]?.querySelector("img");
@@ -214,7 +255,7 @@ const scrollToSection = (section) => {
 
       <div className="gallery-scroll" ref={scrollRef}>
         
-        {/* NAV BUTTONS (NOW SCROLL WITH PAGE) */}
+        {/* NAV BUTTONS */}
         <div className="gallery-nav">
           {groupedImages.map(([section]) => (
             <button
@@ -223,7 +264,7 @@ const scrollToSection = (section) => {
               onClick={() => scrollToSection(section)}
             >
               <img
-                src={`/nav/${section}.png`} // custom images
+                src={`/nav/${section}.png`}
                 alt={section}
                 draggable={false}
               />
@@ -252,6 +293,8 @@ const scrollToSection = (section) => {
                       index < visibleCount ? "show" : ""
                     }`}
                     style={{ transitionDelay: `${index * 15}ms` }}
+                    onMouseMove={(e) => handleMouseMove(e, index)}
+                    onMouseLeave={() => handleMouseLeave(index)}
                   >
                     <div className="tilt-outer">
                       <div className="tilt-inner">
@@ -281,7 +324,7 @@ const scrollToSection = (section) => {
         ))}
       </div>
 
-      {/* MODAL (unchanged) */}
+      {/* MODAL */}
       {selectedImage && imagePosition && (
         <div
           className={`modal-overlay ${isModalOpen ? "open" : "closing"}`}
