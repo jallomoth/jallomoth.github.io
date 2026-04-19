@@ -1,5 +1,5 @@
 :root {
-  --ui-top-space: 8vw;
+  --ui-top-space: 9vw;
   --gallery-offset: 2vw;
   --ui-side-space: 5vw;
 }
@@ -59,6 +59,46 @@
 }
 @media (max-width: 500px) {
   .gallery-container { column-count: 1; }
+}
+
+/* -----------------------------
+   NAV BUTTON BAR (SCROLLS AWAY)
+----------------------------- */
+
+.gallery-nav {
+  width: 90%;
+  margin: -1.5vw auto 1vw auto;
+
+  padding-left: var(--ui-side-space);
+  padding-right: var(--ui-side-space);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vw;
+  justify-content: center;
+}
+
+.gallery-nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.gallery-nav-button img {
+  width: 6vw;
+  max-width: 120px;
+  pointer-events: none;
+}
+
+.gallery-nav-button:hover {
+  transform: scale(1.1);
+}
+
+.gallery-nav-button:active {
+  transform: scale(0.95);
 }
 
 /* -----------------------------
@@ -279,13 +319,13 @@
   top: 2vh;
   right: 5.5vw;
 
-  width: 150px;
-  height: 150px;
+  width: 5vw;
+  height: 5vw;
 
   background: none;
   border: none;
 
-  cursor: pointer;
+  cursor: none !important;
 
   display: flex;
   justify-content: center;
@@ -294,7 +334,11 @@
   z-index: 1002;
 
   opacity: 0;
-  transition: opacity 0.35s ease;
+
+  transform: scale(1);
+  transition:
+    opacity 0.35s ease,
+    transform 0.2s ease;
 }
 
 .modal-overlay.open .close-button {
@@ -303,6 +347,16 @@
 
 .modal-overlay.closing .close-button {
   opacity: 0;
+}
+
+/* HOVER = grow */
+.close-button:hover {
+  transform: scale(1.1);
+}
+
+/* CLICK = shrink */
+.close-button:active {
+  transform: scale(0.95);
 }
 
 /* -----------------------------
@@ -327,6 +381,7 @@
   opacity: 0;
 }
 
+/* hover image swap */
 .close-button:hover .close-icon.default {
   opacity: 0;
 }
@@ -335,6 +390,7 @@
   opacity: 1;
 }
 
+/* click image swap */
 .close-button:active .close-icon.hover {
   opacity: 0;
 }

@@ -1,3 +1,7 @@
+/* -----------------------------
+   BACK BUTTON
+----------------------------- */
+
 .back-button {
   position: fixed;
   top: 20px;
@@ -7,12 +11,14 @@
   background: none;
   border: none;
   padding: 0;
+
   cursor: none !important;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  transform: scale(1);
   transition: transform 0.2s ease;
 }
 
@@ -20,14 +26,22 @@
   outline: none;
 }
 
+/* HOVER = grow */
+.back-button:hover {
+  transform: scale(1.1);
+}
+
+/* CLICK = shrink */
+.back-button:active {
+  transform: scale(0.95);
+}
+
+/* IMAGE */
 .back-button-image {
   width: 5vw;
   height: 5vw;
   object-fit: contain;
+
   pointer-events: none;
   user-select: none;
-}
-
-.back-button:hover {
-  transform: scale(1.1);
 }

@@ -25,6 +25,10 @@
   transform: scale(1.1);
 }
 
+.volume-icon:active {
+  transform: scale(0.95);
+}
+
 /* SLIDER CONTAINER */
 .volume-slider {
   margin-top: 1vw;

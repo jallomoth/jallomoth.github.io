@@ -16,7 +16,6 @@ const images = Object.entries(imageModules)
   .map(([path, mod]) => {
     const fileName = path.split("/").pop().split(".")[0];
 
-    // robust folder detection
     const parts = path.split("/");
     const folder = parts[parts.length - 2]?.toLowerCase() || "";
 
@@ -34,7 +33,6 @@ const images = Object.entries(imageModules)
       if (match) section = match[1];
     }
 
-    // clean filename
     const cleanName = fileName
       .replace(/\(.*?\)/g, "")
       .replace(/\s+/g, " ")
@@ -44,17 +42,12 @@ const images = Object.entries(imageModules)
       .replace(/[-_]/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
-    return {
-      src: mod.default,
-      label,
-      fileName,
-      section,
-    };
+    return { src: mod.default, label, fileName, section };
   })
   .sort((a, b) => a.fileName.localeCompare(b.fileName));
 
 /* -----------------------------
-   GROUP + SORT SECTIONS
+   GROUP + SORT
 ----------------------------- */
 const groupedImages = Object.entries(
   images.reduce((acc, img) => {
@@ -68,19 +61,12 @@ const groupedImages = Object.entries(
     "Fool's Errand !": 2,
   };
 
-  const aKey = a[0];
-  const bKey = b[0];
+  const aPriority = order[a[0]] ?? 1;
+  const bPriority = order[b[0]] ?? 1;
 
-  const aPriority = order[aKey] ?? 1;
-  const bPriority = order[bKey] ?? 1;
+  if (aPriority !== bPriority) return aPriority - bPriority;
 
-  // priority sort
-  if (aPriority !== bPriority) {
-    return aPriority - bPriority;
-  }
-
-  // year sort (descending)
-  return bKey.localeCompare(aKey);
+  return b[0].localeCompare(a[0]);
 });
 
 export default function ArtGallery() {
@@ -97,6 +83,8 @@ export default function ArtGallery() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const itemRefs = useRef([]);
+  const sectionRefs = useRef({});
+  const scrollRef = useRef(null);
 
   /* -----------------------------
      CASCADE LOAD
@@ -113,49 +101,38 @@ export default function ArtGallery() {
   }, []);
 
   /* -----------------------------
-     3D TILT
+     SCROLL TO SECTION
   ----------------------------- */
-  const handleMouseMove = (e, index) => {
-    const el = itemRefs.current[index];
-    if (!el) return;
+const scrollToSection = (section) => {
+  const container = scrollRef.current;
+  const target = sectionRefs.current[section];
 
-    const inner = el.querySelector(".tilt-inner");
-    if (!inner) return;
+  if (!container || !target) return;
 
-    const rect = el.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  // get CSS variable (vw → px)
+  const uiTopSpace = getComputedStyle(document.documentElement)
+    .getPropertyValue("--ui-top-space");
 
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+  const offsetPx =
+    (parseFloat(uiTopSpace) / 100) * window.innerWidth;
 
-    const rotateY = ((x - centerX) / centerX) * 8;
-    const rotateX = -((y - centerY) / centerY) * 8;
+  const scrollTop =
+    targetRect.top -
+    containerRect.top +
+    container.scrollTop -
+    offsetPx;
 
-    inner.style.transform = `
-      rotateX(${rotateX}deg)
-      rotateY(${rotateY}deg)
-      scale(1.05)
-    `;
-  };
-
-  const handleMouseLeave = (index) => {
-    const el = itemRefs.current[index];
-    if (!el) return;
-
-    const inner = el.querySelector(".tilt-inner");
-    if (!inner) return;
-
-    inner.style.transform = `
-      rotateX(0deg)
-      rotateY(0deg)
-      scale(1)
-    `;
-  };
+  container.scrollTo({
+    top: scrollTop,
+    behavior: "smooth",
+  });
+};
 
   /* -----------------------------
-     CLICK IMAGE
+     IMAGE CLICK (unchanged)
   ----------------------------- */
   const handleImageClick = (img, index) => {
     const imgElement = itemRefs.current[index]?.querySelector("img");
@@ -235,9 +212,32 @@ export default function ArtGallery() {
       <Logo top="1vw" left="50%" width="35vw" center />
       <BackButton />
 
-      <div className="gallery-scroll">
+      <div className="gallery-scroll" ref={scrollRef}>
+        
+        {/* NAV BUTTONS (NOW SCROLL WITH PAGE) */}
+        <div className="gallery-nav">
+          {groupedImages.map(([section]) => (
+            <button
+              key={section}
+              className="gallery-nav-button"
+              onClick={() => scrollToSection(section)}
+            >
+              <img
+                src={`/nav/${section}.png`} // custom images
+                alt={section}
+                draggable={false}
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* SECTIONS */}
         {groupedImages.map(([section, imgs]) => (
-          <div key={section} className="gallery-section">
+          <div
+            key={section}
+            className="gallery-section"
+            ref={(el) => (sectionRefs.current[section] = el)}
+          >
             <h2 className="gallery-year">{section}</h2>
 
             <div className="gallery-container">
@@ -252,8 +252,6 @@ export default function ArtGallery() {
                       index < visibleCount ? "show" : ""
                     }`}
                     style={{ transitionDelay: `${index * 15}ms` }}
-                    onMouseMove={(e) => handleMouseMove(e, index)}
-                    onMouseLeave={() => handleMouseLeave(index)}
                   >
                     <div className="tilt-outer">
                       <div className="tilt-inner">
@@ -269,7 +267,6 @@ export default function ArtGallery() {
                               selectedIndex === index && selectedImage
                                 ? 0
                                 : 1,
-                            transition: "none",
                           }}
                         />
                       </div>
@@ -284,6 +281,7 @@ export default function ArtGallery() {
         ))}
       </div>
 
+      {/* MODAL (unchanged) */}
       {selectedImage && imagePosition && (
         <div
           className={`modal-overlay ${isModalOpen ? "open" : "closing"}`}
