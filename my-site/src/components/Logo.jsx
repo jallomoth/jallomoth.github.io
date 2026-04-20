@@ -59,9 +59,6 @@ export default function Logo({
 
   // physics
   useEffect(() => {
-    // Respect prefers-reduced-motion: do not run physics animation loop
-    const prefersReduced = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
@@ -70,11 +67,6 @@ export default function Logo({
 
       pos.current.x = mouse.current.x - dragOffset.current.x;
       pos.current.y = mouse.current.y - dragOffset.current.y;
-
-      // If reduced motion is requested, apply immediate transform for dragging
-      if (prefersReduced && containerRef.current) {
-        containerRef.current.style.transform = `\n          ${center ? "translate(-50%, -50%)" : ""}\n          translate(${pos.current.x}px, ${pos.current.y}px)\n        `;
-      }
     };
 
     const handleMouseUp = () => {
@@ -106,14 +98,6 @@ export default function Logo({
 
     let frame;
     let lastTime = performance.now();
-
-    // ensure initial centered transform is applied before the first frame
-    if (containerRef.current) {
-      containerRef.current.style.transform = `
-        ${center ? "translate(-50%, -50%)" : ""}
-        translate(${pos.current.x}px, ${pos.current.y}px)
-      `;
-    }
 
     const animate = (currentTime) => {
       const deltaTime = Math.min(
@@ -149,26 +133,12 @@ export default function Logo({
       frame = requestAnimationFrame(animate);
     };
 
-    // Start animation only when reduced-motion is not requested
-    if (!prefersReduced) frame = requestAnimationFrame(animate);
-
-    const handleVisibility = () => {
-      if (document.hidden) {
-        if (frame) cancelAnimationFrame(frame);
-        frame = null;
-      } else if (!prefersReduced) {
-        lastTime = performance.now();
-        frame = requestAnimationFrame(animate);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibility);
+    animate(lastTime);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
       cancelAnimationFrame(frame);
-      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [effectiveVolume, center]);
 

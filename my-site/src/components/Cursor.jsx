@@ -16,10 +16,6 @@ export default function Cursor() {
       return;
     }
 
-    // Respect prefers-reduced-motion
-    const prefersReduced = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
-
     // default state
     window.isGrabbing = false;
 
@@ -105,18 +101,7 @@ export default function Cursor() {
       frame = requestAnimationFrame(animate);
     };
 
-    frame = requestAnimationFrame(animate);
-
-    const handleVisibility = () => {
-      if (document.hidden) {
-        if (frame) cancelAnimationFrame(frame);
-        frame = null;
-      } else {
-        frame = requestAnimationFrame(animate);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibility);
+    animate();
 
     return () => {
       window.removeEventListener("mousemove", move);
@@ -126,8 +111,8 @@ export default function Cursor() {
       window.removeEventListener("blur", handleBlur);
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("mouseleave", handleLeave);
+
       cancelAnimationFrame(frame);
-      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 

@@ -1,10 +1,9 @@
 import './App.css';
 import { Routes, Route, Outlet } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
 
-const ParallaxBackground = lazy(() => import('./components/ParallaxBackground'));
-const Cursor = lazy(() => import('./components/Cursor'));
-const VolumeControl = lazy(() => import('./components/audio/VolumeControl'));
+import Cursor from './components/Cursor';
+import ParallaxBackground from './components/ParallaxBackground';
+import VolumeControl from './components/audio/VolumeControl';
 
 import Home from './pages/Home';
 import FoolsErrand from './pages/FoolsErrand';
@@ -22,11 +21,9 @@ import NotFound from './pages/NotFound';
 function MainLayout() {
   return (
     <>
-      <Suspense fallback={null}>
-        <ParallaxBackground />
-        <Cursor />
-        <VolumeControl />
-      </Suspense>
+      <ParallaxBackground />
+      <Cursor />
+      <VolumeControl />
 
       <Outlet />
     </>
@@ -40,10 +37,8 @@ function MainLayout() {
 function MinimalLayout() {
   return (
     <>
-      <Suspense fallback={null}>
-        <Cursor />
-        <Outlet />
-      </Suspense>
+      <Cursor />;
+      <Outlet />;
     </>
   );
 }
