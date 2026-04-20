@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
 
@@ -46,6 +46,9 @@ export default function ArtGallery() {
       "Fool's Errand": 2,
     }
   );
+
+  // Refs to thumbnail elements so keyboard navigation can position animations
+  const itemRefs = useRef([]);
 
   const handleImageClick = (img, index, rect) => {
     // Convert DOMRect to plain object with the values we need
@@ -96,6 +99,63 @@ export default function ArtGallery() {
     }, 650); // Allow 600ms CSS transition + small buffer
   };
 
+  // Animate modal image when selectedImage changes while modal is already open
+  useEffect(() => {
+    if (!isModalOpen || !selectedImage || !finalImagePosition) return;
+
+    const modalImage = document.querySelector(".modal-image");
+    if (!modalImage) return;
+
+    // If we have a source thumbnail position, start the modal image there
+    if (imagePosition) {
+      modalImage.style.top = `${imagePosition.top}px`;
+      modalImage.style.left = `${imagePosition.left}px`;
+      modalImage.style.width = `${imagePosition.width}px`;
+      modalImage.style.height = `${imagePosition.height}px`;
+      // force reflow
+      void modalImage.offsetWidth;
+    }
+
+    // animate to final position
+    modalImage.style.top = `${finalImagePosition.top}px`;
+    modalImage.style.left = `${finalImagePosition.left}px`;
+    modalImage.style.width = `${finalImagePosition.width}px`;
+    modalImage.style.height = `${finalImagePosition.height}px`;
+  }, [selectedImage]);
+
+  // Keyboard navigation while modal is open
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!isModalOpen) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+
+      if (typeof selectedIndex !== "number") return;
+      // Build a flat list matching the UI ordering (grouped sections order)
+      const flatOrder = grouped.flatMap(([, imgs]) => imgs);
+      const count = flatOrder.length;
+      let next = selectedIndex;
+      if (e.key === "ArrowRight") next = (selectedIndex + 1) % count;
+      if (e.key === "ArrowLeft") next = (selectedIndex - 1 + count) % count;
+
+      // compute thumbnail rect if available
+      const thumbEl = itemRefs.current?.[next]?.querySelector("img");
+      const rect = thumbEl ? thumbEl.getBoundingClientRect() : null;
+
+      if (rect) {
+        setImagePosition({ top: rect.top, left: rect.left, width: rect.width, height: rect.height });
+      } else {
+        setImagePosition(null);
+      }
+
+      setSelectedIndex(next);
+      setSelectedImage(flatOrder[next]);
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isModalOpen, selectedIndex, grouped, imagePosition, finalImagePosition]);
+
   return (
     <>
       <Logo top="1vw" left="50%" width="35vw" center />
@@ -107,6 +167,7 @@ export default function ArtGallery() {
         selectedIndex={selectedIndex}
         isModalOpen={isModalOpen}
         isModalClosing={isModalClosing}
+        itemRefs={itemRefs}
         onImageClick={handleImageClick}
       />
 
