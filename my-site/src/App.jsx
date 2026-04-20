@@ -3,7 +3,7 @@ import { Routes, Route, Outlet } from 'react-router-dom';
 
 import Cursor from './components/Cursor';
 import ParallaxBackground from './components/ParallaxBackground';
-import VolumeControl from './components/VolumeControl';
+import VolumeControl from './components/audio/VolumeControl';
 
 import Home from './pages/Home';
 import FoolsErrand from './pages/FoolsErrand';

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useAudio } from "./AudioContext";
+import { useAudio } from "./audio/AudioContext";
 import "./Logo.css";
 
 export default function Logo({

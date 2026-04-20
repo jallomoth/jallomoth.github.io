@@ -1,0 +1,61 @@
+/* SECTION CONTAINER */
+.gallery-section {
+  margin-bottom: 1vw;
+}
+
+/* YEAR/SECTION HEADER */
+.gallery-year {
+  width: 90%;
+  margin: 0 auto 1.5vw auto;
+
+  padding-left: var(--ui-side-space);
+  padding-right: var(--ui-side-space);
+
+  font-size: clamp(18px, 2vw, 32px);
+  font-weight: 600;
+
+  font-size: 2.5vw;
+  color: #b3a1ff;
+
+  font-family: "Chelsea Market", system-ui;
+  font-optical-sizing: auto;
+  font-style: normal;
+  letter-spacing: 0.08em;
+
+  text-align: left;
+}
+
+/* LINE UNDER HEADER */
+.gallery-year::after {
+  content: "";
+  display: block;
+
+  margin-top: 0.2vw;
+
+  width: 100%;
+  height: 0.3vw;
+
+  background: #b3a1ff;
+}
+
+/* GALLERY CONTAINER (CSS COLUMNS) */
+.gallery-container {
+  column-count: 5;
+  column-gap: 2vw;
+
+  width: 90%;
+  margin: 0 auto 4vw auto;
+
+  padding-left: var(--ui-side-space);
+  padding-right: var(--ui-side-space);
+}
+
+@media (max-width: 1200px) {
+  .gallery-container { column-count: 3; }
+}
+@media (max-width: 800px) {
+  .gallery-container { column-count: 2; }
+}
+@media (max-width: 500px) {
+  .gallery-container { column-count: 1; }
+}

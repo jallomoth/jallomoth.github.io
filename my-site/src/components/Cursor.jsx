@@ -134,7 +134,7 @@ export default function Cursor() {
         left: "0.65vw",
         width: "3.5vw",
         pointerEvents: "none",
-        zIndex: 9999,
+        zIndex: 99999,
         willChange: "transform",
         display: "block",
         opacity: 0,

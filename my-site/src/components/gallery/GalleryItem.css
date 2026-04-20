@@ -1,0 +1,77 @@
+/* ITEM CONTAINER */
+.gallery-item {
+  break-inside: avoid;
+  margin-bottom: 2vw;
+
+  opacity: 0;
+  transform: translate3d(0, 20px, 0) scale(0.95);
+
+  transition:
+    opacity 0.4s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-item.show {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* TILT SYSTEM */
+.tilt-outer {
+  width: 100%;
+  perspective: 900px;
+}
+
+.tilt-inner {
+  width: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg) rotateY(0deg) scale(1);
+
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.25s ease;
+}
+
+.gallery-item:hover .tilt-inner {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* IMAGE */
+.gallery-item img {
+  width: 100%;
+  display: block;
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  cursor: pointer;
+}
+
+/* TEXT LABEL */
+.gallery-item p {
+  margin-top: 1vw;
+  text-align: center;
+  font-size: 1.5vw;
+  color: #b3a1ff;
+
+  font-family: "Chelsea Market", system-ui;
+  font-optical-sizing: auto;
+  font-style: normal;
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+
+  transform: scale(1);
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    color 0.25s ease;
+}
+
+.gallery-item:hover p {
+  transform: scale(1.05);
+  opacity: 1;
+  color: #ffffff;
+}

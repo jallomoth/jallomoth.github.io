@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import "../App.css";
 import Logo from "../components/Logo";
 import ButtonGrid from "../components/ButtonGrid";
-import { useAudio } from "../components/AudioContext";
+import { useAudio } from "../components/audio/AudioContext";
 
 export default function Home() {
     useEffect(() => {

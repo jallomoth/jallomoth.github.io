@@ -1,218 +1,65 @@
-import { useEffect, useRef, useState } from "react";
-import "../App.css";
+import { useEffect, useState } from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
+
+import Gallery from "../components/gallery/Gallery";
+import useGalleryImages from "../components/gallery/useGalleryImages";
+
 import "./ArtGallery.css";
 
-/* -----------------------------
-   LOAD IMAGES
------------------------------ */
-const imageModules = import.meta.glob(
-  "../assets/gallery/**/*.{png,jpg,jpeg,webp,gif}",
-  { eager: true }
-);
-
-const images = Object.entries(imageModules)
-  .map(([path, mod]) => {
-    const fileName = path.split("/").pop().split(".")[0];
-
-    const parts = path.split("/");
-    const folder = parts[parts.length - 2]?.toLowerCase() || "";
-
-    let section = "Unknown";
-
-    if (folder === "hall of fame") {
-      section = "Hall of Fame";
-    } else if (
-      folder === "fools errand" ||
-      folder === "fool's errand"
-    ) {
-      section = "Fool's Errand";
-    } else {
-      const match = path.match(/gallery\/(\d{4})\//);
-      if (match) section = match[1];
-    }
-
-    const cleanName = fileName
-      .replace(/\(.*?\)/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    const label = cleanName
-      .replace(/[-_]/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
-    return { src: mod.default, label, fileName, section };
-  })
-  .sort((a, b) => a.fileName.localeCompare(b.fileName));
-
-/* -----------------------------
-   GROUP + SORT
------------------------------ */
-const groupedImages = Object.entries(
-  images.reduce((acc, img) => {
-    if (!acc[img.section]) acc[img.section] = [];
-    acc[img.section].push(img);
-    return acc;
-  }, {})
-).sort((a, b) => {
-  const order = {
-    "Hall of Fame": 0,
-    "Fool's Errand": 2,
-  };
-
-  const aPriority = order[a[0]] ?? 1;
-  const bPriority = order[b[0]] ?? 1;
-
-  if (aPriority !== bPriority) return aPriority - bPriority;
-
-  return b[0].localeCompare(a[0]);
-});
-
 export default function ArtGallery() {
-  useEffect(() => {
-    document.title = "Jallomoth — Art Gallery";
-  }, []);
-
-  const [visibleCount, setVisibleCount] = useState(0);
-
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [finalImagePosition, setFinalImagePosition] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalClosing, setIsModalClosing] = useState(false);
 
-  const itemRefs = useRef([]);
-  const sectionRefs = useRef({});
-  const scrollRef = useRef(null);
-
-  /* -----------------------------
-     CASCADE LOAD
-  ----------------------------- */
   useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setVisibleCount(i);
-      if (i >= images.length) clearInterval(interval);
-    }, 20);
-
-    return () => clearInterval(interval);
+    document.title = "Jallomoth — Art Gallery";
   }, []);
 
-  /* -----------------------------
-     3D TILT (RESTORED)
-  ----------------------------- */
-  const handleMouseMove = (e, index) => {
-    const el = itemRefs.current[index];
-    if (!el) return;
+  // Animate modal image to final position when opening
+  useEffect(() => {
+    if (isModalOpen && finalImagePosition) {
+      const modalImage = document.querySelector(".modal-image");
+      if (modalImage) {
+        // Force a reflow to trigger the animation
+        void modalImage.offsetWidth;
+        
+        modalImage.style.top = `${finalImagePosition.top}px`;
+        modalImage.style.left = `${finalImagePosition.left}px`;
+        modalImage.style.width = `${finalImagePosition.width}px`;
+        modalImage.style.height = `${finalImagePosition.height}px`;
+      }
+    }
+  }, [isModalOpen, finalImagePosition]);
 
-    const inner = el.querySelector(".tilt-inner");
-    if (!inner) return;
+  const { images, grouped } = useGalleryImages(
+    {
+      "hall of fame": "Hall of Fame",
+      "fools errand": "Fool's Errand",
+      "fool's errand": "Fool's Errand",
+    },
+    {
+      "Hall of Fame": 0,
+      "Fool's Errand": 2,
+    }
+  );
 
-    const rect = el.getBoundingClientRect();
-
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rotateY = ((x - centerX) / centerX) * 8;
-    const rotateX = -((y - centerY) / centerY) * 8;
-
-    inner.style.transform = `
-      rotateX(${rotateX}deg)
-      rotateY(${rotateY}deg)
-      scale(1.05)
-    `;
-  };
-
-  const handleMouseLeave = (index) => {
-    const el = itemRefs.current[index];
-    if (!el) return;
-
-    const inner = el.querySelector(".tilt-inner");
-    if (!inner) return;
-
-    inner.style.transform = `
-      rotateX(0deg)
-      rotateY(0deg)
-      scale(1)
-    `;
-  };
-
-  /* -----------------------------
-     SCROLL TO SECTION
-  ----------------------------- */
-  const scrollToSection = (section) => {
-    const container = scrollRef.current;
-    const target = sectionRefs.current[section];
-
-    if (!container || !target) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-
-    const uiTopSpace = getComputedStyle(document.documentElement)
-      .getPropertyValue("--ui-top-space");
-
-    const offsetPx =
-      (parseFloat(uiTopSpace) / 100) * window.innerWidth;
-
-    const scrollTop =
-      targetRect.top -
-      containerRect.top +
-      container.scrollTop -
-      offsetPx;
-
-    container.scrollTo({
-      top: scrollTop,
-      behavior: "smooth",
+  const handleImageClick = (img, index, rect) => {
+    // Convert DOMRect to plain object with the values we need
+    setImagePosition({
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
     });
-  };
-
-  /* -----------------------------
-     IMAGE CLICK
-  ----------------------------- */
-  const handleImageClick = (img, index) => {
-    const imgElement = itemRefs.current[index]?.querySelector("img");
-    if (!imgElement) return;
-
-    imgElement.style.opacity = "0";
-
-    const rect = imgElement.getBoundingClientRect();
-
-    const naturalWidth = imgElement.naturalWidth || rect.width;
-    const naturalHeight = imgElement.naturalHeight || rect.height;
-
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-
-    const maxWidth = vw * 0.9;
-    const maxHeight = vh * 0.9;
-
-    const aspectRatio = naturalWidth / naturalHeight;
-
-    let targetWidth = naturalWidth * 1.2;
-    let targetHeight = naturalHeight * 1.2;
-
-    if (targetWidth > maxWidth) {
-      targetWidth = maxWidth;
-      targetHeight = targetWidth / aspectRatio;
-    }
-
-    if (targetHeight > maxHeight) {
-      targetHeight = maxHeight;
-      targetWidth = targetHeight * aspectRatio;
-    }
-
-    setImagePosition(rect);
     setFinalImagePosition({
-      top: (vh - targetHeight) / 2,
-      left: (vw - targetWidth) / 2,
-      width: targetWidth,
-      height: targetHeight,
+      top: window.innerHeight * 0.1,
+      left: window.innerWidth * 0.1,
+      width: window.innerWidth * 0.8,
+      height: window.innerHeight * 0.8,
     });
 
     setSelectedImage(img);
@@ -221,134 +68,78 @@ export default function ArtGallery() {
     setTimeout(() => setIsModalOpen(true), 10);
   };
 
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleCloseModal = () => {
+    // Mark closing state so UI stays rendered while animation runs
+    setIsModalClosing(true);
 
-  useEffect(() => {
-    if (selectedImage && !isModalOpen) {
-      const timer = setTimeout(() => {
-        setSelectedImage(null);
-        setImagePosition(null);
-        setSelectedIndex(null);
-      }, 500);
-
-      return () => clearTimeout(timer);
+    // Animate image back to original position
+    const modalImage = document.querySelector(".modal-image");
+    if (modalImage && imagePosition) {
+      modalImage.style.top = `${imagePosition.top}px`;
+      modalImage.style.left = `${imagePosition.left}px`;
+      modalImage.style.width = `${imagePosition.width}px`;
+      modalImage.style.height = `${imagePosition.height}px`;
     }
-  }, [isModalOpen, selectedImage]);
 
-  const modalStyle =
-    imagePosition
-      ? isModalOpen && finalImagePosition
-        ? finalImagePosition
-        : imagePosition
-      : {};
+    // Delay removing the `open` class slightly to avoid race conditions
+    // where React updates could remove the class before the closing flag
+    // is applied, causing the overlay to disappear instantly.
+    setTimeout(() => setIsModalOpen(false), 20);
 
-  /* -----------------------------
-     RENDER
-  ----------------------------- */
-
-  let globalIndex = 0;
+    // Remove modal after animation completes (allow overlay + image to finish)
+    setTimeout(() => {
+      setSelectedImage(null);
+      setImagePosition(null);
+      setFinalImagePosition(null);
+      setSelectedIndex(null);
+      setIsModalClosing(false);
+    }, 650); // Allow 600ms CSS transition + small buffer
+  };
 
   return (
     <>
       <Logo top="1vw" left="50%" width="35vw" center />
       <BackButton />
 
-      <div className="gallery-scroll" ref={scrollRef}>
-        
-        {/* NAV BUTTONS */}
-        <div className="gallery-nav">
-          {groupedImages.map(([section]) => (
-            <button
-              key={section}
-              className="gallery-nav-button"
-              onClick={() => scrollToSection(section)}
-            >
-              <img
-                src={`/nav/${section}.png`}
-                alt={section}
-                draggable={false}
-              />
-            </button>
-          ))}
-        </div>
+      <Gallery
+        groupedImages={grouped}
+        images={images}
+        selectedIndex={selectedIndex}
+        isModalOpen={isModalOpen}
+        isModalClosing={isModalClosing}
+        onImageClick={handleImageClick}
+      />
 
-        {/* SECTIONS */}
-        {groupedImages.map(([section, imgs]) => (
-          <div
-            key={section}
-            className="gallery-section"
-            ref={(el) => (sectionRefs.current[section] = el)}
-          >
-            <h2 className="gallery-year">{section}</h2>
-
-            <div className="gallery-container">
-              {imgs.map((img) => {
-                const index = globalIndex++;
-
-                return (
-                  <div
-                    key={index}
-                    ref={(el) => (itemRefs.current[index] = el)}
-                    className={`gallery-item ${
-                      index < visibleCount ? "show" : ""
-                    }`}
-                    style={{ transitionDelay: `${index * 15}ms` }}
-                    onMouseMove={(e) => handleMouseMove(e, index)}
-                    onMouseLeave={() => handleMouseLeave(index)}
-                  >
-                    <div className="tilt-outer">
-                      <div className="tilt-inner">
-                        <img
-                          src={img.src}
-                          alt={img.label}
-                          draggable="false"
-                          loading="lazy"
-                          onClick={() => handleImageClick(img, index)}
-                          style={{
-                            cursor: "pointer",
-                            opacity:
-                              selectedIndex === index && selectedImage
-                                ? 0
-                                : 1,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <p>{img.label}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* MODAL */}
-      {selectedImage && imagePosition && (
+      {/* MODAL OVERLAY */}
+      {(selectedImage || isModalClosing) && (
         <div
-          className={`modal-overlay ${isModalOpen ? "open" : "closing"}`}
+          className={`modal-overlay ${isModalOpen ? "open" : ""} ${isModalClosing ? "closing" : ""}`}
           onClick={handleCloseModal}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          {selectedImage && (
             <img
+              className="modal-image"
               src={selectedImage.src}
               alt={selectedImage.label}
-              className="modal-image"
               style={{
-                top: `${modalStyle.top}px`,
-                left: `${modalStyle.left}px`,
-                width: `${modalStyle.width}px`,
-                height: `${modalStyle.height}px`,
+                top: `${imagePosition?.top ?? 0}px`,
+                left: `${imagePosition?.left ?? 0}px`,
+                width: `${imagePosition?.width ?? 0}px`,
+                height: `${imagePosition?.height ?? 0}px`,
               }}
             />
-
-            <button className="close-button" onClick={handleCloseModal}>
-              <img src="/x/x.png" className="close-icon default" draggable={false} />
-              <img src="/x/x-hover.png" className="close-icon hover" draggable={false} />
-              <img src="/x/x-press.png" className="close-icon press" draggable={false} />
-            </button>
-          </div>
+          )}
+          <button
+            className="close-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCloseModal();
+            }}
+          >
+            <img className="close-icon default" src="/x/x.png" alt="close" />
+            <img className="close-icon hover" src="/x/x-hover.png" alt="close" />
+            <img className="close-icon press" src="/x/x-press.png" alt="close" />
+          </button>
         </div>
       )}
     </>
