@@ -8,6 +8,10 @@ export default function ParallaxBackground() {
   const pos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    // Respect prefers-reduced-motion
+    const prefersReduced = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
     const handleMouseMove = (e) => {
       target.current.x = e.clientX / window.innerWidth - 0.5;
       target.current.y = e.clientY / window.innerHeight - 0.5;
@@ -19,6 +23,12 @@ export default function ParallaxBackground() {
     let lastTime = performance.now();
 
     const animate = (currentTime) => {
+      if (document.hidden) {
+        frame = requestAnimationFrame(animate);
+        lastTime = currentTime;
+        return;
+      }
+
       const deltaTime = (currentTime - lastTime) / (1000 / 60); // Normalize to 60fps
       lastTime = currentTime;
 
@@ -46,11 +56,24 @@ export default function ParallaxBackground() {
       frame = requestAnimationFrame(animate);
     };
 
-    animate(lastTime);
+    frame = requestAnimationFrame(animate);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (frame) cancelAnimationFrame(frame);
+        frame = null;
+      } else {
+        lastTime = performance.now();
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
 

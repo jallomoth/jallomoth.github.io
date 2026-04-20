@@ -19,21 +19,16 @@ export default function ArtGallery() {
     document.title = "Jallomoth — Art Gallery";
   }, []);
 
-  // Animate modal image to final position when opening
-  useEffect(() => {
-    if (isModalOpen && finalImagePosition) {
-      const modalImage = document.querySelector(".modal-image");
-      if (modalImage) {
-        // Force a reflow to trigger the animation
-        void modalImage.offsetWidth;
-        
-        modalImage.style.top = `${finalImagePosition.top}px`;
-        modalImage.style.left = `${finalImagePosition.left}px`;
-        modalImage.style.width = `${finalImagePosition.width}px`;
-        modalImage.style.height = `${finalImagePosition.height}px`;
-      }
-    }
-  }, [isModalOpen, finalImagePosition]);
+  // Animate modal image to final position when opening (layout-based)
+  const getFinalRect = () => {
+    if (finalImagePosition) return finalImagePosition;
+    return {
+      top: window.innerHeight * 0.1,
+      left: window.innerWidth * 0.1,
+      width: window.innerWidth * 0.8,
+      height: window.innerHeight * 0.8,
+    };
+  };
 
   const { images, grouped } = useGalleryImages(
     {
@@ -75,7 +70,7 @@ export default function ArtGallery() {
     // Mark closing state so UI stays rendered while animation runs
     setIsModalClosing(true);
 
-    // Animate image back to original position
+    // Animate image back to original position (layout properties)
     const modalImage = document.querySelector(".modal-image");
     if (modalImage && imagePosition) {
       modalImage.style.top = `${imagePosition.top}px`;
@@ -85,8 +80,6 @@ export default function ArtGallery() {
     }
 
     // Delay removing the `open` class slightly to avoid race conditions
-    // where React updates could remove the class before the closing flag
-    // is applied, causing the overlay to disappear instantly.
     setTimeout(() => setIsModalOpen(false), 20);
 
     // Remove modal after animation completes (allow overlay + image to finish)
@@ -99,29 +92,21 @@ export default function ArtGallery() {
     }, 650); // Allow 600ms CSS transition + small buffer
   };
 
-  // Animate modal image when selectedImage changes while modal is already open
+  // Animate modal image to final position when opening (layout-based)
   useEffect(() => {
-    if (!isModalOpen || !selectedImage || !finalImagePosition) return;
+    if (isModalOpen && finalImagePosition) {
+      const modalImage = document.querySelector(".modal-image");
+      if (modalImage) {
+        // Force a reflow to trigger the animation
+        void modalImage.offsetWidth;
 
-    const modalImage = document.querySelector(".modal-image");
-    if (!modalImage) return;
-
-    // If we have a source thumbnail position, start the modal image there
-    if (imagePosition) {
-      modalImage.style.top = `${imagePosition.top}px`;
-      modalImage.style.left = `${imagePosition.left}px`;
-      modalImage.style.width = `${imagePosition.width}px`;
-      modalImage.style.height = `${imagePosition.height}px`;
-      // force reflow
-      void modalImage.offsetWidth;
+        modalImage.style.top = `${finalImagePosition.top}px`;
+        modalImage.style.left = `${finalImagePosition.left}px`;
+        modalImage.style.width = `${finalImagePosition.width}px`;
+        modalImage.style.height = `${finalImagePosition.height}px`;
+      }
     }
-
-    // animate to final position
-    modalImage.style.top = `${finalImagePosition.top}px`;
-    modalImage.style.left = `${finalImagePosition.left}px`;
-    modalImage.style.width = `${finalImagePosition.width}px`;
-    modalImage.style.height = `${finalImagePosition.height}px`;
-  }, [selectedImage]);
+  }, [isModalOpen, finalImagePosition]);
 
   // Keyboard navigation while modal is open
   useEffect(() => {
@@ -183,10 +168,10 @@ export default function ArtGallery() {
               src={selectedImage.src}
               alt={selectedImage.label}
               style={{
-                top: `${imagePosition?.top ?? 0}px`,
-                left: `${imagePosition?.left ?? 0}px`,
-                width: `${imagePosition?.width ?? 0}px`,
-                height: `${imagePosition?.height ?? 0}px`,
+                top: `${imagePosition?.top ?? (finalImagePosition?.top ?? (window.innerHeight * 0.1))}px`,
+                left: `${imagePosition?.left ?? (finalImagePosition?.left ?? (window.innerWidth * 0.1))}px`,
+                width: `${imagePosition?.width ?? (finalImagePosition?.width ?? (window.innerWidth * 0.8))}px`,
+                height: `${imagePosition?.height ?? (finalImagePosition?.height ?? (window.innerHeight * 0.8))}px`,
               }}
             />
           )}
