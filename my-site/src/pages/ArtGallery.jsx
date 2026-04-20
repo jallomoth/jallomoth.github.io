@@ -72,11 +72,42 @@ export default function ArtGallery() {
 
     // Animate image back to original position (layout properties)
     const modalImage = document.querySelector(".modal-image");
-    if (modalImage && imagePosition) {
-      modalImage.style.top = `${imagePosition.top}px`;
-      modalImage.style.left = `${imagePosition.left}px`;
-      modalImage.style.width = `${imagePosition.width}px`;
-      modalImage.style.height = `${imagePosition.height}px`;
+    if (modalImage) {
+      // Prefer the stored `imagePosition` (when image was clicked). If the
+      // user navigated with arrow keys, `imagePosition` may be null — in
+      // that case compute the thumbnail rect for the currently selected
+      // index from `itemRefs` so the modal can shrink back to the right
+      // thumbnail.
+      let target = imagePosition;
+
+      if (!target && typeof selectedIndex === "number") {
+        try {
+          const thumbEl = itemRefs.current?.[selectedIndex]?.querySelector("img");
+          const rect = thumbEl ? thumbEl.getBoundingClientRect() : null;
+          if (rect) {
+            target = {
+              top: rect.top,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height,
+            };
+          }
+        } catch (err) {
+          // defensive: if itemRefs or DOM query fails, fall back to no target
+          target = null;
+        }
+      }
+
+      if (target) {
+        modalImage.style.top = `${target.top}px`;
+        modalImage.style.left = `${target.left}px`;
+        modalImage.style.width = `${target.width}px`;
+        modalImage.style.height = `${target.height}px`;
+      } else {
+        // If we couldn't find a thumbnail (e.g., unmount/virtualized), fade out
+        modalImage.style.transition = "opacity 0.18s ease";
+        modalImage.style.opacity = "0";
+      }
     }
 
     // Delay removing the `open` class slightly to avoid race conditions
@@ -123,16 +154,10 @@ export default function ArtGallery() {
       if (e.key === "ArrowRight") next = (selectedIndex + 1) % count;
       if (e.key === "ArrowLeft") next = (selectedIndex - 1 + count) % count;
 
-      // compute thumbnail rect if available
-      const thumbEl = itemRefs.current?.[next]?.querySelector("img");
-      const rect = thumbEl ? thumbEl.getBoundingClientRect() : null;
-
-      if (rect) {
-        setImagePosition({ top: rect.top, left: rect.left, width: rect.width, height: rect.height });
-      } else {
-        setImagePosition(null);
-      }
-
+      // Keep the modal centered while navigating with arrows — do not
+      // animate back to the thumbnail position. Clear `imagePosition` so
+      // the modal stays at the final (centered) bounding box.
+      setImagePosition(null);
       setSelectedIndex(next);
       setSelectedImage(flatOrder[next]);
     };
