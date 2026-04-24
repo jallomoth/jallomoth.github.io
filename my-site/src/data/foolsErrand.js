@@ -4,7 +4,7 @@
 // Import only image files as URLs
 const imageModules = import.meta.glob(
   "../assets/fools-errand/chapters/**/*.{png,jpg,jpeg,webp,gif,svg}",
-  { eager: true, as: "url" }
+  { eager: true, query: "?url", import: "default" }
 );
 
 // Import any manifest.json files (eager so we can read titles/order)

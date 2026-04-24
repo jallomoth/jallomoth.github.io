@@ -84,27 +84,19 @@ export default function ComicViewer() {
     });
   }, [chapter, pageIndex]);
 
-  // fullscreen cursor: track mouse inside fullscreen element
+  // fullscreen cursor: the site-wide custom cursor lives outside the FS element, so we render our own
   useEffect(() => {
     if (!isFullscreen) return;
     let frame;
     const pos = { x: -200, y: -200 };
-    let visible = false;
-
-    const onMove = (e) => {
-      pos.x = e.clientX;
-      pos.y = e.clientY;
-      visible = true;
-    };
+    const onMove = (e) => { pos.x = e.clientX; pos.y = e.clientY; };
     const animate = () => {
       if (fsCursorRef.current) {
-        fsCursorRef.current.style.opacity = visible ? "1" : "0";
         fsCursorRef.current.style.transform =
           `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`;
       }
       frame = requestAnimationFrame(animate);
     };
-
     document.addEventListener("mousemove", onMove);
     animate();
     return () => {
@@ -129,78 +121,91 @@ export default function ComicViewer() {
       ref={containerRef}
       style={isFullscreen ? { paddingTop: 0 } : undefined}
     >
-
-      {/* fullscreen cursor (visible only in fullscreen since .custom-cursor img is outside the FS layer) */}
-      {isFullscreen && (
-        <img
-          ref={fsCursorRef}
-          src="/cursor/Cursor.png"
-          alt=""
-          draggable={false}
-          style={{
-            position: "fixed",
-            top: "1.2vw",
-            left: "0.65vw",
-            width: "3.5vw",
-            pointerEvents: "none",
-            zIndex: 99999,
-            opacity: 0,
-            userSelect: "none",
-          }}
-        />
-      )}
-
-      {/* topbar: chapter dropdown left, page count + fullscreen right */}
-      <div className="comic-topbar">
-        <div className="topbar-left" ref={menuRef}>
-          <button
-            className="chapter-toggle"
-            onClick={() => setMenuOpen((s) => !s)}
-            aria-expanded={menuOpen}
-          >
-            {chapter.label} ▾
-          </button>
-
-          {menuOpen && (
-            <div className="chapter-list">
-              {chapters.map((c) => (
-                <button
-                  key={c.id}
-                  className={`chapter-item${c.id === chapter.id ? " active" : ""}`}
-                  onClick={() => { setMenuOpen(false); navigate(`/fools-errand/${c.id}/1`); }}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="topbar-right">
-          <button className="fullscreen-btn" onClick={toggleFullscreen}>
-            {isFullscreen ? "✕ Exit" : "⛶ Fullscreen"}
-          </button>
-        </div>
-      </div>
-
-      {/* comic stage: fills remaining height, image centered */}
-      <div className="comic-stage">
-        <div className="image-wrap">
-          <button className="nav prev" onClick={prev} aria-label="Previous page">‹</button>
-
+      {isFullscreen ? (
+        // fullscreen: only the image + invisible left/right click zones + custom cursor
+        <>
           <img
             ref={imgRef}
             src={chapter.images[pageIndex]}
             alt={`${chapter.label} — page ${pageIndex + 1}`}
-            className="comic-image"
+            className="fs-image"
           />
+          <button className="fs-zone fs-zone-prev" onClick={prev} aria-label="Previous page" />
+          <button className="fs-zone fs-zone-next" onClick={next} aria-label="Next page" />
+          <img
+            ref={fsCursorRef}
+            src="/cursor/Cursor.png"
+            alt=""
+            draggable={false}
+            className="fs-cursor"
+          />
+        </>
+      ) : (
+        // normal mode: topbar + stage
+        <>
+          <div className="comic-topbar">
+            <div className="topbar-left" ref={menuRef}>
+              <button
+                className="chapter-toggle"
+                onClick={() => setMenuOpen((s) => !s)}
+                aria-expanded={menuOpen}
+              >
+                {chapter.label} ▾
+              </button>
 
-          <button className="nav next" onClick={next} aria-label="Next page">›</button>
-        </div>
+              {menuOpen && (
+                <div className="chapter-list">
+                  {chapters.map((c) => (
+                    <button
+                      key={c.id}
+                      className={`chapter-item${c.id === chapter.id ? " active" : ""}`}
+                      onClick={() => { setMenuOpen(false); navigate(`/fools-errand/${c.id}/1`); }}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        <div className="page-indicator-below">{pageIndex + 1} / {total}</div>
-      </div>
+            <div className="topbar-center">{chapter.label}</div>
 
+            <div className="topbar-right">
+              <button className="fullscreen-btn" onClick={toggleFullscreen}>
+                {"⛶ Fullscreen"}
+              </button>
+            </div>
+          </div>
+
+          <div className="comic-stage">
+            <button
+              className={`nav prev${pageIndex === 0 ? " disabled" : ""}`}
+              onClick={prev}
+              disabled={pageIndex === 0}
+              aria-label="Previous page"
+            >‹</button>
+
+            <div className="stage-center">
+              <div className="image-wrap">
+                <img
+                  ref={imgRef}
+                  src={chapter.images[pageIndex]}
+                  alt={`${chapter.label} — page ${pageIndex + 1}`}
+                  className="comic-image"
+                />
+              </div>
+              <div className="page-indicator-below">{pageIndex + 1} / {total}</div>
+            </div>
+
+            <button
+              className={`nav next${pageIndex + 1 >= total ? " disabled" : ""}`}
+              onClick={next}
+              disabled={pageIndex + 1 >= total}
+              aria-label="Next page"
+            >›</button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

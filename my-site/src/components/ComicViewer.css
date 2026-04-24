@@ -17,7 +17,7 @@
   --cv-image-max-h: calc(100vh - var(--cv-header-clearance) - 120px);
 
   /* Prev / Next buttons */
-  --cv-nav-w:       96px;
+  --cv-nav-w:       auto;  /* now flex:1, this var only used as min-width fallback */
   --cv-nav-gap:     10px;   /* gap between nav button and image edge */
   --cv-nav-font:    2.6rem;
   --cv-nav-bg:      rgba(0, 0, 0, 0.30);
@@ -55,6 +55,17 @@
   border-bottom: none;
   position: relative;
   z-index: 10;
+}
+
+.topbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #b3a1ff;
+  font-family: 'Chelsea Market', system-ui;
+  font-size: 2rem;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .topbar-left {
@@ -146,15 +157,27 @@
   flex: 1;
   min-height: 0;
   display: flex;
+  flex-direction: row;     /* nav | image | nav */
+  align-items: stretch;
+  padding: 6px;            /* small margin so focus ring isn't clipped */
+  gap: 8px;
+  background: var(--cv-stage-bg);
+  -webkit-backdrop-filter: blur(var(--cv-stage-blur));
+  backdrop-filter: blur(var(--cv-stage-blur));
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+/* center column: holds image + page indicator */
+.stage-center {
+  flex: 0 0 auto;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 1rem calc(var(--cv-nav-w) + var(--cv-nav-gap) + 20px);
-  background: var(--cv-stage-bg);
-  -webkit-backdrop-filter: blur(var(--cv-stage-blur));
-  backdrop-filter: blur(var(--cv-stage-blur));
-  overflow: hidden;
+  padding: 1rem 0;
+  min-width: 0;
 }
 
 /* ── image + nav wrapper ──────────────────────────────────────────────────── */
@@ -177,10 +200,8 @@
 /* ── prev / next ──────────────────────────────────────────────────────────── */
 
 .nav {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--cv-nav-w);
+  flex: 1;                 /* fills all space between viewport edge and image */
+  min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -188,17 +209,21 @@
   color: #fff;
   background: var(--cv-nav-bg);
   border: 1px solid var(--cv-nav-border);
-  border-radius: 7px;
   cursor: pointer;
-  z-index: 5;
   transition: background 0.15s;
   line-height: 1;
 }
 .nav:hover  { background: var(--cv-nav-hover); }
 .nav:focus  { outline: none; box-shadow: 0 0 0 3px rgba(179,161,255,0.25); }
+.nav.disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
-.nav.prev { right: calc(100% + var(--cv-nav-gap)); }
-.nav.next { left:  calc(100% + var(--cv-nav-gap)); }
+/* border-radius: all corners rounded */
+.nav.prev { border-radius: 7px; }
+.nav.next { border-radius: 7px; }
 
 /* ── page indicator ───────────────────────────────────────────────────────── */
 
@@ -219,6 +244,31 @@
 .comic-container:-webkit-full-screen {
   padding: 0;
   background: #000;
+  /* make absolute children (fs-image, fs-zones) fill this element */
+  position: fixed;
+  inset: 0;
+}
+
+/* fullscreen image: fills the entire screen, letterboxed to preserve ratio */
+.fs-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* custom cursor rendered inside the fullscreen element */
+.fs-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 3.5vw;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-200px, -200px) translate(-50%, -50%);
+  user-select: none;
 }
 
 .comic-container.is-fullscreen *,
@@ -230,7 +280,7 @@
 .comic-container.is-fullscreen .comic-topbar,
 .comic-container:fullscreen .comic-topbar,
 .comic-container:-webkit-full-screen .comic-topbar {
-  display: none;
+  display: none !important;
 }
 
 .comic-container.is-fullscreen .comic-stage,
@@ -252,6 +302,21 @@
   display: none;
 }
 
+/* invisible prev/next click zones covering left and right halves of the image in fullscreen */
+.fs-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: transparent;
+  border: none;
+  cursor: none !important;
+  z-index: 6;
+  padding: 0;
+}
+.fs-zone-prev { left: 0; }
+.fs-zone-next { right: 0; }
+
 .comic-container.is-fullscreen .page-indicator-below,
 .comic-container:fullscreen .page-indicator-below,
 .comic-container:-webkit-full-screen .page-indicator-below {
@@ -261,10 +326,11 @@
 .comic-container.is-fullscreen .comic-image,
 .comic-container:fullscreen .comic-image,
 .comic-container:-webkit-full-screen .comic-image {
-  max-width:  100vw;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
   max-height: 100vh;
-  width:  auto;
-  height: auto;
+  object-fit: contain;
   box-shadow: none;
 }
 
@@ -273,9 +339,7 @@
 @media (max-width: 800px) {
   :root {
     --cv-image-max-w: 88vw;
-    --cv-nav-w: 64px;
     --cv-nav-font: 1.9rem;
   }
-  .comic-stage { padding: 0.75rem calc(var(--cv-nav-w) + var(--cv-nav-gap) + 8px); }
 }
 
