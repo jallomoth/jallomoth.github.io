@@ -98,7 +98,7 @@ export default function NotFound() {
             fontSize: "5vh",
             margin: 0,
 
-            fontFamily: "'Arial', 'Arial Black', sans-serif",
+            fontFamily: '"Chelsea Market", system-ui',
 
             WebkitTextStroke: "0.2vh black",
           }}
