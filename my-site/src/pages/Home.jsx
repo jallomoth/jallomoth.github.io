@@ -9,12 +9,12 @@ export default function Home() {
       document.title = "Jallomoth";
     }, []);
 
-  const { startMusic, stopMusic } = useAudio();
+  const { startMusic } = useAudio();
 
   useEffect(() => {
     startMusic();
-    return () => stopMusic();
-  }, [startMusic, stopMusic]);
+    // intentionally no cleanup — music keeps playing as user navigates to subpages
+  }, [startMusic]);
 
   return (
     <>

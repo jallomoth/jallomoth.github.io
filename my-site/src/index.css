@@ -58,6 +58,11 @@ body {
   margin: 0;
   background: var(--bg);
   cursor: none !important;
+
+  font-family: "Chelsea Market", system-ui;
+  font-optical-sizing: auto;
+  font-style: normal;
+  letter-spacing: 0.08em;
 }
 
 #root {

@@ -54,7 +54,7 @@ function App() {
       {/* FULL EXPERIENCE PAGES */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/fools-errand" element={<FoolsErrand />} />
+        <Route path="/fools-errand/*" element={<FoolsErrand />} />
         <Route path="/jalloseum" element={<Jalloseum />} />
         <Route path="/art-gallery" element={<ArtGallery />} />
         <Route path="/commissions" element={<Commissions />} />

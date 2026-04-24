@@ -5,7 +5,39 @@ import "./VolumeControl.css";
 export default function VolumeControl() {
   const { volume, setVolume, muted, toggleMute } = useAudio();
 
-  const [containerHovered, setContainerHovered] = useState(false);
+  // slider is shown only when hovering the icon; stays open while over slider or dragging
+  const [sliderVisible, setSliderVisible] = useState(false);
+  const [sliderClosing, setSliderClosing] = useState(false);
+  const sliderVisibleRef = useRef(false); // ref so timers can read current value
+  const hideTimer    = useRef(null);
+  const closingTimer = useRef(null);
+  const overControl  = useRef(false); // true while mouse is over icon or slider
+
+  // keep ref in sync
+  const setSliderVisibleSynced = (val) => {
+    sliderVisibleRef.current = val;
+    setSliderVisible(val);
+  };
+
+  const scheduleHide = () => {
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => {
+      // only animate away if the slider is actually visible
+      if (!sliderVisibleRef.current) return;
+      // start exit animation, then unmount after it completes
+      setSliderClosing(true);
+      closingTimer.current = setTimeout(() => {
+        setSliderVisibleSynced(false);
+        setSliderClosing(false);
+      }, 200);
+    }, 400); // generous delay so mouse can travel to slider
+  };
+
+  const cancelHide = () => {
+    clearTimeout(hideTimer.current);
+    clearTimeout(closingTimer.current);
+    setSliderClosing(false); // abort any in-progress exit animation
+  };
 
   const [iconHovered, setIconHovered] = useState(false);
   const [iconPressed, setIconPressed] = useState(false);
@@ -47,6 +79,7 @@ export default function VolumeControl() {
   // VOLUME CALCULATION
   // -----------------------------
   const updateVolumeFromMouse = (clientY) => {
+    if (!sliderRef.current) return;
     const rect = sliderRef.current.getBoundingClientRect();
 
     const usableHeight = rect.height - TOP_PADDING - BOTTOM_PADDING;
@@ -67,13 +100,20 @@ export default function VolumeControl() {
 
   useEffect(() => {
     const handleMove = (e) => {
-      if (dragging) updateVolumeFromMouse(e.clientY);
+      if (dragging) {
+        cancelHide(); // keep slider open while actively dragging
+        updateVolumeFromMouse(e.clientY);
+      }
     };
 
     const handleUp = () => {
-      setDragging(false);
       setIconPressed(false);
       window.isGrabbing = false;
+      if (dragging) {
+        setDragging(false);
+        // only schedule hide if mouse has left the control
+        if (!overControl.current) scheduleHide();
+      }
     };
 
     window.addEventListener("mousemove", handleMove);
@@ -119,8 +159,6 @@ export default function VolumeControl() {
   return (
     <div
       className="volume-container"
-      onMouseEnter={() => setContainerHovered(true)}
-      onMouseLeave={() => setContainerHovered(false)}
     >
       {/* ICON */}
       <img
@@ -129,15 +167,20 @@ export default function VolumeControl() {
         alt="volume"
         draggable="false"
         onClick={toggleMute}
-        onMouseEnter={() => setIconHovered(true)}
-        onMouseLeave={() => setIconHovered(false)}
+        onMouseEnter={() => { setIconHovered(true); overControl.current = true; cancelHide(); setSliderVisibleSynced(true); }}
+        onMouseLeave={() => { setIconHovered(false); overControl.current = false; scheduleHide(); }}
         onMouseDown={() => {
           setIconPressed(true);
         }}
       />
 
-      {/* SLIDER */}
-      <div className={`volume-slider ${containerHovered ? "show" : ""}`}>
+      {/* SLIDER — only mounted when visible, so the space below the icon is empty when closed */}
+      {(sliderVisible || dragging || sliderClosing) && (
+      <div
+        className={`volume-slider${sliderClosing ? " closing" : ""}`}
+        onMouseEnter={() => { overControl.current = true; cancelHide(); }}
+        onMouseLeave={() => { overControl.current = false; scheduleHide(); }}
+      >
         <div
           className="slider-track"
           ref={sliderRef}
@@ -161,6 +204,7 @@ export default function VolumeControl() {
           />
         </div>
       </div>
+      )}
     </div>
   );
 }

@@ -43,7 +43,7 @@ export default function BackButton({
     setState("hover");
 
     playSound(); // SOUND NOW ONLY ON RELEASE
-    navigate(-1);
+    navigate('/');
   };
 
   const handleMouseEnter = () => {
