@@ -7,6 +7,8 @@ export default function Logo({
   left = "50%",
   width = "60vw",
   center = true,
+  src = "/logo/Jallogo.png",
+  hoverSrc = "/logo/JallogoHover.png",
 }) {
   const [hovered, setHovered] = useState(false);
   const [effects, setEffects] = useState([]);
@@ -197,13 +199,13 @@ export default function Logo({
         onMouseDown={handleMouseDown}
       >
         <img
-          src="/logo/Jallogo.png"
+          src={src}
           draggable={false}
           className={`logo-img ${hovered ? "fade-out" : "fade-in"}`}
           alt="Logo"
         />
         <img
-          src="/logo/JallogoHover.png"
+          src={hoverSrc}
           draggable={false}
           className={`logo-img logo-hover ${
             hovered ? "fade-in" : "fade-out"

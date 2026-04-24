@@ -54,11 +54,17 @@ const chapters = Object.keys(groups)
       images = files.map((f) => f.url);
     }
 
-    const label = (manifest && manifest.title) ? manifest.title : id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const label = (manifest && manifest.dropdownLabel) ? manifest.dropdownLabel
+      : (manifest && manifest.title) ? manifest.title
+      : id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+    const pageTitle = (manifest && manifest.pageTitle) ? manifest.pageTitle
+      : label;
 
     return {
       id,
       label,
+      pageTitle,
       images,
     };
   });

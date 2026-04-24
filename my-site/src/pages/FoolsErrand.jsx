@@ -11,7 +11,7 @@ export default function FoolsErrand() {
 
   return (
     <>
-      <Logo top="1.5vw" left="50%" width="20vw" center={true} />
+      <Logo top="1.5vw" left="50%" width="20vw" center={true} src="/logo/FoolsErrand.png" hoverSrc="/logo/FoolsErrand-hover.png" />
       <BackButton />
       <div className="page-content" />
 

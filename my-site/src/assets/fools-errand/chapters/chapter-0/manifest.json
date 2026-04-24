@@ -1,6 +1,7 @@
 {
-  "title": "Chapter 0 — Genesis",
-  "description": "The first chapter of Fool's Errand.",
+  "dropdownLabel": "Chapter 0 — Genesis",
+  "pageTitle": "Genesis",
+  "description": "The start chapter of Fool's Errand.",
   "pages": [
     "001.png",
     "002.png",

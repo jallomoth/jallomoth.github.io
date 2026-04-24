@@ -168,7 +168,7 @@ export default function ComicViewer() {
               )}
             </div>
 
-            <div className="topbar-center">{chapter.label}</div>
+            <div className="topbar-center">{chapter.pageTitle}</div>
 
             <div className="topbar-right">
               <button className="fullscreen-btn" onClick={toggleFullscreen}>
