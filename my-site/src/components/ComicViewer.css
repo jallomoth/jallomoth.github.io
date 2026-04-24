@@ -100,7 +100,8 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  min-width: 200px;
+  min-width: 100%;         /* at least as wide as the toggle button */
+  width: max-content;      /* expand to fit the longest item on one line */
   background: rgba(12, 10, 22, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
@@ -124,6 +125,7 @@
   border-radius: 5px;
   font-size: 1.05rem;
   font-family: 'Chelsea Market', system-ui;
+  white-space: nowrap;     /* never wrap to next line */
   transition: background 0.12s;
 }
 .chapter-item:hover  { background: rgba(179, 161, 255, 0.14); }
