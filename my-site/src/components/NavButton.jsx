@@ -7,6 +7,8 @@ import "./NavButton.css";
 // threshold for treating a drag as a click (pixels)
 const DRAG_THRESHOLD = 80;
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export default function NavButton({ image, hoverImage, to, alt, label, textImage }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
@@ -113,6 +115,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
   // Spring + magnetic animation (shared rAF scheduler)
   useAnimationFrame((currentTime) => {
+    if (prefersReducedMotion) return;
     const deltaTime = (currentTime - lastTimeRef.current) / (1000 / 60);
     lastTimeRef.current = currentTime;
 

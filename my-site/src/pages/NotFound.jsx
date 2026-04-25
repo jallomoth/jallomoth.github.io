@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Logo from "../components/Logo";
 import ParallaxBackground from "../components/ParallaxBackground";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 // IMPORT ALL MEDIA FILES FROM FOLDER
 const mediaModules = import.meta.glob(
@@ -55,6 +56,7 @@ export default function NotFound() {
 
       <main>
         {/* MEDIA */}
+        <ErrorBoundary>
         <div style={mediaContainerStyle}>
         {isVideo && !videoError ? (
           <video
@@ -75,6 +77,7 @@ export default function NotFound() {
           />
         )}
         </div>
+        </ErrorBoundary>
 
         {/* TEXT */}
         <div

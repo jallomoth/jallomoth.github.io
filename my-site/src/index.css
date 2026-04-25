@@ -8,6 +8,14 @@ body {
 :root {
   --text: #6b6375;
   --bg: #000;
+
+  /* Accent palette (NTH-15) */
+  --color-accent:        #b3a1ff;
+  --color-accent-subtle: rgba(179, 161, 255, 0.14);
+  --color-accent-mid:    rgba(179, 161, 255, 0.20);
+  --color-accent-glow:   rgba(179, 161, 255, 0.25);
+  --color-accent-light:  #e0d8ff;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -83,4 +91,13 @@ img {
 
   user-select: none;
   -webkit-user-select: none;
+}
+
+/* ── Reduced motion (NTH-3) ──────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

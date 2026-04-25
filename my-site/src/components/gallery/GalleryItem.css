@@ -48,12 +48,25 @@
   cursor: pointer;
 }
 
+/* Loading skeleton shimmer (NTH-14) */
+.gallery-item img:not(.loaded) {
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(90deg, #1a1a2e 25%, #2a2a4e 50%, #1a1a2e 75%);
+  background-size: 200% 100%;
+  animation: gallery-shimmer 1.5s infinite;
+}
+
+@keyframes gallery-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
 /* TEXT LABEL */
 .gallery-item p {
   margin-top: 1vw;
   text-align: center;
   font-size: 1.5vw;
-  color: #b3a1ff;
+  color: var(--color-accent);
 
   font-family: "Chelsea Market", system-ui;
   font-optical-sizing: auto;

@@ -61,7 +61,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  color: #b3a1ff;
+  color: var(--color-accent);
   font-family: 'Chelsea Market', system-ui;
   font-size: 2rem;
   white-space: nowrap;
@@ -116,7 +116,7 @@
 }
 
 .chapter-item {
-  color: #e0d8ff;
+  color: var(--color-accent-light);
   background: transparent;
   border: none;
   padding: 0.65rem 1rem;
@@ -128,8 +128,8 @@
   white-space: nowrap;     /* never wrap to next line */
   transition: background 0.12s;
 }
-.chapter-item:hover  { background: rgba(179, 161, 255, 0.14); }
-.chapter-item.active { background: rgba(179, 161, 255, 0.20); color: #fff; }
+.chapter-item:hover  { background: var(--color-accent-subtle); }
+.chapter-item.active { background: var(--color-accent-mid); color: #fff; }
 
 /* page count */
 .page-count {
@@ -235,7 +235,7 @@
   line-height: 1;
 }
 .nav:hover  { background: var(--cv-nav-hover); }
-.nav:focus  { outline: none; box-shadow: 0 0 0 3px rgba(179,161,255,0.25); }
+.nav:focus  { outline: none; box-shadow: 0 0 0 3px var(--color-accent-glow); }
 .nav.disabled {
   opacity: 0.25;
   cursor: not-allowed;

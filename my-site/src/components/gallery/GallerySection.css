@@ -14,7 +14,7 @@
   font-weight: 600;
 
   font-size: 2.5vw;
-  color: #b3a1ff;
+  color: var(--color-accent);
 
   font-family: "Chelsea Market", system-ui;
   font-optical-sizing: auto;
@@ -34,7 +34,7 @@
   width: 100%;
   height: 0.3vw;
 
-  background: #b3a1ff;
+  background: var(--color-accent);
 }
 
 /* GALLERY CONTAINER (CSS COLUMNS) */

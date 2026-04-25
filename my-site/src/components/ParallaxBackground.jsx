@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export default function ParallaxBackground() {
   const bgRef = useRef(null);
 
@@ -22,6 +24,7 @@ export default function ParallaxBackground() {
 
   // Animation (shared rAF scheduler)
   useAnimationFrame((currentTime) => {
+    if (prefersReducedMotion) return;
     const deltaTime = (currentTime - lastTimeRef.current) / (1000 / 60);
     lastTimeRef.current = currentTime;
 

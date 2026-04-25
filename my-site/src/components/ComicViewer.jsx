@@ -24,12 +24,24 @@ export default function ComicViewer() {
     return { pageIndex: page - 1, chapter: chapMeta };
   }, [location.pathname]);
 
-  // redirect bare /fools-errand to first chapter page 1
+  // redirect bare /fools-errand to first chapter page 1,
+  // restoring last-read position from localStorage if available (NTH-12)
   useEffect(() => {
     if (
       location.pathname === "/fools-errand" ||
       location.pathname === "/fools-errand/"
     ) {
+      const savedRaw = localStorage.getItem('fe-last-read');
+      if (savedRaw) {
+        try {
+          const { chapterId, pageIndex: savedPage } = JSON.parse(savedRaw);
+          const savedChapter = chapters.find((c) => c.id === chapterId);
+          if (savedChapter && savedPage >= 0 && savedPage < savedChapter.images.length) {
+            navigate(`/fools-errand/${chapterId}/${savedPage + 1}`, { replace: true });
+            return;
+          }
+        } catch (_) { /* corrupt data — fall through to default */ }
+      }
       navigate(`/fools-errand/${chapters[0].id}/1`, { replace: true });
     }
   }, [location.pathname, navigate]);
@@ -63,6 +75,35 @@ export default function ComicViewer() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [pageIndex, chapter]);
+
+  // Persist reading progress to localStorage (NTH-12)
+  useEffect(() => {
+    try {
+      localStorage.setItem('fe-last-read', JSON.stringify({ chapterId: chapter.id, pageIndex }));
+    } catch (_) {}
+  }, [chapter.id, pageIndex]);
+
+  // Touch swipe navigation (NTH-4)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    let startX = 0;
+    const onTouchStart = (e) => {
+      if (e.touches.length === 1) startX = e.touches[0].clientX;
+    };
+    const onTouchEnd = (e) => {
+      if (e.changedTouches.length !== 1) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx < -50) next();
+      if (dx > 50)  prev();
+    };
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
   }, [pageIndex, chapter]);
 
   // fullscreen listener

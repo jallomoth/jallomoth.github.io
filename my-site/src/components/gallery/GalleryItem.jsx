@@ -12,6 +12,7 @@ export default function GalleryItem({
 }) {
   const localRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   // Create a combined ref that sets both the callback ref and local ref
   const combinedRef = (el) => {
@@ -82,6 +83,9 @@ export default function GalleryItem({
             alt={img.label}
             draggable="false"
             loading="lazy"
+            className={imageLoaded ? 'loaded' : ''}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageLoaded(true)}
             onClick={onClick}
             style={{
               // Hide immediately when selected (no fade) so the modal image

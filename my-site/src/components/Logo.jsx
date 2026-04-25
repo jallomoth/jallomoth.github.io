@@ -4,6 +4,8 @@ import useAnimationFrame from "../hooks/useAnimationFrame";
 import { useDrag } from "../contexts/DragContext";
 import "./Logo.css";
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export default function Logo({
   top = "10%",
   left = "50%",
@@ -104,6 +106,7 @@ export default function Logo({
 
   // physics — animation loop (shared rAF scheduler)
   useAnimationFrame((currentTime) => {
+    if (prefersReducedMotion) return;
     const deltaTime = Math.min(
       (currentTime - lastTimeRef.current) / (1000 / 60),
       2
