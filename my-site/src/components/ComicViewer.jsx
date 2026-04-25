@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import chapters from "../data/foolsErrand";
+import { useAudio } from "./audio/AudioContext";
 import "./ComicViewer.css";
 
 export default function ComicViewer() {
@@ -13,6 +14,10 @@ export default function ComicViewer() {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [menuOpen,     setMenuOpen]     = useState(false);
+  const [prevState,    setPrevState]    = useState("normal");
+  const [nextState,    setNextState]    = useState("normal");
+
+  const { effectiveVolume, playSound } = useAudio();
 
   // derive chapter + page from URL
   const { pageIndex, chapter } = useMemo(() => {
@@ -24,24 +29,12 @@ export default function ComicViewer() {
     return { pageIndex: page - 1, chapter: chapMeta };
   }, [location.pathname]);
 
-  // redirect bare /fools-errand to first chapter page 1,
-  // restoring last-read position from localStorage if available (NTH-12)
+  // redirect bare /fools-errand to first chapter page 1
   useEffect(() => {
     if (
       location.pathname === "/fools-errand" ||
       location.pathname === "/fools-errand/"
     ) {
-      const savedRaw = localStorage.getItem('fe-last-read');
-      if (savedRaw) {
-        try {
-          const { chapterId, pageIndex: savedPage } = JSON.parse(savedRaw);
-          const savedChapter = chapters.find((c) => c.id === chapterId);
-          if (savedChapter && savedPage >= 0 && savedPage < savedChapter.images.length) {
-            navigate(`/fools-errand/${chapterId}/${savedPage + 1}`, { replace: true });
-            return;
-          }
-        } catch (_) { /* corrupt data — fall through to default */ }
-      }
       navigate(`/fools-errand/${chapters[0].id}/1`, { replace: true });
     }
   }, [location.pathname, navigate]);
@@ -56,6 +49,25 @@ export default function ComicViewer() {
 
   const next = () => { if (pageIndex + 1 < total) goTo(chapter.id, pageIndex + 1); };
   const prev = () => { if (pageIndex > 0)          goTo(chapter.id, pageIndex - 1); };
+
+  const navImg = (base, state) => {
+    if (state === "hover")  return `/comic/${base}Hover.png`;
+    if (state === "click")  return `/comic/${base}Select.png`;
+    return `/comic/${base}.png`;
+  };
+
+  const makeNavHandlers = (disabled, action, setState) => ({
+    onMouseEnter: ()  => { if (!disabled) setState("hover"); },
+    onMouseLeave: ()  => setState("normal"),
+    onMouseDown:  ()  => { if (!disabled) setState("click"); },
+    onMouseUp:    ()  => {
+      if (!disabled) {
+        setState("hover");
+        playSound("/sounds/click.mp3", effectiveVolume * 0.2);
+        action();
+      }
+    },
+  });
 
   // close dropdown on outside click
   useEffect(() => {
@@ -75,35 +87,6 @@ export default function ComicViewer() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [pageIndex, chapter]);
-
-  // Persist reading progress to localStorage (NTH-12)
-  useEffect(() => {
-    try {
-      localStorage.setItem('fe-last-read', JSON.stringify({ chapterId: chapter.id, pageIndex }));
-    } catch (_) {}
-  }, [chapter.id, pageIndex]);
-
-  // Touch swipe navigation (NTH-4)
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    let startX = 0;
-    const onTouchStart = (e) => {
-      if (e.touches.length === 1) startX = e.touches[0].clientX;
-    };
-    const onTouchEnd = (e) => {
-      if (e.changedTouches.length !== 1) return;
-      const dx = e.changedTouches[0].clientX - startX;
-      if (dx < -50) next();
-      if (dx > 50)  prev();
-    };
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
   }, [pageIndex, chapter]);
 
   // fullscreen listener
@@ -242,10 +225,17 @@ export default function ComicViewer() {
           <div className="comic-stage">
             <button
               className={`nav prev${pageIndex === 0 ? " disabled" : ""}`}
-              onClick={prev}
               disabled={pageIndex === 0}
               aria-label="Previous page"
-            >‹</button>
+              {...makeNavHandlers(pageIndex === 0, prev, setPrevState)}
+            >
+              <img
+                src={navImg("Prev", pageIndex === 0 ? "normal" : prevState)}
+                alt=""
+                draggable={false}
+                className="nav-img"
+              />
+            </button>
 
             <div className="stage-center">
               <div className="image-wrap">
@@ -261,10 +251,17 @@ export default function ComicViewer() {
 
             <button
               className={`nav next${pageIndex + 1 >= total ? " disabled" : ""}`}
-              onClick={next}
               disabled={pageIndex + 1 >= total}
               aria-label="Next page"
-            >›</button>
+              {...makeNavHandlers(pageIndex + 1 >= total, next, setNextState)}
+            >
+              <img
+                src={navImg("Next", pageIndex + 1 >= total ? "normal" : nextState)}
+                alt=""
+                draggable={false}
+                className="nav-img"
+              />
+            </button>
           </div>
         </>
       )}

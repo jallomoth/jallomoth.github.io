@@ -61,7 +61,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  color: var(--color-accent);
+  color: #b3a1ff;
   font-family: 'Chelsea Market', system-ui;
   font-size: 2rem;
   white-space: nowrap;
@@ -116,7 +116,7 @@
 }
 
 .chapter-item {
-  color: var(--color-accent-light);
+  color: #e0d8ff;
   background: transparent;
   border: none;
   padding: 0.65rem 1rem;
@@ -128,8 +128,8 @@
   white-space: nowrap;     /* never wrap to next line */
   transition: background 0.12s;
 }
-.chapter-item:hover  { background: var(--color-accent-subtle); }
-.chapter-item.active { background: var(--color-accent-mid); color: #fff; }
+.chapter-item:hover  { background: rgba(179, 161, 255, 0.14); }
+.chapter-item.active { background: rgba(179, 161, 255, 0.20); color: #fff; }
 
 /* page count */
 .page-count {
@@ -221,21 +221,21 @@
 /* ── prev / next ──────────────────────────────────────────────────────────── */
 
 .nav {
-  flex: 1;                 /* fills all space between viewport edge and image */
+  flex: 1;
   min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--cv-nav-font);
-  color: #fff;
-  background: var(--cv-nav-bg);
-  border: 1px solid var(--cv-nav-border);
-  cursor: pointer;
-  transition: background 0.15s;
-  line-height: 1;
+  background: none;
+  border: none;
+  cursor: none !important;
+  padding: 0;
+  transform: scale(1);
+  transition: transform 0.2s ease;
 }
-.nav:hover  { background: var(--cv-nav-hover); }
-.nav:focus  { outline: none; box-shadow: 0 0 0 3px var(--color-accent-glow); }
+.nav:focus   { outline: none; }
+.nav:hover   { transform: scale(1.05); }
+.nav:active  { transform: scale(0.95); }
 .nav.disabled {
   opacity: 0.25;
   cursor: not-allowed;
@@ -245,6 +245,17 @@
 /* border-radius: all corners rounded */
 .nav.prev { border-radius: 7px; }
 .nav.next { border-radius: 7px; }
+
+.nav-img {
+  width: 5vw;
+  max-width: 80px;
+  min-width: 32px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  display: block;
+}
 
 /* ── page indicator ───────────────────────────────────────────────────────── */
 
