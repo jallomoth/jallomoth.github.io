@@ -143,11 +143,6 @@ export default function ComicViewer() {
     };
   }, [pageIndex, chapter]);
 
-  // reset loaded state on every page/chapter change so the placeholder appears
-  useEffect(() => {
-    setImageLoaded(false);
-  }, [chapter.id, pageIndex]);
-
   // fullscreen cursor: the site-wide custom cursor lives outside the FS element, so we render our own
   useEffect(() => {
     if (!isFullscreen) return;
@@ -281,6 +276,7 @@ export default function ComicViewer() {
               <div className="image-wrap">
                   {!imageLoaded && <div className="comic-placeholder" />}
                   <img
+                    key={`${chapter.id}-${pageIndex}`}
                     ref={imgRef}
                     src={chapter.images[pageIndex]}
                     alt={`${chapter.label} — page ${pageIndex + 1}`}
