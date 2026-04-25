@@ -2,6 +2,13 @@ import { useEffect, useRef } from "react";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { useDrag } from "../contexts/DragContext";
 
+// Width of the cursor image in viewport-width units (must match the CSS `width` below)
+const CURSOR_WIDTH_VW = 3.5;
+// Hotspot: fraction of image dimensions (0–1) from the top-left corner to the fingertip.
+// Adjust these two values until the fingertip aligns with the actual click point.
+const HOTSPOT_X_FRAC = 0.30; // fingertip is ~30 % from the left edge
+const HOTSPOT_Y_FRAC = 0.04; // fingertip is ~4 % from the top edge
+
 export default function Cursor() {
   const cursorRef = useRef(null);
 
@@ -99,9 +106,13 @@ export default function Cursor() {
           currentImage.current = nextImage;
         }
 
+        // Compute the hotspot offset in pixels so the fingertip tracks the real
+        // mouse position at every viewport width (cursor is sized in vw units).
+        const cursorPx = CURSOR_WIDTH_VW / 100 * window.innerWidth;
+        const offsetX = HOTSPOT_X_FRAC * cursorPx;
+        const offsetY = HOTSPOT_Y_FRAC * cursorPx;
         cursorRef.current.style.transform = `
-          translate(${pos.current.x}px, ${pos.current.y}px)
-          translate(-50%, -50%)
+          translate(${pos.current.x - offsetX}px, ${pos.current.y - offsetY}px)
           scale(${scale.current})
         `;
 
