@@ -154,7 +154,7 @@ export default function ArtGallery() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isModalOpen, selectedIndex, grouped, imagePosition, finalImagePosition]);
+  }, [isModalOpen, selectedIndex, grouped]);
 
   return (
     <>

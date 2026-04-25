@@ -51,11 +51,6 @@ export default function GalleryItem({
     inner.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
   };
 
-  // Don't hide the entire item when selected - just make image invisible
-  // if (isSelected && isModalOpen) {
-  //   return null;
-  // }
-
   return (
     <div
       ref={combinedRef}

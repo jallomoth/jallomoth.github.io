@@ -37,8 +37,8 @@ function MainLayout() {
 function MinimalLayout() {
   return (
     <>
-      <Cursor />;
-      <Outlet />;
+      <Cursor />
+      <Outlet />
     </>
   );
 }

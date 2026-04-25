@@ -8,7 +8,8 @@ export default function Gallery({ groupedImages, images, selectedIndex, isModalO
   // Allow parent to pass a ref array so the parent (ArtGallery) can read
   // thumbnail DOMRects for keyboard navigation. If not provided, fall back
   // to an internal ref.
-  const itemRefs = externalItemRefs || useRef([]);
+  const internalItemRefs = useRef([]);
+  const itemRefs = externalItemRefs ?? internalItemRefs;
   const sectionRefs = useRef({});
   const scrollRef = useRef(null);
 

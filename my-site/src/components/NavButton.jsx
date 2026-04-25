@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NavButton.css";
 
+// threshold for treating a drag as a click (pixels)
+const DRAG_THRESHOLD = 80;
+
 export default function NavButton({ image, hoverImage, to, alt, label, textImage }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
@@ -22,9 +25,6 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   const isActive = hovered || draggingState;
   const src = isActive && hoverImage ? hoverImage : image;
   const altText = alt || label || "Navigation button";
-
-  // threshold
-  const DRAG_THRESHOLD = 80;
 
   /* -----------------------------
      FIXED NAVIGATION
@@ -145,20 +145,6 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       }
 
       if (iconRef.current) {
-        let translateY = 0;
-
-        if (window.isDraggingButton) {
-          // During dragging
-          if (isActive) {
-            translateY = -1;
-          }
-        } else {
-          // Normal state
-          if (isActive) {
-            translateY = -1;
-          }
-        }
-
         iconRef.current.style.setProperty('--translate-x', `${pos.current.x}px`);
         iconRef.current.style.setProperty('--translate-y', `${pos.current.y}px`);
       }

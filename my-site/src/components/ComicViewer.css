@@ -153,6 +153,25 @@
 }
 .fullscreen-btn:hover { background: rgba(255, 255, 255, 0.16); }
 
+.chapter-nav-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.55rem 1.05rem;
+  border-radius: 6px;
+  font-size: 1.0rem;
+  font-family: 'Chelsea Market', system-ui;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.chapter-nav-btn:hover  { background: rgba(255, 255, 255, 0.16); }
+.chapter-nav-btn.disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ── comic stage ──────────────────────────────────────────────────────────── */
 
 .comic-stage {

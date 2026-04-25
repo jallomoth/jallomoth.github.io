@@ -171,6 +171,27 @@ export default function ComicViewer() {
             <div className="topbar-center">{chapter.pageTitle}</div>
 
             <div className="topbar-right">
+              {(() => {
+                const chapterIndex = chapters.findIndex((c) => c.id === chapter.id);
+                const hasPrev = chapterIndex > 0;
+                const hasNext = chapterIndex < chapters.length - 1;
+                return (
+                  <>
+                    <button
+                      className={`chapter-nav-btn${!hasPrev ? " disabled" : ""}`}
+                      disabled={!hasPrev}
+                      onClick={() => hasPrev && navigate(`/fools-errand/${chapters[chapterIndex - 1].id}/1`)}
+                      aria-label="Previous chapter"
+                    >‹ Prev Chapter</button>
+                    <button
+                      className={`chapter-nav-btn${!hasNext ? " disabled" : ""}`}
+                      disabled={!hasNext}
+                      onClick={() => hasNext && navigate(`/fools-errand/${chapters[chapterIndex + 1].id}/1`)}
+                      aria-label="Next chapter"
+                    >Next Chapter ›</button>
+                  </>
+                );
+              })()}
               <button className="fullscreen-btn" onClick={toggleFullscreen}>
                 {"⛶ Fullscreen"}
               </button>
