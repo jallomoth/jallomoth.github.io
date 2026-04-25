@@ -51,8 +51,12 @@ export default function ArtGallery() {
   // Refs to thumbnail elements so keyboard navigation can position animations
   const itemRefs = useRef([]);
   const modalImageRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  // Tracks what had focus before the modal opened so we can restore it on close
+  const previousFocusRef = useRef(null);
 
   const handleImageClick = (img, index, rect) => {
+    previousFocusRef.current = document.activeElement;
     // Convert DOMRect to plain object with the values we need
     setImagePosition({
       top: rect.top,
@@ -98,6 +102,7 @@ export default function ArtGallery() {
       setFinalImagePosition(null);
       setSelectedIndex(null);
       setIsModalClosing(false);
+      previousFocusRef.current?.focus();
     }, 650); // Allow 600ms CSS transition + small buffer
   };
 
@@ -158,11 +163,33 @@ export default function ArtGallery() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isModalOpen, selectedIndex, grouped]);
 
+  // Move focus into the modal when it opens; the close button is the only
+  // interactive element so it always receives focus.
+  useEffect(() => {
+    if (isModalOpen && closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+  }, [isModalOpen]);
+
+  // Tab-key trap: keep focus locked inside the modal while it is open.
+  // Only one focusable element exists (the close button), so Tab simply
+  // stays on it rather than escaping to background content.
+  const handleModalKeyDown = (e) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      closeButtonRef.current?.focus();
+    }
+    if (e.key === "Escape") {
+      handleCloseModal();
+    }
+  };
+
   return (
     <>
       <Logo top="1vw" left="50%" width="35vw" center />
       <BackButton />
 
+      <main>
       <Gallery
         groupedImages={grouped}
         selectedIndex={selectedIndex}
@@ -175,8 +202,12 @@ export default function ArtGallery() {
       {/* MODAL OVERLAY */}
       {(selectedImage || isModalClosing) && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image preview"
           className={`modal-overlay ${isModalOpen ? "open" : ""} ${isModalClosing ? "closing" : ""}`}
           onClick={handleCloseModal}
+          onKeyDown={handleModalKeyDown}
         >
           {selectedImage && (
             <img
@@ -193,6 +224,7 @@ export default function ArtGallery() {
             />
           )}
           <button
+            ref={closeButtonRef}
             className="close-button"
             aria-label="Close"
             onMouseEnter={() => setCloseState("hover")}
@@ -216,6 +248,7 @@ export default function ArtGallery() {
           </button>
         </div>
       )}
+      </main>
     </>
   );
 }

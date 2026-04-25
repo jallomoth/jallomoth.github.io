@@ -53,8 +53,9 @@ export default function NotFound() {
       {/* BACKGROUND */}
       <ParallaxBackground />
 
-      {/* MEDIA */}
-      <div style={mediaContainerStyle}>
+      <main>
+        {/* MEDIA */}
+        <div style={mediaContainerStyle}>
         {isVideo && !videoError ? (
           <video
             src={selectedMedia}
@@ -73,41 +74,42 @@ export default function NotFound() {
             style={mediaStyle}
           />
         )}
-      </div>
+        </div>
+
+        {/* TEXT */}
+        <div
+          style={{
+            position: "fixed",
+            top: "20vh",
+            left: "50%",
+            transform: "translateX(-50%)",
+
+            zIndex: 2,
+
+            textAlign: "center",
+            pointerEvents: "none",
+          }}
+        >
+          <h1
+            style={{
+              color: "#5C33FF",
+              fontSize: "5vh",
+              margin: 0,
+
+              fontFamily: '"Chelsea Market", system-ui',
+
+              WebkitTextStroke: "0.2vh black",
+            }}
+          >
+            404 ERROR (╯°□°)╯︵ ┻━┻
+            <br />
+            erm ... dafuq ?
+          </h1>
+        </div>
+      </main>
 
       {/* LOGO */}
       <Logo top="2vh" width="40vw" />
-
-      {/* TEXT */}
-      <div
-        style={{
-          position: "fixed",
-          top: "20vh",
-          left: "50%",
-          transform: "translateX(-50%)",
-
-          zIndex: 2,
-
-          textAlign: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <h1
-          style={{
-            color: "#5C33FF",
-            fontSize: "5vh",
-            margin: 0,
-
-            fontFamily: '"Chelsea Market", system-ui',
-
-            WebkitTextStroke: "0.2vh black",
-          }}
-        >
-          404 ERROR (╯°□°)╯︵ ┻━┻
-          <br />
-          erm ... dafuq ?
-        </h1>
-      </div>
     </>
   );
 }

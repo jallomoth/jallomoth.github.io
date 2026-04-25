@@ -1,4 +1,4 @@
-import '../App.css';
+import './PlaceholderPage.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
 import usePageTitle from "../hooks/usePageTitle";
@@ -10,10 +10,10 @@ export default function Jalloseum() {
     <>
       <Logo top="1.5vw" left="50%" width="20vw" center={true} />
       <BackButton />
-      <div className="page-content">
+      <main className="page-content">
         <h1>Jalloseum</h1>
         <p>Coming soon...</p>
-      </div>
+      </main>
     </>
   );
 }
