@@ -61,7 +61,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  color: #b3a1ff;
+  color: var(--color-accent);
   font-family: 'Chelsea Market', system-ui;
   font-size: 2rem;
   white-space: nowrap;
@@ -116,7 +116,7 @@
 }
 
 .chapter-item {
-  color: #e0d8ff;
+  color: var(--color-accent-light);
   background: transparent;
   border: none;
   padding: 0.65rem 1rem;
@@ -128,8 +128,8 @@
   white-space: nowrap;     /* never wrap to next line */
   transition: background 0.12s;
 }
-.chapter-item:hover  { background: rgba(179, 161, 255, 0.14); }
-.chapter-item.active { background: rgba(179, 161, 255, 0.20); color: #fff; }
+.chapter-item:hover  { background: var(--color-accent-subtle); }
+.chapter-item.active { background: var(--color-accent-mid); color: #fff; }
 
 /* page count */
 .page-count {
@@ -216,6 +216,30 @@
   width: auto;
   height: auto;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+
+/* ── loading placeholder ──────────────────────────────────────────────────── */
+
+/* Matches the rendered size of a 2360×1640 comic image under the same
+   max-width / max-height constraints as .comic-image.
+   min() picks whichever dimension is the binding constraint, exactly like
+   an <img> with width:auto height:auto + both max constraints does. */
+.comic-placeholder {
+  display: block;
+  width: min(
+    var(--cv-image-max-w),
+    calc(var(--cv-image-max-h) * (2360 / 1640))
+  );
+  aspect-ratio: 2360 / 1640;
+  background: linear-gradient(90deg, #1a1a2e 25%, #2a2a4e 50%, #1a1a2e 75%);
+  background-size: 200% 100%;
+  animation: comic-shimmer 1.5s infinite;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes comic-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
 }
 
 /* ── prev / next ──────────────────────────────────────────────────────────── */

@@ -26,6 +26,8 @@ export default function Logo({
 
   const pos = useRef({ x: 0, y: 0 });
   const velocity = useRef({ x: 0, y: 0 });
+  // Tracks the position from the previous frame so we can compute drag velocity for fling
+  const prevDragPosRef = useRef({ x: 0, y: 0 });
 
   const { effectiveVolume, playSound } = useAudio();
   // Ref so the physics closure always reads the latest volume without restarting
@@ -81,6 +83,13 @@ export default function Logo({
         isDragging.current = false;
         isGrabbingRef.current = false;
 
+        // Boost the velocity that the rAF loop tracked this frame so the fling
+        // carries visible momentum against the spring. Without this boost the
+        // strong damping (0.8/frame) kills the velocity within 1–2 frames.
+        const FLING_BOOST = 8;
+        velocity.current.x *= FLING_BOOST;
+        velocity.current.y *= FLING_BOOST;
+
         const distance = Math.sqrt(
           pos.current.x * pos.current.x +
           pos.current.y * pos.current.y
@@ -126,9 +135,20 @@ export default function Logo({
       pos.current.x += velocity.current.x * deltaTime;
       pos.current.y += velocity.current.y * deltaTime;
     } else {
-      velocity.current.x = 0;
-      velocity.current.y = 0;
+      // Normalize velocity to "pixels per 60fps-equivalent frame" by dividing the
+      // raw pixel delta by deltaTime. This makes fling feel identical on 60Hz, 120Hz,
+      // 144Hz, etc. — a fast throw always produces the same velocity regardless of
+      // how many frames elapsed since the last rAF.
+      const MAX_FLING = 40;
+      const norm = deltaTime > 0 ? 1 / deltaTime : 1;
+      velocity.current.x = Math.max(-MAX_FLING, Math.min(MAX_FLING,
+        (pos.current.x - prevDragPosRef.current.x) * norm));
+      velocity.current.y = Math.max(-MAX_FLING, Math.min(MAX_FLING,
+        (pos.current.y - prevDragPosRef.current.y) * norm));
     }
+
+    prevDragPosRef.current.x = pos.current.x;
+    prevDragPosRef.current.y = pos.current.y;
 
     if (containerRef.current) {
       containerRef.current.style.transform = `

@@ -16,6 +16,7 @@ export default function ComicViewer() {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [prevState,    setPrevState]    = useState("normal");
   const [nextState,    setNextState]    = useState("normal");
+  const [imageLoaded,  setImageLoaded]  = useState(false);
 
   const { effectiveVolume, playSound } = useAudio();
 
@@ -29,12 +30,22 @@ export default function ComicViewer() {
     return { pageIndex: page - 1, chapter: chapMeta };
   }, [location.pathname]);
 
-  // redirect bare /fools-errand to first chapter page 1
+  // redirect bare /fools-errand to saved position (NTH-12) or first chapter page 1
   useEffect(() => {
     if (
       location.pathname === "/fools-errand" ||
       location.pathname === "/fools-errand/"
     ) {
+      try {
+        const saved = JSON.parse(localStorage.getItem("fe-last-read"));
+        if (saved?.chapterId && saved?.page != null) {
+          const validChapter = chapters.find((c) => c.id === saved.chapterId);
+          if (validChapter) {
+            navigate(`/fools-errand/${saved.chapterId}/${saved.page + 1}`, { replace: true });
+            return;
+          }
+        }
+      } catch { /* ignore bad localStorage */ }
       navigate(`/fools-errand/${chapters[0].id}/1`, { replace: true });
     }
   }, [location.pathname, navigate]);
@@ -107,6 +118,35 @@ export default function ComicViewer() {
       img.src = src;
     });
   }, [chapter, pageIndex]);
+
+  // persist reading position to localStorage (NTH-12)
+  useEffect(() => {
+    localStorage.setItem("fe-last-read", JSON.stringify({ chapterId: chapter.id, page: pageIndex }));
+  }, [chapter.id, pageIndex]);
+
+  // touch swipe navigation (NTH-4)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    let startX = 0;
+    const onTouchStart = (e) => { startX = e.touches[0].clientX; };
+    const onTouchEnd = (e) => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx < -50) next();
+      if (dx > 50)  prev();
+    };
+    el.addEventListener("touchstart", onTouchStart);
+    el.addEventListener("touchend",   onTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchend",   onTouchEnd);
+    };
+  }, [pageIndex, chapter]);
+
+  // reset loaded state on every page/chapter change so the placeholder appears
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [chapter.id, pageIndex]);
 
   // fullscreen cursor: the site-wide custom cursor lives outside the FS element, so we render our own
   useEffect(() => {
@@ -239,12 +279,16 @@ export default function ComicViewer() {
 
             <div className="stage-center">
               <div className="image-wrap">
-                <img
-                  ref={imgRef}
-                  src={chapter.images[pageIndex]}
-                  alt={`${chapter.label} — page ${pageIndex + 1}`}
-                  className="comic-image"
-                />
+                  {!imageLoaded && <div className="comic-placeholder" />}
+                  <img
+                    ref={imgRef}
+                    src={chapter.images[pageIndex]}
+                    alt={`${chapter.label} — page ${pageIndex + 1}`}
+                    className="comic-image"
+                    style={imageLoaded ? undefined : { display: 'none' }}
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(true)}
+                  />
               </div>
               <div className="page-indicator-below">{pageIndex + 1} / {total}</div>
             </div>

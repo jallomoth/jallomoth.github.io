@@ -24,6 +24,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
   const pos = useRef({ x: 0, y: 0 });
   const velocity = useRef({ x: 0, y: 0 });
+  // Tracks position from the previous rAF frame to compute framerate-independent fling velocity
+  const prevDragPosRef = useRef({ x: 0, y: 0 });
 
   const { isGrabbingRef, isDraggingButtonRef, draggedButtonPosRef } = useDrag();
   const lastTimeRef = useRef(performance.now());
@@ -86,6 +88,12 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
         setHovered(false);
 
+        // Boost the tracked velocity so the fling carries visible momentum.
+        // Same approach as Logo: multiply by a constant, then let spring + damping take over.
+        const FLING_BOOST = 8;
+        velocity.current.x *= FLING_BOOST;
+        velocity.current.y *= FLING_BOOST;
+
         // -----------------------------
         // DISTANCE CHECK
         // -----------------------------
@@ -116,7 +124,10 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   // Spring + magnetic animation (shared rAF scheduler)
   useAnimationFrame((currentTime) => {
     if (prefersReducedMotion) return;
-    const deltaTime = (currentTime - lastTimeRef.current) / (1000 / 60);
+    const deltaTime = Math.min(
+      (currentTime - lastTimeRef.current) / (1000 / 60),
+      2
+    );
     lastTimeRef.current = currentTime;
 
     if (!isDragging.current) {
@@ -132,9 +143,18 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       pos.current.x += velocity.current.x * deltaTime;
       pos.current.y += velocity.current.y * deltaTime;
     } else {
-      velocity.current.x = 0;
-      velocity.current.y = 0;
+      // Normalize velocity to pixels-per-60fps-frame so fling feels the same
+      // on 60 Hz, 120 Hz, 144 Hz monitors.
+      const MAX_FLING = 40;
+      const norm = deltaTime > 0 ? 1 / deltaTime : 1;
+      velocity.current.x = Math.max(-MAX_FLING, Math.min(MAX_FLING,
+        (pos.current.x - prevDragPosRef.current.x) * norm));
+      velocity.current.y = Math.max(-MAX_FLING, Math.min(MAX_FLING,
+        (pos.current.y - prevDragPosRef.current.y) * norm));
     }
+
+    prevDragPosRef.current.x = pos.current.x;
+    prevDragPosRef.current.y = pos.current.y;
 
     if (!isDragging.current && draggedButtonPosRef.current) {
       const rect = iconRef.current.getBoundingClientRect();
@@ -183,6 +203,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
     velocity.current.x = 0;
     velocity.current.y = 0;
+    prevDragPosRef.current.x = pos.current.x;
+    prevDragPosRef.current.y = pos.current.y;
   };
 
   // -----------------------------
