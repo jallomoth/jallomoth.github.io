@@ -125,8 +125,8 @@ export default function Cursor() {
       className="custom-cursor"
       style={{
         position: "fixed",
-        top: "1.2vw",
-        left: "0.65vw",
+        top: 0,
+        left: 0,
         width: "3.5vw",
         pointerEvents: "none",
         zIndex: 99999,

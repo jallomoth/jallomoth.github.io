@@ -5,7 +5,6 @@ export default function GallerySection({
   section,
   imgs,
   startIndex,
-  visibleCount,
   itemRefs,
   onImageClick,
   selectedIndex,
@@ -31,7 +30,6 @@ export default function GallerySection({
               key={index}
               img={img}
               index={index}
-              visible={index < visibleCount}
               itemRef={(el) => (itemRefs.current[index] = el)}
               onClick={() => onImageClick(img, index)}
               isSelected={selectedIndex === index}

@@ -1,5 +1,5 @@
 import "./ButtonGrid.css";
-import ButtonRow from "./ButtonRow";
+import NavButton from "./NavButton";
 
 const BUTTONS_PER_ROW = 4;
 
@@ -28,7 +28,11 @@ export default function ButtonGrid() {
   return (
     <div className="button-grid">
       {rows.map((row, rowIndex) => (
-        <ButtonRow key={rowIndex} buttons={row} />
+        <div key={rowIndex} className="button-row">
+          {row.map((btn, index) => (
+            <NavButton key={index} {...btn} />
+          ))}
+        </div>
       ))}
     </div>
   );

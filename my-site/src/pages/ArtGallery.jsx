@@ -7,6 +7,17 @@ import useGalleryImages from "../components/gallery/useGalleryImages";
 
 import "./ArtGallery.css";
 
+const SECTION_MAP = {
+  "hall of fame": "Hall of Fame",
+  "fools errand": "Fool's Errand",
+  "fool's errand": "Fool's Errand",
+};
+
+const SORT_ORDER = {
+  "Hall of Fame": 0,
+  "Fool's Errand": 2,
+};
+
 export default function ArtGallery() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
@@ -14,6 +25,7 @@ export default function ArtGallery() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalClosing, setIsModalClosing] = useState(false);
+  const [closeState, setCloseState] = useState("normal");
 
   useEffect(() => {
     document.title = "Jallomoth — Art Gallery";
@@ -35,17 +47,7 @@ export default function ArtGallery() {
     }
   }, [isModalOpen, finalImagePosition]);
 
-  const { images, grouped } = useGalleryImages(
-    {
-      "hall of fame": "Hall of Fame",
-      "fools errand": "Fool's Errand",
-      "fool's errand": "Fool's Errand",
-    },
-    {
-      "Hall of Fame": 0,
-      "Fool's Errand": 2,
-    }
-  );
+  const { images, grouped } = useGalleryImages(SECTION_MAP, SORT_ORDER);
 
   // Refs to thumbnail elements so keyboard navigation can position animations
   const itemRefs = useRef([]);
@@ -163,7 +165,6 @@ export default function ArtGallery() {
 
       <Gallery
         groupedImages={grouped}
-        images={images}
         selectedIndex={selectedIndex}
         isModalOpen={isModalOpen}
         isModalClosing={isModalClosing}
@@ -192,14 +193,25 @@ export default function ArtGallery() {
           )}
           <button
             className="close-button"
+            aria-label="Close"
+            onMouseEnter={() => setCloseState("hover")}
+            onMouseLeave={() => setCloseState("normal")}
+            onMouseDown={() => setCloseState("press")}
+            onMouseUp={() => setCloseState("hover")}
             onClick={(e) => {
               e.stopPropagation();
               handleCloseModal();
             }}
           >
-            <img className="close-icon default" src="/x/x.png" alt="close" />
-            <img className="close-icon hover" src="/x/x-hover.png" alt="close" />
-            <img className="close-icon press" src="/x/x-press.png" alt="close" />
+            <img
+              className="close-icon"
+              src={
+                closeState === "press" ? "/x/x-press.png"
+                : closeState === "hover" ? "/x/x-hover.png"
+                : "/x/x.png"
+              }
+              alt=""
+            />
           </button>
         </div>
       )}

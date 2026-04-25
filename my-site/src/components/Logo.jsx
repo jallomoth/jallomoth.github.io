@@ -23,8 +23,9 @@ export default function Logo({
   const pos = useRef({ x: 0, y: 0 });
   const velocity = useRef({ x: 0, y: 0 });
 
-  const soundRef = useRef(null);
-  const { effectiveVolume } = useAudio();
+  const { effectiveVolume, playSound } = useAudio();
+  // Ref so the physics closure always reads the latest volume without restarting
+  const effectiveVolumeRef = useRef(effectiveVolume);
 
   // -----------------------------
   // POPUP SCALE CALC
@@ -52,12 +53,10 @@ export default function Logo({
 
   const popupSize = getPopupSize();
 
-  // preload sound
+  // Keep effectiveVolumeRef in sync so the physics closure reads the latest value
   useEffect(() => {
-    const audio = new Audio("/sounds/snap.mp3");
-    audio.volume = effectiveVolume;
-    soundRef.current = audio;
-  }, []);
+    effectiveVolumeRef.current = effectiveVolume;
+  }, [effectiveVolume]);
 
   // physics
   useEffect(() => {
@@ -83,14 +82,9 @@ export default function Logo({
 
         const THRESHOLD = 500;
 
-        if (distance > THRESHOLD && soundRef.current) {
+        if (distance > THRESHOLD) {
           const strength = Math.min(distance / 300, 1);
-
-          soundRef.current.volume =
-            effectiveVolume * (0.4 + strength * 0.6);
-
-          soundRef.current.currentTime = 0;
-          soundRef.current.play().catch(() => {});
+          playSound("/sounds/snap.mp3", effectiveVolumeRef.current * (0.4 + strength * 0.6));
         }
       }
     };
@@ -142,13 +136,7 @@ export default function Logo({
       window.removeEventListener("mouseup", handleMouseUp);
       cancelAnimationFrame(frame);
     };
-  }, [effectiveVolume, center]);
-
-  useEffect(() => {
-    if (soundRef.current) {
-      soundRef.current.volume = effectiveVolume;
-    }
-  }, [effectiveVolume]);
+  }, [center]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();

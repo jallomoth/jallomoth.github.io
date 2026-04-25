@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import GallerySection from "./GallerySection";
 import "./Gallery.css";
 
-export default function Gallery({ groupedImages, images, selectedIndex, isModalOpen, isModalClosing, onImageClick, itemRefs: externalItemRefs }) {
-  const [visibleCount, setVisibleCount] = useState(0);
+export default function Gallery({ groupedImages, selectedIndex, isModalOpen, isModalClosing, onImageClick, itemRefs: externalItemRefs }) {
 
   // Allow parent to pass a ref array so the parent (ArtGallery) can read
   // thumbnail DOMRects for keyboard navigation. If not provided, fall back
@@ -12,17 +11,6 @@ export default function Gallery({ groupedImages, images, selectedIndex, isModalO
   const itemRefs = externalItemRefs ?? internalItemRefs;
   const sectionRefs = useRef({});
   const scrollRef = useRef(null);
-
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setVisibleCount(i);
-      if (i >= images.length) clearInterval(interval);
-    }, 20);
-
-    return () => clearInterval(interval);
-  }, [images.length]);
 
   const scrollToSection = (section) => {
     const container = scrollRef.current;
@@ -84,7 +72,6 @@ export default function Gallery({ groupedImages, images, selectedIndex, isModalO
             section={section}
             imgs={imgs}
             startIndex={startIndex}
-            visibleCount={visibleCount}
             itemRefs={itemRefs}
             onImageClick={handleImageClick}
             selectedIndex={selectedIndex}

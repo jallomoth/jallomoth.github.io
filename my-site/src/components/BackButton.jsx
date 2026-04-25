@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAudio } from "./audio/AudioContext";
 import "./BackButton.css";
@@ -10,30 +10,7 @@ export default function BackButton({
 }) {
   const navigate = useNavigate();
   const [state, setState] = useState("normal");
-  const { effectiveVolume } = useAudio();
-
-  // Audio setup
-  const clickSound = useRef(new Audio("/sounds/click.mp3"));
-
-  useEffect(() => {
-    const audio = clickSound.current;
-    audio.load();
-    audio.volume = effectiveVolume * 0.2; // base 0.2
-  }, []);
-
-  useEffect(() => {
-    if (clickSound.current) {
-      clickSound.current.volume = effectiveVolume * 0.2;
-    }
-  }, [effectiveVolume]);
-
-  const playSound = () => {
-    const audio = clickSound.current;
-
-    // allow rapid replays
-    audio.currentTime = 0;
-    audio.play();
-  };
+  const { effectiveVolume, playSound } = useAudio();
 
   const handleMouseDown = () => {
     setState("click"); // visual only
@@ -41,8 +18,7 @@ export default function BackButton({
 
   const handleMouseUp = () => {
     setState("hover");
-
-    playSound(); // SOUND NOW ONLY ON RELEASE
+    playSound("/sounds/click.mp3", effectiveVolume * 0.2);
     navigate('/');
   };
 

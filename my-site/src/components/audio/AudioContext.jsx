@@ -53,6 +53,7 @@ export function AudioProvider({ children }) {
   const [musicPlaying, setMusicPlaying] = useState(false);
 
   const audioRef = useRef(null);
+  const soundPoolRef = useRef({});
   const effectiveVolumeRef = useRef(0.5);
   const musicPlayingRef = useRef(false);
   const interactionStartRef = useRef(null);
@@ -62,21 +63,32 @@ export function AudioProvider({ children }) {
   const effectiveVolume = muted ? 0 : volume;
 
   /* -----------------------------
-     PRELOAD SOUNDS
+     PRELOAD SOUND EFFECTS INTO POOL
   ----------------------------- */
 
   useEffect(() => {
-    const sounds = [
-      "/music/home.mp3",
-      "/sounds/snap.mp3",
-      "/sounds/click.mp3",
-    ];
-
-    sounds.forEach((src) => {
+    ["/sounds/snap.mp3", "/sounds/click.mp3"].forEach((src) => {
       const audio = new Audio(src);
       audio.preload = "auto";
       audio.load();
+      soundPoolRef.current[src] = audio;
     });
+  }, []);
+
+  /* -----------------------------
+     PLAY SOUND (SHARED HELPER)
+  ----------------------------- */
+
+  const playSound = useCallback((src, volume) => {
+    if (!soundPoolRef.current[src]) {
+      const audio = new Audio(src);
+      audio.preload = "auto";
+      soundPoolRef.current[src] = audio;
+    }
+    const audio = soundPoolRef.current[src];
+    audio.volume = Math.max(0, Math.min(1, volume ?? effectiveVolumeRef.current));
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
   }, []);
 
   /* -----------------------------
@@ -222,6 +234,7 @@ export function AudioProvider({ children }) {
         muted,
         toggleMute,
         effectiveVolume,
+        playSound,
         startMusic,
         stopMusic,
         musicPlaying,

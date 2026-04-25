@@ -1,10 +1,9 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./GalleryItem.css";
 
 export default function GalleryItem({
   img,
   index,
-  visible,
   itemRef,
   onClick,
   isSelected,
@@ -12,12 +11,30 @@ export default function GalleryItem({
   isModalClosing,
 }) {
   const localRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Create a combined ref that sets both the callback ref and local ref
   const combinedRef = (el) => {
     localRef.current = el;
     if (itemRef) itemRef(el);
   };
+
+  // Animate in when scrolled into view; unobserve afterwards (fire-once)
+  useEffect(() => {
+    const el = localRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMouseMove = (e) => {
     const el = localRef.current;
@@ -54,7 +71,7 @@ export default function GalleryItem({
   return (
     <div
       ref={combinedRef}
-      className={`gallery-item ${visible ? "show" : ""}`}
+      className={`gallery-item ${isVisible ? "show" : ""}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleLeave}
     >
