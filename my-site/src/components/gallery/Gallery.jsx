@@ -56,7 +56,7 @@ export default function Gallery({ groupedImages, selectedIndex, isModalOpen, isM
             className="gallery-nav-button"
             onClick={() => scrollToSection(section)}
           >
-            <img src={`/nav/${section}.png`} alt={section} />
+            <img src={`/gallery/${section}.png`} alt={section} />
           </button>
         ))}
       </div>
