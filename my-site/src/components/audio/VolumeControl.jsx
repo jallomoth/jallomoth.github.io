@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useAudio } from "./AudioContext";
+import { useDrag } from "../../contexts/DragContext";
 import "./VolumeControl.css";
 
 export default function VolumeControl() {
   const { volume, setVolume, muted, toggleMute } = useAudio();
+  const { isGrabbingRef } = useDrag();
 
   // slider is shown only when hovering the icon; stays open while over slider or dragging
   const [sliderVisible, setSliderVisible] = useState(false);
@@ -94,7 +96,7 @@ export default function VolumeControl() {
 
   const handleSliderMouseDown = (e) => {
     setDragging(true);
-    window.isGrabbing = true;
+    isGrabbingRef.current = true;
     updateVolumeFromMouse(e.clientY);
   };
 
@@ -108,7 +110,7 @@ export default function VolumeControl() {
 
     const handleUp = () => {
       setIconPressed(false);
-      window.isGrabbing = false;
+      isGrabbingRef.current = false;
       if (dragging) {
         setDragging(false);
         // only schedule hide if mouse has left the control

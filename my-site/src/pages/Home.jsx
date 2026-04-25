@@ -3,11 +3,10 @@ import "../App.css";
 import Logo from "../components/Logo";
 import ButtonGrid from "../components/ButtonGrid";
 import { useAudio } from "../components/audio/AudioContext";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function Home() {
-    useEffect(() => {
-      document.title = "Jallomoth";
-    }, []);
+  usePageTitle("Jallomoth");
 
   const { startMusic } = useAudio();
 

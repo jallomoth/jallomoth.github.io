@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import useAnimationFrame from "../hooks/useAnimationFrame";
+import { useDrag } from "../contexts/DragContext";
 
 export default function Cursor() {
   const cursorRef = useRef(null);
@@ -10,6 +12,9 @@ export default function Cursor() {
 
   const currentImage = useRef("/cursor/cursor.png");
 
+  const { isGrabbingRef } = useDrag();
+
+  // Event listeners (no rAF here — handled by useAnimationFrame below)
   useEffect(() => {
     // Disable on touch devices
     if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
@@ -17,7 +22,7 @@ export default function Cursor() {
     }
 
     // default state
-    window.isGrabbing = false;
+    isGrabbingRef.current = false;
 
     const move = (e) => {
       const x = e.clientX;
@@ -44,7 +49,7 @@ export default function Cursor() {
 
     const handleUp = () => {
       scale.current = 1;
-      window.isGrabbing = false; // release grab globally
+      isGrabbingRef.current = false; // release grab globally
     };
 
     const handleBlur = () => {
@@ -67,16 +72,26 @@ export default function Cursor() {
     window.addEventListener("focus", handleFocus);
     document.addEventListener("mouseleave", handleLeave);
 
-    let frame;
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mousedown", handleDown);
+      window.removeEventListener("mouseup", handleUp);
 
-    const animate = () => {
-      pos.current.x = mouse.current.x;
-      pos.current.y = mouse.current.y;
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("mouseleave", handleLeave);
+    };
+  }, [isGrabbingRef]);
 
-      // SWITCH CURSOR IMAGE BASED ON GLOBAL STATE
-      const nextImage = window.isGrabbing
-        ? "/cursor/CursorGrab.png"
-        : "/cursor/Cursor.png";
+  // Animation (shared rAF scheduler)
+  useAnimationFrame(() => {
+    pos.current.x = mouse.current.x;
+    pos.current.y = mouse.current.y;
+
+    // SWITCH CURSOR IMAGE BASED ON GLOBAL STATE
+    const nextImage = isGrabbingRef.current
+      ? "/cursor/CursorGrab.png"
+      : "/cursor/Cursor.png";
 
       if (cursorRef.current) {
         if (currentImage.current !== nextImage) {
@@ -92,24 +107,7 @@ export default function Cursor() {
 
         cursorRef.current.style.opacity = visible.current ? "1" : "0";
       }
-
-      frame = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mousedown", handleDown);
-      window.removeEventListener("mouseup", handleUp);
-
-      window.removeEventListener("blur", handleBlur);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("mouseleave", handleLeave);
-
-      cancelAnimationFrame(frame);
-    };
-  }, []);
+  });
 
   if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
     return null;

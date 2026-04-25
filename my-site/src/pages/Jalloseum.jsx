@@ -1,12 +1,10 @@
-import { useEffect } from "react";
 import '../App.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function Jalloseum() {
-  useEffect(() => {
-    document.title = "Jallomoth — Jalloseum";
-  }, []);
+  usePageTitle("Jallomoth — Jalloseum");
 
   return (
     <>

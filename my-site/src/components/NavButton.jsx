@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useAnimationFrame from "../hooks/useAnimationFrame";
+import { useDrag } from "../contexts/DragContext";
 import "./NavButton.css";
 
 // threshold for treating a drag as a click (pixels)
@@ -21,6 +23,9 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   const pos = useRef({ x: 0, y: 0 });
   const velocity = useRef({ x: 0, y: 0 });
 
+  const { isGrabbingRef, isDraggingButtonRef, draggedButtonPosRef } = useDrag();
+  const lastTimeRef = useRef(performance.now());
+
   const isExternal = /^https?:\/\//.test(to) || to?.startsWith("//");
   const isActive = hovered || draggingState;
   const src = isActive && hoverImage ? hoverImage : image;
@@ -40,6 +45,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   // -----------------------------
   // DRAG + SPRING + MAGNETIC
   // -----------------------------
+  // Event listeners only — animation handled by useAnimationFrame below
   useEffect(() => {
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
@@ -50,7 +56,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       pos.current.x = mouse.current.x - dragOffset.current.x;
       pos.current.y = mouse.current.y - dragOffset.current.y;
 
-      window.draggedButtonPos = {
+      draggedButtonPosRef.current = {
         x: mouse.current.x,
         y: mouse.current.y,
       };
@@ -72,9 +78,9 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         isDragging.current = false;
         setDraggingState(false);
 
-        window.isGrabbing = false;
-        window.isDraggingButton = false;
-        window.draggedButtonPos = null;
+        isGrabbingRef.current = false;
+        isDraggingButtonRef.current = false;
+        draggedButtonPosRef.current = null;
 
         setHovered(false);
 
@@ -99,67 +105,60 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
 
-    let frame;
-    let lastTime = performance.now();
-
-    const animate = (currentTime) => {
-      const deltaTime = (currentTime - lastTime) / (1000 / 60);
-      lastTime = currentTime;
-
-      if (!isDragging.current) {
-        const spring = 0.2;
-        const damping = 0.7;
-
-        velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
-        velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
-
-        velocity.current.x *= Math.pow(damping, deltaTime);
-        velocity.current.y *= Math.pow(damping, deltaTime);
-
-        pos.current.x += velocity.current.x * deltaTime;
-        pos.current.y += velocity.current.y * deltaTime;
-      } else {
-        velocity.current.x = 0;
-        velocity.current.y = 0;
-      }
-
-      if (!isDragging.current && window.draggedButtonPos) {
-        const rect = iconRef.current.getBoundingClientRect();
-
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-
-        const dx = cx - window.draggedButtonPos.x;
-        const dy = cy - window.draggedButtonPos.y;
-
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        const RADIUS = 350;
-
-        if (dist < RADIUS) {
-          const force = (RADIUS - dist) / RADIUS;
-
-          pos.current.x += (dx / dist) * force * 20 * deltaTime;
-          pos.current.y += (dy / dist) * force * 20 * deltaTime;
-        }
-      }
-
-      if (iconRef.current) {
-        iconRef.current.style.setProperty('--translate-x', `${pos.current.x}px`);
-        iconRef.current.style.setProperty('--translate-y', `${pos.current.y}px`);
-      }
-
-      frame = requestAnimationFrame(animate);
-    };
-
-    animate(lastTime);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
-      cancelAnimationFrame(frame);
     };
   }, [navigate, to]);
+
+  // Spring + magnetic animation (shared rAF scheduler)
+  useAnimationFrame((currentTime) => {
+    const deltaTime = (currentTime - lastTimeRef.current) / (1000 / 60);
+    lastTimeRef.current = currentTime;
+
+    if (!isDragging.current) {
+      const spring = 0.2;
+      const damping = 0.7;
+
+      velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
+      velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
+
+      velocity.current.x *= Math.pow(damping, deltaTime);
+      velocity.current.y *= Math.pow(damping, deltaTime);
+
+      pos.current.x += velocity.current.x * deltaTime;
+      pos.current.y += velocity.current.y * deltaTime;
+    } else {
+      velocity.current.x = 0;
+      velocity.current.y = 0;
+    }
+
+    if (!isDragging.current && draggedButtonPosRef.current) {
+      const rect = iconRef.current.getBoundingClientRect();
+
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      const dx = cx - draggedButtonPosRef.current.x;
+      const dy = cy - draggedButtonPosRef.current.y;
+
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      const RADIUS = 350;
+
+      if (dist < RADIUS) {
+        const force = (RADIUS - dist) / RADIUS;
+
+        pos.current.x += (dx / dist) * force * 20 * deltaTime;
+        pos.current.y += (dy / dist) * force * 20 * deltaTime;
+      }
+    }
+
+    if (iconRef.current) {
+      iconRef.current.style.setProperty('--translate-x', `${pos.current.x}px`);
+      iconRef.current.style.setProperty('--translate-y', `${pos.current.y}px`);
+    }
+  });
 
   // -----------------------------
   // START DRAG
@@ -170,8 +169,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     isDragging.current = true;
     setDraggingState(true);
 
-    window.isGrabbing = true;
-    window.isDraggingButton = true;
+    isGrabbingRef.current = true;
+    isDraggingButtonRef.current = true;
 
     dragOffset.current.x = e.clientX - pos.current.x;
     dragOffset.current.y = e.clientY - pos.current.y;
@@ -187,11 +186,11 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   // HOVER CONTROL
   // -----------------------------
   const handleEnter = () => {
-    if (!window.isDraggingButton) setHovered(true);
+    if (!isDraggingButtonRef.current) setHovered(true);
   };
 
   const handleLeave = () => {
-    if (!window.isDraggingButton) setHovered(false);
+    if (!isDraggingButtonRef.current) setHovered(false);
   };
 
   const handleKeyDown = (event) => {

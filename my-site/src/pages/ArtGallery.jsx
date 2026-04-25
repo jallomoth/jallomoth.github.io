@@ -4,6 +4,7 @@ import BackButton from "../components/BackButton";
 
 import Gallery from "../components/gallery/Gallery";
 import useGalleryImages from "../components/gallery/useGalleryImages";
+import usePageTitle from "../hooks/usePageTitle";
 
 import "./ArtGallery.css";
 
@@ -27,14 +28,12 @@ export default function ArtGallery() {
   const [isModalClosing, setIsModalClosing] = useState(false);
   const [closeState, setCloseState] = useState("normal");
 
-  useEffect(() => {
-    document.title = "Jallomoth — Art Gallery";
-  }, []);
+  usePageTitle("Jallomoth — Art Gallery");
 
   // Animate modal image to final position when opening
   useEffect(() => {
     if (isModalOpen && finalImagePosition) {
-      const modalImage = document.querySelector(".modal-image");
+      const modalImage = modalImageRef.current;
       if (modalImage) {
         // Force a reflow to trigger the animation
         void modalImage.offsetWidth;
@@ -51,6 +50,7 @@ export default function ArtGallery() {
 
   // Refs to thumbnail elements so keyboard navigation can position animations
   const itemRefs = useRef([]);
+  const modalImageRef = useRef(null);
 
   const handleImageClick = (img, index, rect) => {
     // Convert DOMRect to plain object with the values we need
@@ -78,7 +78,7 @@ export default function ArtGallery() {
     setIsModalClosing(true);
 
     // Animate image back to original position
-    const modalImage = document.querySelector(".modal-image");
+    const modalImage = modalImageRef.current;
     if (modalImage && imagePosition) {
       modalImage.style.top = `${imagePosition.top}px`;
       modalImage.style.left = `${imagePosition.left}px`;
@@ -105,7 +105,7 @@ export default function ArtGallery() {
   useEffect(() => {
     if (!isModalOpen || !selectedImage || !finalImagePosition) return;
 
-    const modalImage = document.querySelector(".modal-image");
+    const modalImage = modalImageRef.current;
     if (!modalImage) return;
 
     // If we have a source thumbnail position, start the modal image there
@@ -180,6 +180,7 @@ export default function ArtGallery() {
         >
           {selectedImage && (
             <img
+              ref={modalImageRef}
               className="modal-image"
               src={selectedImage.src}
               alt={selectedImage.label}

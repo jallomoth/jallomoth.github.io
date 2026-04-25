@@ -1,20 +1,16 @@
-import { useEffect } from "react";
 import '../App.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
 import ComicViewer from "../components/ComicViewer";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function FoolsErrand() {
-  useEffect(() => {
-    document.title = "Jallomoth — Fool's Errand";
-  }, []);
+  usePageTitle("Jallomoth — Fool's Errand");
 
   return (
     <>
       <Logo top="1.5vw" left="50%" width="20vw" center={true} src="/logo/FoolsErrand.png" hoverSrc="/logo/FoolsErrand-hover.png" />
       <BackButton />
-      <div className="page-content" />
-
       <ComicViewer />
     </>
   );

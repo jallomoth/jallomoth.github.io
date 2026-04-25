@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAudio } from "./audio/AudioContext";
+import useAnimationFrame from "../hooks/useAnimationFrame";
+import { useDrag } from "../contexts/DragContext";
 import "./Logo.css";
 
 export default function Logo({
@@ -26,6 +28,8 @@ export default function Logo({
   const { effectiveVolume, playSound } = useAudio();
   // Ref so the physics closure always reads the latest volume without restarting
   const effectiveVolumeRef = useRef(effectiveVolume);
+  const { isGrabbingRef } = useDrag();
+  const lastTimeRef = useRef(performance.now());
 
   // -----------------------------
   // POPUP SCALE CALC
@@ -58,7 +62,7 @@ export default function Logo({
     effectiveVolumeRef.current = effectiveVolume;
   }, [effectiveVolume]);
 
-  // physics
+  // physics — event listeners
   useEffect(() => {
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
@@ -73,7 +77,7 @@ export default function Logo({
     const handleMouseUp = () => {
       if (isDragging.current) {
         isDragging.current = false;
-        window.isGrabbing = false;
+        isGrabbingRef.current = false;
 
         const distance = Math.sqrt(
           pos.current.x * pos.current.x +
@@ -92,57 +96,50 @@ export default function Logo({
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
 
-    let frame;
-    let lastTime = performance.now();
-
-    const animate = (currentTime) => {
-      const deltaTime = Math.min(
-        (currentTime - lastTime) / (1000 / 60),
-        2
-      );
-      lastTime = currentTime;
-
-      if (!isDragging.current) {
-        const spring = 0.16;
-        const damping = 0.8;
-
-        velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
-        velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
-
-        velocity.current.x *= Math.pow(damping, deltaTime);
-        velocity.current.y *= Math.pow(damping, deltaTime);
-
-        pos.current.x += velocity.current.x * deltaTime;
-        pos.current.y += velocity.current.y * deltaTime;
-      } else {
-        velocity.current.x = 0;
-        velocity.current.y = 0;
-      }
-
-      if (containerRef.current) {
-        containerRef.current.style.transform = `
-          ${center ? "translate(-50%, -50%)" : ""}
-          translate(${pos.current.x}px, ${pos.current.y}px)
-        `;
-      }
-
-      frame = requestAnimationFrame(animate);
-    };
-
-    animate(lastTime);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
-      cancelAnimationFrame(frame);
     };
-  }, [center]);
+  }, [playSound, isGrabbingRef]);
+
+  // physics — animation loop (shared rAF scheduler)
+  useAnimationFrame((currentTime) => {
+    const deltaTime = Math.min(
+      (currentTime - lastTimeRef.current) / (1000 / 60),
+      2
+    );
+    lastTimeRef.current = currentTime;
+
+    if (!isDragging.current) {
+      const spring = 0.16;
+      const damping = 0.8;
+
+      velocity.current.x += (0 - pos.current.x) * spring * deltaTime;
+      velocity.current.y += (0 - pos.current.y) * spring * deltaTime;
+
+      velocity.current.x *= Math.pow(damping, deltaTime);
+      velocity.current.y *= Math.pow(damping, deltaTime);
+
+      pos.current.x += velocity.current.x * deltaTime;
+      pos.current.y += velocity.current.y * deltaTime;
+    } else {
+      velocity.current.x = 0;
+      velocity.current.y = 0;
+    }
+
+    if (containerRef.current) {
+      containerRef.current.style.transform = `
+        ${center ? "translate(-50%, -50%)" : ""}
+        translate(${pos.current.x}px, ${pos.current.y}px)
+      `;
+    }
+  });
 
   const handleMouseDown = (e) => {
     e.preventDefault();
 
     isDragging.current = true;
-    window.isGrabbing = true;
+    isGrabbingRef.current = true;
 
     dragOffset.current.x = e.clientX - pos.current.x;
     dragOffset.current.y = e.clientY - pos.current.y;
@@ -168,13 +165,13 @@ export default function Logo({
 
   useEffect(() => {
     const handleGlobalMouseUp = () => {
-      window.isGrabbing = false;
+      isGrabbingRef.current = false;
     };
 
     window.addEventListener("mouseup", handleGlobalMouseUp);
     return () =>
       window.removeEventListener("mouseup", handleGlobalMouseUp);
-  }, []);
+  }, [isGrabbingRef]);
 
   return (
     <>
