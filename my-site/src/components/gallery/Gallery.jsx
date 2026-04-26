@@ -20,18 +20,18 @@ export default function Gallery({ groupedImages, selectedIndex, isModalOpen, isM
     const containerRect = container.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
 
-    const offsetPx =
-      (parseFloat(
-        getComputedStyle(document.documentElement)
-          .getPropertyValue("--ui-top-space")
-      ) / 100) * window.innerWidth;
+    // Read the resolved pixel value of padding-top directly from computed style.
+    // getPropertyValue("--ui-top-space") returns the raw token string (e.g.
+    // "clamp(60px, 9vw, 200px)") which parseFloat cannot evaluate — it returns NaN
+    // and the scroll is silently skipped.
+    const topOffset = parseFloat(getComputedStyle(container).paddingTop) || 0;
 
     container.scrollTo({
       top:
         targetRect.top -
         containerRect.top +
         container.scrollTop -
-        offsetPx,
+        topOffset,
       behavior: "smooth",
     });
   };

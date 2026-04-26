@@ -11,6 +11,7 @@ export default function Logo({
   left = "50%",
   width = "60vw",
   center = true,
+  className = "",
   src = "/logo/Jallogo.png",
   hoverSrc = "/logo/JallogoHover.png",
 }) {
@@ -200,7 +201,7 @@ export default function Logo({
     <>
       <div
         ref={containerRef}
-        className="logo-container"
+        className={`logo-container${className ? ` ${className}` : ""}`}
         style={{ top, left, width }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}

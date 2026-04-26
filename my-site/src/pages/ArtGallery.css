@@ -1,5 +1,9 @@
 :root {
-  --ui-top-space: 9vw;
-  --gallery-offset: 2vw;
-  --ui-side-space: 5vw;
+  /* Enough headroom for the logo + back/mute buttons (which end at ~64px).
+     60px gives comfortable clearance without pushing content too low. */
+  --ui-top-space:     clamp(60px, 9vw, 200px);
+  /* Fade width — gallery content transitions from invisible to fully opaque
+     over this distance, ending exactly where the nav button bar starts. */
+  --gallery-offset:   clamp(24px, 2vw, 40px);
+  --ui-side-space:    clamp(12px, 5vw, 100px);
 }

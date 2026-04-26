@@ -26,11 +26,14 @@ export default function NotFound() {
   // -----------------------------
   // MEDIA STYLES
   // -----------------------------
+  // min(50vh, 85vw) prevents horizontal overflow on portrait mobile
+  // where 50vh could exceed the viewport width.
+  const mediaSize = "min(50vh, 85vw)";
   const mediaContainerStyle = {
     position: "fixed",
 
-    width: "50vh",
-    height: "50vh",
+    width: mediaSize,
+    height: mediaSize,
 
     left: "50%",
     transform: "translateX(-50%)",

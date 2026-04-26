@@ -5,6 +5,9 @@
 
   will-change: transform;
 
+  /* Eliminate 300ms tap delay and prevent double-tap zoom on touch devices */
+  touch-action: manipulation;
+
   -webkit-user-drag: none;
   user-select: none;
 }

@@ -218,9 +218,11 @@ export function AudioProvider({ children }) {
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = effectiveVolume;
+      // Use .muted for reliable cross-platform muting (iOS Safari ignores .volume changes)
+      audioRef.current.muted = muted;
+      audioRef.current.volume = muted ? 0 : volume;
     }
-  }, [effectiveVolume]);
+  }, [muted, volume]);
 
   /* -----------------------------
      CONTEXT

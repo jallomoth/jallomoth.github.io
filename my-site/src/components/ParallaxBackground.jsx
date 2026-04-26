@@ -22,6 +22,24 @@ export default function ParallaxBackground() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  // Device orientation tracking (mobile gyroscope parallax)
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    if (!('DeviceOrientationEvent' in window)) return;
+
+    const handleOrientation = (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      // gamma: left/right tilt (-90 to 90 degrees)
+      // beta:  front/back tilt (-180 to 180 degrees); subtract 30° for
+      //        the natural forward-tilted angle when holding a phone
+      target.current.x = Math.max(-0.5, Math.min(0.5, e.gamma / 45));
+      target.current.y = Math.max(-0.5, Math.min(0.5, (e.beta - 30) / 45));
+    };
+
+    window.addEventListener("deviceorientation", handleOrientation);
+    return () => window.removeEventListener("deviceorientation", handleOrientation);
+  }, []);
+
   // Animation (shared rAF scheduler)
   useAnimationFrame((currentTime) => {
     if (prefersReducedMotion) return;

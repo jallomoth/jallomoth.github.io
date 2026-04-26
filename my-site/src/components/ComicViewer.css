@@ -1,7 +1,10 @@
 /* ─── ComicViewer — complete layout ────────────────────────────────────────── */
 
 :root {
-  /* How far down to start below the fixed site header (logo ~5vw tall + 1.5vw top offset) */
+  /* How far down to start below the fixed site header.
+     Logo center is now at calc(20px + clamp(22px, 2.5vw, 50px)).
+     At 1920px: 68px center + ~34px logo half-height ≈ 100px → 7vw ≈ 134px is fine.
+     The comment below is kept for context. */
   --cv-header-clearance: 7vw;
 
   /* Topbar */
@@ -396,6 +399,90 @@
   :root {
     --cv-image-max-w: 88vw;
     --cv-nav-font: 1.9rem;
+  }
+}
+
+/* ── Mobile portrait (<= 600px) ──────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  :root {
+    /* Push topbar below the fixed back button + volume icon (both end at ~64px).
+       7vw on a 390px phone = only 27px — far too little clearance. */
+    --cv-header-clearance: 72px;
+    /* Constrain image so the side nav buttons always have 40px each */
+    --cv-image-max-w: calc(100vw - 80px);
+  }
+
+  /* ── topbar: flex-wrap so items can form two lines ── */
+  .comic-topbar {
+    flex-wrap: wrap;
+    padding: 0.5rem 0.75rem;
+    row-gap: 0.35rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .topbar-left  { order: 1; }
+  .topbar-right { order: 2; gap: 0.4rem; }
+
+  /* Title drops to its own full-width line */
+  .topbar-center {
+    position: static;
+    transform: none;
+    font-size: 1rem;
+    order: 10;
+    width: 100%;
+    text-align: center;
+    padding: 0.1rem 0;
+    pointer-events: none;
+  }
+
+  /* Shrink all topbar buttons */
+  .chapter-toggle {
+    font-size: 0.78rem;
+    padding: 0.38rem 0.6rem;
+    letter-spacing: 0;
+  }
+
+  /* Dropdown: smaller text, centered below the toggle */
+  .chapter-list {
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    max-height: 180px;
+  }
+
+  .chapter-item {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.75rem;
+    text-align: center;
+  }
+
+  /* Fullscreen API is unsupported on iOS — hide the button on mobile */
+  .fullscreen-btn {
+    display: none;
+  }
+
+  /* Chapter-nav buttons: show again (replaces fullscreen space), compact size */
+  .chapter-nav-btn {
+    display: inline-flex;
+    font-size: 0.72rem;
+    padding: 0.38rem 0.5rem;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  /* Page counter is already visible below the image */
+  .page-count {
+    display: none;
+  }
+
+  /* Shrink side nav arrow images */
+  .nav-img {
+    width: 7vw;
+    min-width: 28px;
+    max-width: 44px;
   }
 }
 

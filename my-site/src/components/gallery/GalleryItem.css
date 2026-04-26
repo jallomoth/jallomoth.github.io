@@ -32,9 +32,12 @@
     filter 0.25s ease;
 }
 
-.gallery-item:hover .tilt-inner {
-  transform: scale(1.05);
-  filter: brightness(1.1);
+/* Tilt hover only on real pointer devices */
+@media (hover: hover) {
+  .gallery-item:hover .tilt-inner {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
 }
 
 /* IMAGE */
@@ -63,9 +66,9 @@
 
 /* TEXT LABEL */
 .gallery-item p {
-  margin-top: 1vw;
+  margin-top: clamp(6px, 1vw, 16px);
   text-align: center;
-  font-size: 1.5vw;
+  font-size: clamp(16px, 1.5vw, 28px);
   color: var(--color-accent);
 
   font-family: "Chelsea Market", system-ui;
@@ -83,8 +86,16 @@
     color 0.25s ease;
 }
 
-.gallery-item:hover p {
-  transform: scale(1.05);
-  opacity: 1;
-  color: #ffffff;
+/* Hover effects only on pointer devices — prevents stuck hover state on iOS */
+@media (hover: hover) {
+  .gallery-item:hover .tilt-inner {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+
+  .gallery-item:hover p {
+    transform: scale(1.05);
+    opacity: 1;
+    color: #ffffff;
+  }
 }

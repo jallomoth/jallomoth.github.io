@@ -11,21 +11,22 @@
 
   padding-top: calc(var(--ui-top-space) + var(--gallery-offset));
 
+  /* Transparent zone covers the fixed logo/back/mute elements (0 → --ui-top-space).
+     Short fade ends at --ui-top-space + --gallery-offset, which is exactly where
+     padding-top places the nav button bar — so nav buttons are always fully opaque. */
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    transparent calc(var(--ui-top-space) - 1vw),
-    rgba(0, 0, 0, 0.6) var(--ui-top-space),
-    black calc(var(--ui-top-space) + 1vw),
+    transparent var(--ui-top-space),
+    black calc(var(--ui-top-space) + var(--gallery-offset)),
     black 100%
   );
 
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    transparent calc(var(--ui-top-space) - 1vw),
-    rgba(0, 0, 0, 0.6) var(--ui-top-space),
-    black calc(var(--ui-top-space) + 1vw),
+    transparent calc(var(--ui-top-space) + 12px),
+    black calc(var(--ui-top-space) + var(--gallery-offset)),
     black 100%
   );
 }
@@ -36,7 +37,7 @@
 
 .gallery-nav {
   width: 90%;
-  margin: -1.5vw auto 1vw auto;
+  margin: 0 auto 1vw auto;
 
   padding-left: var(--ui-side-space);
   padding-right: var(--ui-side-space);
@@ -52,13 +53,13 @@
   border: none;
   cursor: pointer;
 
-  padding: 0;
+  /* Padding expands tap area on mobile without changing visual size */
+  padding: 0.35rem;
   transition: transform 0.2s ease;
 }
 
 .gallery-nav-button img {
-  width: 6vw;
-  max-width: 120px;
+  width: clamp(44px, 6vw, 120px);
   pointer-events: none;
 }
 
@@ -128,8 +129,8 @@
   top: 3vh;
   right: 3vw;
 
-  width: 4vw;
-  height: 4vw;
+  width: clamp(36px, 4vw, 64px);
+  height: clamp(36px, 4vw, 64px);
 
   background: transparent;
   border: none;

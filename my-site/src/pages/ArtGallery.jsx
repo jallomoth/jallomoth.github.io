@@ -316,7 +316,7 @@ export default function ArtGallery() {
 
   return (
     <>
-      <Logo top="1vw" left="50%" width="35vw" center />
+      <Logo top="20px" left="50%" width="35vw" center />
       <BackButton />
 
       <main>

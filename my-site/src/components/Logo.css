@@ -4,8 +4,32 @@
   height: auto;
   z-index: 9998;
 
+  /* Prevent logo from becoming untappably small on very narrow viewports.
+     min-width overrides the inline width prop when vw math produces a smaller value. */
+  min-width: 80px;
+
   pointer-events: auto;
   cursor: grab;
+}
+
+/* On mobile, subpage logos (20vw ≈ 78px) are too small to read.
+   Bump the minimum so they're always at least 150px wide. */
+@media (max-width: 600px) {
+  .logo-container {
+    min-width: 200px;
+  }
+}
+
+/* Home page logo: on portrait/narrow screens center it vertically in
+   the empty space between the fixed header buttons and the button grid.
+   calc(32px + 16vh) ≈ midpoint of (header-bottom ≈ 64px) and (grid-top ≈ 30vh).
+   !important is needed to override the inline `top` style set by the prop. */
+@media (max-width: 860px) {
+  .home-logo {
+    top: calc(32px + 14vh) !important;
+    /* Match the nav button grid width (4 × 20vw + 3 × 3vw = 89vw) */
+    width: 88vw !important;
+  }
 }
 
 .logo-container:active {

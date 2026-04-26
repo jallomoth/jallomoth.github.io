@@ -3,6 +3,9 @@ import { useAudio } from "./AudioContext";
 import { useDrag } from "../../contexts/DragContext";
 import "./VolumeControl.css";
 
+// True on any touch-primary device (phones, tablets)
+const IS_TOUCH_DEVICE = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
 export default function VolumeControl() {
   const { volume, setVolume, muted, toggleMute } = useAudio();
   const { isGrabbingRef } = useDrag();
@@ -22,6 +25,8 @@ export default function VolumeControl() {
   };
 
   const scheduleHide = () => {
+    // Never auto-hide on touch devices — slider stays open
+    if (IS_TOUCH_DEVICE) return;
     clearTimeout(hideTimer.current);
     hideTimer.current = setTimeout(() => {
       // only animate away if the slider is actually visible
@@ -48,6 +53,9 @@ export default function VolumeControl() {
   const [dragging, setDragging] = useState(false);
 
   const sliderRef = useRef(null);
+
+  // On touch devices the slider is shown/hidden by tapping the icon.
+  // (The permanent-show approach was removed because it covered page content.)
 
   // -----------------------------
   // VW → PX RESPONSIVE PADDING
@@ -98,6 +106,22 @@ export default function VolumeControl() {
     setDragging(true);
     isGrabbingRef.current = true;
     updateVolumeFromMouse(e.clientY);
+  };
+
+  // Touch drag handlers for mobile slider
+  const handleSliderTouchStart = (e) => {
+    setDragging(true);
+    isGrabbingRef.current = true;
+    updateVolumeFromMouse(e.touches[0].clientY);
+  };
+
+  const handleSliderTouchMove = (e) => {
+    if (dragging) updateVolumeFromMouse(e.touches[0].clientY);
+  };
+
+  const handleSliderTouchEnd = () => {
+    setDragging(false);
+    isGrabbingRef.current = false;
   };
 
   useEffect(() => {
@@ -176,8 +200,8 @@ export default function VolumeControl() {
         }}
       />
 
-      {/* SLIDER — only mounted when visible, so the space below the icon is empty when closed */}
-      {(sliderVisible || dragging || sliderClosing) && (
+      {/* SLIDER — only rendered on non-touch (mouse/pointer) devices */}
+      {!IS_TOUCH_DEVICE && (sliderVisible || dragging || sliderClosing) && (
       <div
         className={`volume-slider${sliderClosing ? " closing" : ""}`}
         onMouseEnter={() => { overControl.current = true; cancelHide(); }}
@@ -187,6 +211,9 @@ export default function VolumeControl() {
           className="slider-track"
           ref={sliderRef}
           onMouseDown={handleSliderMouseDown}
+          onTouchStart={handleSliderTouchStart}
+          onTouchMove={handleSliderTouchMove}
+          onTouchEnd={handleSliderTouchEnd}
         >
           {/* TRACK */}
           <img

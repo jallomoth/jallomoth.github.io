@@ -13,6 +13,7 @@
   padding: 0;
 
   cursor: none !important;
+  touch-action: manipulation;
 
   display: flex;
   align-items: center;
@@ -38,8 +39,8 @@
 
 /* IMAGE */
 .back-button-image {
-  width: 5vw;
-  height: 5vw;
+  width: clamp(44px, 5vw, 100px);
+  height: clamp(44px, 5vw, 100px);
   object-fit: contain;
 
   pointer-events: none;

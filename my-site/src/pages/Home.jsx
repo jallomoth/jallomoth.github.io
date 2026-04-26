@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <>
-      <Logo top="5%" left="50%" width="60vw" center={true} />
+      <Logo top="max(5%, 6vh)" left="50%" width="60vw" center={true} className="home-logo" />
       <main>
         <ButtonGrid />
       </main>

@@ -34,11 +34,40 @@
 @media (max-width: 720px) {
   .button-grid {
     top: 32%;
-    gap: 3rem;
+    gap: var(--row-gap);
   }
 
   .button-row {
-    gap: 3vw;
+    gap: var(--button-gap);
+  }
+}
+
+/* ── Mobile portrait (<= 540px): keep 4-per-row, scale everything down ────── */
+@media (max-width: 540px) {
+  :root {
+    --button-size: 20vw;
+    --button-gap: 3vw;
+    --row-gap: 3vw;
+  }
+
+  .button-grid {
+    top: 30%;
+    gap: var(--row-gap);
+    /* remove padding so the 4-wide row never overflows on narrow screens */
+    padding: 0;
+  }
+
+  .button-row {
+    gap: var(--button-gap);
+  }
+
+  /* Lift animation proportional to new button size */
+  .icon-container.active-icon .icon-visual {
+    transform: translateY(-1.5vw) scale(1.1);
+  }
+
+  .button-grid.dragging .icon-container.active-icon .icon-visual {
+    transform: translateY(-1.5vw) scale(1.1);
   }
 }
 

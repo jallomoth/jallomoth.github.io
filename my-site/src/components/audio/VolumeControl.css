@@ -1,7 +1,7 @@
 .volume-container {
   position: fixed;
-  top: 40px;
-  right: 40px;
+  top: 20px;
+  right: 20px;
   z-index: 1000;
 
   display: flex;
@@ -14,8 +14,8 @@
 
 /* ICON */
 .volume-icon {
-  width: 4vw;
-  height: 4vw;
+  width: clamp(44px, 5vw, 100px);
+  height: clamp(44px, 5vw, 100px);
   cursor: none !important;
   pointer-events: auto;
 
@@ -62,13 +62,16 @@
 /* TRACK WRAPPER */
 .slider-track {
   position: relative;
-  width: 4vw;
-  height: 9vw;
+  width: clamp(36px, 4vw, 72px);
+  height: clamp(90px, 9vw, 160px);
 
   display: flex;
   justify-content: center;
 
   cursor: pointer;
+
+  /* Prevents the page from scrolling when the user drags the thumb on touch */
+  touch-action: none;
 }
 
 /* TRACK IMAGE */
@@ -87,7 +90,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
 
-  width: 5vw;
+  width: clamp(44px, 5vw, 88px);
   height: auto;
 
   pointer-events: auto;

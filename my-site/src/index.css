@@ -47,6 +47,13 @@ a,
   cursor: none !important;
 }
 
+/* Eliminate 300ms tap delay on touch devices */
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+}
+
 input:hover,
 input:focus,
 textarea:hover,
