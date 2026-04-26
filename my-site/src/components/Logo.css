@@ -26,7 +26,7 @@
    !important is needed to override the inline `top` style set by the prop. */
 @media (max-width: 860px) {
   .home-logo {
-    top: calc(32px + 14vh) !important;
+    top: calc(20px + 10vh) !important;
     /* Match the nav button grid width (4 × 20vw + 3 × 3vw = 89vw) */
     width: 88vw !important;
   }
