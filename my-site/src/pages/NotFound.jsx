@@ -38,7 +38,7 @@ export default function NotFound() {
     left: "50%",
     transform: "translateX(-50%)",
 
-    bottom: "10vh",
+    bottom: "8vh",
 
     zIndex: 1,
 
@@ -89,6 +89,8 @@ export default function NotFound() {
             top: "20vh",
             left: "50%",
             transform: "translateX(-50%)",
+            width: "90vw",
+            maxWidth: "700px",
 
             zIndex: 2,
 
@@ -99,16 +101,17 @@ export default function NotFound() {
           <h1
             style={{
               color: "#5C33FF",
-              fontSize: "5vh",
+              fontSize: "min(5vh, 7vw)",
               margin: 0,
 
               fontFamily: '"Chelsea Market", system-ui',
 
               WebkitTextStroke: "0.2vh black",
+              lineHeight: 1.4,
             }}
           >
-            404 ERROR (╯°□°)╯︵ ┻━┻
-            <br />
+            404 ERROR<br />
+            <span style={{ whiteSpace: "nowrap" }}>(╯°□°)╯︵ ┻━┻</span><br />
             erm ... dafuq ?
           </h1>
         </div>
