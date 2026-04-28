@@ -10,7 +10,7 @@ export default function FoolsErrand() {
 
   return (
     <>
-      <Logo top="20px" left="50%" width="20vw" center={true} src="/logo/FoolsErrand.png" hoverSrc="/logo/FoolsErrand-hover.png" />
+      <Logo top="28px" left="50%" width="24vw" center={true} src="/logo/FoolsErrand.png" hoverSrc="/logo/FoolsErrand-hover.png" />
       <BackButton />
       <main>
         <ErrorBoundary>

@@ -21,6 +21,8 @@ export default function Logo({
   const containerRef = useRef(null);
 
   const isDragging = useRef(false);
+  const hoveredRef = useRef(false);
+  const hoverScaleRef = useRef(1);
 
   const mouse = useRef({ x: 0, y: 0 });
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -152,9 +154,14 @@ export default function Logo({
     prevDragPosRef.current.y = pos.current.y;
 
     if (containerRef.current) {
+      // Lerp the hover scale for a smooth grow/shrink without needing a CSS transition.
+      const targetScale = hoveredRef.current ? 1.06 : 1;
+      hoverScaleRef.current += (targetScale - hoverScaleRef.current) * 0.15 * deltaTime;
+
       containerRef.current.style.transform = `
         ${center ? "translate(-50%, -50%)" : ""}
         translate(${pos.current.x}px, ${pos.current.y}px)
+        scale(${hoverScaleRef.current})
       `;
     }
   });
@@ -203,8 +210,8 @@ export default function Logo({
         ref={containerRef}
         className={`logo-container${className ? ` ${className}` : ""}`}
         style={{ top, left, width }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={() => { setHovered(true); hoveredRef.current = true; }}
+        onMouseLeave={() => { setHovered(false); hoveredRef.current = false; }}
         onMouseDown={handleMouseDown}
       >
         <img

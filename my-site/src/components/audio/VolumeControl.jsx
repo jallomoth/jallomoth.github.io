@@ -10,6 +10,13 @@ export default function VolumeControl() {
   const { volume, setVolume, muted, toggleMute } = useAudio();
   const { isGrabbingRef } = useDrag();
 
+  // Padding expressed as a fraction of the track's rendered height.
+  // Ratio matches the CSS: top = 1.0vw, bottom = 1.2vw, track = 9vw → 1/9 and 1.2/9.
+  // Using fractions of rect.height (instead of window.innerWidth * vw) means the
+  // calculation stays correct at every zoom level, even when the CSS clamp kicks in.
+  const TOP_PAD_FRAC = 1.0 / 9.0;
+  const BOTTOM_PAD_FRAC = 1.2 / 9.0;
+
   // slider is shown only when hovering the icon; stays open while over slider or dragging
   const [sliderVisible, setSliderVisible] = useState(false);
   const [sliderClosing, setSliderClosing] = useState(false);
@@ -54,37 +61,6 @@ export default function VolumeControl() {
 
   const sliderRef = useRef(null);
 
-  // On touch devices the slider is shown/hidden by tapping the icon.
-  // (The permanent-show approach was removed because it covered page content.)
-
-  // -----------------------------
-  // VW → PX RESPONSIVE PADDING
-  // -----------------------------
-  const TOP_PADDING_VW = 1.0;
-  const BOTTOM_PADDING_VW = 1.2;
-
-  const [padding, setPadding] = useState({
-    top: 0,
-    bottom: 0,
-  });
-
-  useEffect(() => {
-    const updatePadding = () => {
-      setPadding({
-        top: (window.innerWidth * TOP_PADDING_VW) / 100,
-        bottom: (window.innerWidth * BOTTOM_PADDING_VW) / 100,
-      });
-    };
-
-    updatePadding();
-    window.addEventListener("resize", updatePadding);
-
-    return () => window.removeEventListener("resize", updatePadding);
-  }, []);
-
-  const TOP_PADDING = padding.top;
-  const BOTTOM_PADDING = padding.bottom;
-
   // -----------------------------
   // VOLUME CALCULATION
   // -----------------------------
@@ -92,12 +68,11 @@ export default function VolumeControl() {
     if (!sliderRef.current) return;
     const rect = sliderRef.current.getBoundingClientRect();
 
-    const usableHeight = rect.height - TOP_PADDING - BOTTOM_PADDING;
+    const topPx = rect.height * TOP_PAD_FRAC;
+    const usableHeight = rect.height * (1 - TOP_PAD_FRAC - BOTTOM_PAD_FRAC);
 
-    let y = clientY - rect.top - TOP_PADDING;
-
+    const y = clientY - rect.top - topPx;
     let percent = 1 - y / usableHeight;
-
     percent = Math.max(0, Math.min(1, percent));
     setVolume(percent);
   };
@@ -152,12 +127,13 @@ export default function VolumeControl() {
   }, [dragging]);
 
   // -----------------------------
-  // THUMB POSITION (VW-AWARE)
+  // THUMB POSITION
   // -----------------------------
-  const thumbPosition = `calc(${TOP_PADDING}px + ${(1 - volume) * 100}% - ${
-    (1 - volume) * (TOP_PADDING + BOTTOM_PADDING)
-  }px)`;
-
+  // top = TOP_PAD_FRAC% + (1 - volume) * usable%
+  // where usable% = (1 - TOP_PAD_FRAC - BOTTOM_PAD_FRAC) * 100%
+  // All values are % of rect.height, consistent at every zoom level.
+  const usableFrac = 1 - TOP_PAD_FRAC - BOTTOM_PAD_FRAC;
+  const thumbPosition = `calc(${TOP_PAD_FRAC * 100}% + ${(1 - volume) * usableFrac * 100}%)`;
   // -----------------------------
   // THUMB IMAGE
   // -----------------------------

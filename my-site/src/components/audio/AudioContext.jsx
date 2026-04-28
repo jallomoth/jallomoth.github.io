@@ -57,6 +57,9 @@ export function AudioProvider({ children }) {
   const effectiveVolumeRef = useRef(0.5);
   const musicPlayingRef = useRef(false);
   const interactionStartRef = useRef(null);
+  const fadeIntervalRef = useRef(null);
+  // Ref so playSound can check mute state without being recreated on every change.
+  const mutedRef = useRef(muted);
 
   const toggleMute = useCallback(() => setMuted((prev) => !prev), []);
 
@@ -80,6 +83,8 @@ export function AudioProvider({ children }) {
   ----------------------------- */
 
   const playSound = useCallback((src, volume) => {
+    // Bail out when muted — iOS ignores audio.volume=0 and plays at full level anyway.
+    if (mutedRef.current) return;
     if (!soundPoolRef.current[src]) {
       const audio = new Audio(src);
       audio.preload = "auto";
@@ -98,6 +103,10 @@ export function AudioProvider({ children }) {
   useEffect(() => {
     effectiveVolumeRef.current = effectiveVolume;
   }, [effectiveVolume]);
+
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
 
   useEffect(() => {
     musicPlayingRef.current = musicPlaying;
@@ -133,22 +142,24 @@ export function AudioProvider({ children }) {
     let started = false;
 
     const fadeIn = () => {
+      clearInterval(fadeIntervalRef.current);
       let currentVolume = 0;
-      const target = effectiveVolumeRef.current;
 
-      const fade = setInterval(() => {
+      fadeIntervalRef.current = setInterval(() => {
         if (!audioRef.current) {
-          clearInterval(fade);
+          clearInterval(fadeIntervalRef.current);
           return;
         }
 
-        currentVolume = Math.min(currentVolume + 1, target);
+        // Read target dynamically so the fade always aims at the current volume.
+        const target = effectiveVolumeRef.current;
+        currentVolume = Math.min(currentVolume + 0.001, target);
         audioRef.current.volume = currentVolume;
 
         if (currentVolume >= target) {
-          clearInterval(fade);
+          clearInterval(fadeIntervalRef.current);
         }
-      }, 0);
+      }, 10);
     };
 
     const startAudio = () => {
@@ -189,10 +200,8 @@ export function AudioProvider({ children }) {
     );
 
     audio.play().catch(() => {
-      // autoplay blocked
+      // autoplay blocked — startAudio() will fire on first interaction
     });
-
-    audio.load();
   }, [cleanupInteractionListeners]);
 
   /* -----------------------------
@@ -201,6 +210,7 @@ export function AudioProvider({ children }) {
 
   const stopMusic = useCallback(() => {
     cleanupInteractionListeners();
+    clearInterval(fadeIntervalRef.current);
 
     if (audioRef.current) {
       audioRef.current.pause();
@@ -218,6 +228,8 @@ export function AudioProvider({ children }) {
 
   useEffect(() => {
     if (audioRef.current) {
+      // Cancel any active fade so the user's manual change takes immediate effect.
+      clearInterval(fadeIntervalRef.current);
       // Use .muted for reliable cross-platform muting (iOS Safari ignores .volume changes)
       audioRef.current.muted = muted;
       audioRef.current.volume = muted ? 0 : volume;
