@@ -64,6 +64,10 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  max-width: calc(100% - 1000px); /* leaves room for left + right columns; shrinks on narrow screens */
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--color-accent);
   font-family: 'Chelsea Market', system-ui;
   font-size: 2rem;
@@ -73,14 +77,14 @@
 
 .topbar-left {
   position: relative;   /* anchor for the dropdown */
-  flex-shrink: 0;
+  flex: none;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  flex-shrink: 0;
+  flex: none;
 }
 
 /* chapter dropdown toggle */
@@ -94,6 +98,10 @@
   font-family: 'Chelsea Market', system-ui;
   cursor: pointer;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: fit-content;
+  max-width: 440px;
   transition: background 0.15s;
 }
 .chapter-toggle:hover { background: rgba(255, 255, 255, 0.16); }
@@ -103,8 +111,8 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  min-width: 100%;         /* at least as wide as the toggle button */
-  width: max-content;      /* expand to fit the longest item on one line */
+  width: min(440px, calc(100vw - 2.5rem)); /* always full max-width, never bleeds viewport */
+  box-sizing: border-box;
   background: rgba(12, 10, 22, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
@@ -128,7 +136,8 @@
   border-radius: 5px;
   font-size: 1.05rem;
   font-family: 'Chelsea Market', system-ui;
-  white-space: nowrap;     /* never wrap to next line */
+  white-space: normal;
+  overflow-wrap: break-word;
   transition: background 0.12s;
 }
 .chapter-item:hover  { background: var(--color-accent-subtle); }
@@ -423,19 +432,18 @@
     gap: 0.4rem;
   }
 
-  .topbar-left  { order: 1; }
-  .topbar-right { order: 2; gap: 0.4rem; }
+  .topbar-left  { order: 1; flex: none; width: 100%; }
+  .topbar-right { order: 2; flex: none; gap: 0.4rem; width: 100%; justify-content: center; }
 
   /* Title drops to its own full-width line */
   .topbar-center {
     position: static;
     transform: none;
+    max-width: none;
     font-size: 1rem;
     order: 10;
     width: 100%;
-    text-align: center;
     padding: 0.1rem 0;
-    pointer-events: none;
   }
 
   /* Shrink all topbar buttons */
@@ -443,12 +451,15 @@
     font-size: 0.78rem;
     padding: 0.38rem 0.6rem;
     letter-spacing: 0;
+    width: calc(100% - 0.25rem);  /* full row minus right breathing room */
+    max-width: none;
   }
 
-  /* Dropdown: smaller text, centered below the toggle */
+  /* Dropdown: on mobile always full available width */
   .chapter-list {
-    left: 50%;
-    transform: translateX(-50%);
+    width: calc(100vw - 1.5rem);
+    left: 0;
+    transform: none;
     font-size: 0.8rem;
     max-height: 180px;
   }
