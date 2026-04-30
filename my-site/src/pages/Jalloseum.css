@@ -1,0 +1,78 @@
+:root {
+  --ui-top-space:   clamp(190px, 9vw, 200px);
+  --gallery-offset: clamp(24px, 2vw, 40px);
+  --ui-side-space:  clamp(12px, 5vw, 100px);
+}
+
+/* Top padding for the flat grid (no section header above it) */
+.gallery-container.jalloseum-grid {
+  margin-top: clamp(20px, 2vw, 32px);
+}
+
+/* ===========================
+   HUB PAGE LINK GRID
+   =========================== */
+
+.jalloseum-hub {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(20px, 3vw, 52px);
+
+  padding: clamp(16px, 2.5vw, 40px);
+}
+
+.jalloseum-hub-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: clamp(10px, 1.5vw, 22px) clamp(14px, 2vw, 32px);
+
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+
+  color: var(--color-accent, #e0c97f);
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(13px, 1.4vw, 22px);
+  font-optical-sizing: auto;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.jalloseum-hub-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.jalloseum-hub-link:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 700px) {
+  .jalloseum-hub {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .jalloseum-hub {
+    grid-template-columns: 1fr;
+  }
+}

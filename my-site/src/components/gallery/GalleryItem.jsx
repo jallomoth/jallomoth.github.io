@@ -9,6 +9,7 @@ export default function GalleryItem({
   isSelected,
   isModalOpen,
   isModalClosing,
+  showTitle = true,
 }) {
   const localRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -97,7 +98,7 @@ export default function GalleryItem({
         </div>
       </div>
 
-      <p>{img.label}</p>
+      {showTitle && <p>{img.label}</p>}
     </div>
   );
 }

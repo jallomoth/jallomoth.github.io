@@ -7,6 +7,7 @@ export default function BackButton({
   normalImage = "/back/BackArrow.png",
   hoverImage = "/back/BackArrowHover.png",
   clickImage = "/back/BackArrowSelect.png",
+  to = "/",
 }) {
   const navigate = useNavigate();
   const [state, setState] = useState("normal");
@@ -19,7 +20,7 @@ export default function BackButton({
   const handleMouseUp = () => {
     setState("hover");
     playSound("/sounds/click.mp3", effectiveVolume * 0.2);
-    navigate('/');
+    navigate(to);
   };
 
   const handleMouseEnter = () => {
