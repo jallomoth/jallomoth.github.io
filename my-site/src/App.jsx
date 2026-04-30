@@ -1,5 +1,7 @@
 import './App.css';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import ReactGA from 'react-ga4';
 
 import Cursor from './components/Cursor';
 import ParallaxBackground from './components/ParallaxBackground';
@@ -48,6 +50,17 @@ function MinimalLayout() {
 // APP ROUTES
 // -----------------------------
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({
+      hitType: "pageview",
+      page: location.pathname + location.search,
+      page_location: window.location.origin + location.pathname + location.search,
+      page_title: document.title,
+    });
+  }, [location.pathname, location.search]);
+
   return (
     <Routes>
 

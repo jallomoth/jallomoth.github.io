@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import ReactGA from "react-ga4";
 import chapters from "../data/foolsErrand";
 import { useAudio } from "./audio/AudioContext";
 import "./ComicViewer.css";
@@ -122,6 +123,15 @@ export default function ComicViewer() {
   // persist reading position to localStorage (NTH-12)
   useEffect(() => {
     localStorage.setItem("fe-last-read", JSON.stringify({ chapterId: chapter.id, page: pageIndex }));
+  }, [chapter.id, pageIndex]);
+
+  // track chapter page views in GA
+  useEffect(() => {
+    ReactGA.event({
+      category: "Comic",
+      action: "page_read",
+      label: `${chapter.id} — page ${pageIndex + 1}`,
+    });
   }, [chapter.id, pageIndex]);
 
   // touch swipe navigation (NTH-4)
