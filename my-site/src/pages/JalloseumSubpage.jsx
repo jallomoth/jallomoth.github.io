@@ -17,7 +17,7 @@ export default function JalloseumSubpage({ subfolder, title }) {
   const [isModalClosing, setIsModalClosing] = useState(false);
   const [closeState, setCloseState] = useState("normal");
 
-  usePageTitle(`Jallomoth — ${title}`);
+  usePageTitle("Jallomoth — Jalloseum");
 
   const images = useJalloseumImages(subfolder);
 

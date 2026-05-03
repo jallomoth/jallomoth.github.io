@@ -23,13 +23,15 @@ export default function Jalloseum() {
       <Logo top="20px" left="50%" width="35vw" center={true} />
       <BackButton />
       <main>
-        <nav className="jalloseum-hub" aria-label="Jalloseum sections">
-          {SUBPAGES.map(({ label, to }) => (
-            <Link key={to} to={to} className="jalloseum-hub-link">
-              {label}
-            </Link>
-          ))}
-        </nav>
+        <div className="jalloseum-hub-outer">
+          <nav className="jalloseum-hub" aria-label="Jalloseum sections">
+            {SUBPAGES.map(({ label, to }) => (
+              <Link key={to} to={to} className="jalloseum-hub-link">
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </main>
     </>
   );
