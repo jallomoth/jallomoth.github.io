@@ -60,11 +60,16 @@ export default function ParallaxBackground() {
 
     if (bgRef.current) {
       const strength = window.innerWidth * 0.015;
+      // Tile size in px (matches backgroundSize: "60vw 60vw")
+      const tileSize = window.innerWidth * 0.6;
 
-      bgRef.current.style.backgroundPosition = `
-        ${-pos.current.x * strength}px 
-        ${-pos.current.y * strength}px
-      `;
+      // Use transform instead of backgroundPosition so this element is a
+      // proper GPU compositor layer — backdrop-filter can then sample it.
+      // Modulo-wrap within one tile period for seamless infinite tiling.
+      const tx = ((-pos.current.x * strength) % tileSize + tileSize) % tileSize;
+      const ty = ((-pos.current.y * strength) % tileSize + tileSize) % tileSize;
+
+      bgRef.current.style.transform = `translate(${tx}px, ${ty}px)`;
     }
   });
 
@@ -73,12 +78,18 @@ export default function ParallaxBackground() {
       ref={bgRef}
       style={{
         position: "fixed",
-        inset: 0,
+        // Extend one full tile-width (60vw) beyond viewport on every side so
+        // the translated div never shows a gap at the edges.
+        top: "-60vw",
+        left: "-60vw",
+        right: "-60vw",
+        bottom: "-60vw",
         backgroundImage: "url('/background/space.png')",
         backgroundRepeat: "repeat",
         backgroundSize: "60vw 60vw",
         zIndex: -1,
         pointerEvents: "none",
+        willChange: "transform",
       }}
     />
   );

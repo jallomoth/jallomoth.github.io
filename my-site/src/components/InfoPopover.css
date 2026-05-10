@@ -1,31 +1,32 @@
 /* ── Overlay ─────────────────────────────────────────────────────────────── */
+/* Start fully transparent; transition to visible via --visible class.
+   Using transition (not animation) is required because CSS keyframe animations
+   on the same element as backdrop-filter break the blur in GPU-composited
+   browsers (Chrome/Safari production). The gallery modal uses the same pattern. */
 .info-popover-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  animation: popover-fade-in 0.18s ease forwards;
+  /* hidden state — matches gallery modal pattern exactly */
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+
+  transition:
+    background 0.18s ease,
+    backdrop-filter 0.18s ease;
+
+  will-change: backdrop-filter, background;
 }
 
-.info-popover-overlay--exit {
-  animation: popover-fade-out 0.18s ease forwards;
-}
-
-@keyframes popover-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes popover-fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+/* visible state — toggled by React after mount (and removed on close) */
+.info-popover-overlay--visible {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px) saturate(120%);
 }
 
 /* ── Card ────────────────────────────────────────────────────────────────── */

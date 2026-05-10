@@ -41,7 +41,6 @@
 
   background: rgba(150, 150, 150, 0.1);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 2px solid rgba(179, 161, 255, 0.25);
   border-radius: 12px;
 
@@ -112,7 +111,10 @@
   z-index: 2;
   opacity: 0;
   transition: opacity 0.35s ease;
+  /* Paused by default — running animation promotes a compositor layer that
+     can block backdrop-filter on the parent. Only run on hover. */
   animation: jalloseum-border-spin 3s linear infinite;
+  animation-play-state: paused;
   pointer-events: none;
 }
 
@@ -141,6 +143,7 @@
 
   .jalloseum-hub-link:hover::after {
     opacity: 1;
+    animation-play-state: running;
   }
 }
 

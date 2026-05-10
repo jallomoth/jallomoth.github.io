@@ -5,15 +5,23 @@ const EXIT_DURATION = 180; // ms — must match CSS animation duration
 
 export default function InfoPopover({ action, onClose }) {
   const [copied, setCopied] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [exiting, setExiting] = useState(false);
   const [closeState, setCloseState] = useState("normal");
   const overlayRef = useRef(null);
   const closeRef = useRef(null);
 
+  // Trigger enter transition on the next frame (matches gallery modal pattern)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   // Trigger exit animation, then unmount
   const requestClose = () => {
     if (exiting) return;
     setExiting(true);
+    setVisible(false); // removes --visible → transition plays in reverse
     setTimeout(onClose, EXIT_DURATION);
   };
 
@@ -80,7 +88,7 @@ export default function InfoPopover({ action, onClose }) {
   return (
     <div
       ref={overlayRef}
-      className={`info-popover-overlay${exiting ? " info-popover-overlay--exit" : ""}`}
+      className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
