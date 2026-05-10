@@ -1,0 +1,15 @@
+/* ── Community page layout ──────────────────────────────────────────────── */
+
+/* On mobile the grid leaves fixed flow, so the <main> becomes a proper
+   scrollable column. Padding-top clears the fixed logo + back button. */
+@media (max-width: 768px) {
+  .community-main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100dvh;
+    /* clamp: min 110px (clears ~100px logo+back), scales with viewport */
+    padding: clamp(110px, 24vw, 150px) 4vw clamp(24px, 5vw, 48px);
+    box-sizing: border-box;
+  }
+}

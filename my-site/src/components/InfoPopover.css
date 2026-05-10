@@ -1,0 +1,155 @@
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
+.info-popover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: popover-fade-in 0.18s ease forwards;
+}
+
+.info-popover-overlay--exit {
+  animation: popover-fade-out 0.18s ease forwards;
+}
+
+@keyframes popover-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes popover-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.info-popover-card {
+  position: relative;
+  background: rgba(20, 16, 30, 0.92);
+  border: 1.5px solid rgba(179, 161, 255, 0.35);
+  border-radius: 16px;
+
+  padding: clamp(24px, 4vw, 40px) clamp(28px, 5vw, 52px);
+  max-width: min(480px, 88vw);
+  width: 100%;
+  text-align: center;
+
+  animation: popover-slide-up 0.2s ease forwards;
+}
+
+.info-popover-card--exit {
+  animation: popover-slide-down 0.18s ease forwards;
+}
+
+@keyframes popover-slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes popover-slide-down {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(16px); opacity: 0; }
+}
+
+/* ── Close button ────────────────────────────────────────────────────────── */
+.info-popover-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  transition: transform 0.15s ease;
+}
+
+.info-popover-close:hover {
+  transform: scale(1.12);
+}
+
+.info-popover-close-img {
+  width: clamp(28px, 3vw, 40px);
+  height: clamp(28px, 3vw, 40px);
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ── Content ─────────────────────────────────────────────────────────────── */
+.info-popover-title {
+  margin: 0 0 8px;
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(14px, 2vw, 18px);
+  letter-spacing: 0.06em;
+  color: var(--color-accent-light, #e0d8ff);
+}
+
+.info-popover-value {
+  margin: 0 0 24px;
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(15px, 2.2vw, 20px);
+  color: white;
+  /* preserve user-provided line breaks and wrap long lines */
+  white-space: pre-wrap;
+  word-break: break-word;
+  letter-spacing: 0.03em;
+}
+
+/* ── Action buttons ──────────────────────────────────────────────────────── */
+.info-popover-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.info-popover-btn {
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(13px, 1.6vw, 16px);
+  letter-spacing: 0.05em;
+  border-radius: 10px;
+  padding: 10px 22px;
+  border: 1.5px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.info-popover-btn--copy {
+  background: rgba(179, 161, 255, 0.15);
+  border-color: rgba(179, 161, 255, 0.4);
+  color: var(--color-accent-light, #e0d8ff);
+  min-width: 90px;
+}
+
+.info-popover-btn--copy:hover {
+  background: rgba(179, 161, 255, 0.28);
+  border-color: rgba(179, 161, 255, 0.7);
+  transform: scale(1.04);
+}
+
+.info-popover-btn--open {
+  background: rgba(179, 161, 255, 0.85);
+  color: #1a1426;
+}
+
+.info-popover-btn--open:hover {
+  background: rgba(224, 216, 255, 0.95);
+  transform: scale(1.04);
+}
+
+/* ── Accessible live region (visually hidden) ────────────────────────────── */
+.info-popover-sr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

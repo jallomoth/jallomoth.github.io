@@ -1,19 +1,29 @@
-import './PlaceholderPage.css';
+import { useState } from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
+import CommunityButtonGrid from "../components/CommunityButtonGrid";
+import InfoPopover from "../components/InfoPopover";
 import usePageTitle from "../hooks/usePageTitle";
+import "./Community.css";
 
 export default function Community() {
   usePageTitle("Jallomoth — Community");
+  const [activeAction, setActiveAction] = useState(null);
 
   return (
     <>
-      <Logo top="20px" left="50%" width="20vw" center={true} />
+      <Logo top="20px" left="50%" width="35vw" center={true} />
       <BackButton />
-      <main className="page-content">
-        <h1>Community</h1>
-        <p>Coming soon...</p>
+      <main className="community-main">
+        <CommunityButtonGrid onAction={setActiveAction} />
       </main>
+
+      {activeAction && (
+        <InfoPopover
+          action={activeAction}
+          onClose={() => setActiveAction(null)}
+        />
+      )}
     </>
   );
 }

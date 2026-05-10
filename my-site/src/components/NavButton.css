@@ -67,6 +67,7 @@
 .text-container {
   width: var(--button-size);
   transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+  margin-top: clamp(6px, 0.9vw, 18px);
 
   -webkit-user-drag: none;
   user-select: none;
@@ -78,4 +79,19 @@
 
   -webkit-user-drag: none;
   user-select: none;
+}
+
+.text-label {
+  display: block;
+  text-align: center;
+  color: var(--color-accent);
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(22px, 2vw, 26px);
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  user-select: none;
+  -webkit-user-select: none;
 }

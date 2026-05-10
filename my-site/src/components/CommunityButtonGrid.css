@@ -1,0 +1,124 @@
+/* ── Community grid layout: 2 rows × 6 columns ────────────────────────── */
+:root {
+  --community-button-size: 9vw;
+  --community-button-gap:  3.5vw;
+  --community-row-gap:     3vw;
+}
+
+.community-button-grid {
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: grid;
+  grid-template-columns: repeat(6, var(--community-button-size));
+  gap: var(--community-row-gap) var(--community-button-gap);
+
+  align-items: start;
+  padding: 0;
+}
+
+/* Slot sizing (mirrors ButtonGrid's .button-row > *) */
+.community-button-grid > .nav-button-container {
+  width: var(--community-button-size);
+  min-height: var(--community-button-size);
+}
+
+/* Override NavButton's --button-size for community context */
+.community-button-grid .icon-container {
+  width: var(--community-button-size);
+  height: var(--community-button-size);
+}
+
+.community-button-grid .text-container {
+  width: var(--community-button-size);
+}
+
+/* ── Hover: lift active button ─────────────────────────────────────────── */
+.community-button-grid .icon-container.active-icon .icon-visual {
+  transform: translateY(-1.2vw) scale(1.1);
+}
+
+/* ── Dim non-active buttons when one is hovered ────────────────────────── */
+.community-button-grid:has(.active-icon)
+  .icon-container:not(.active-icon) {
+  opacity: 0.4;
+  filter: grayscale(40%);
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.community-button-grid:has(.active-icon)
+  .icon-container:not(.active-icon) .icon-visual {
+  transform: translateY(0) scale(0.95);
+  transition: transform 0.25s ease;
+}
+
+.community-button-grid:has(.active-icon)
+  .text-container:not(.active-text) {
+  opacity: 0.4;
+  transform: scale(0.95);
+  filter: grayscale(40%);
+  transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+}
+
+/* ── Wide tablet: 4 per row ─────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  :root {
+    --community-button-size: 13vw;
+    --community-button-gap:  3vw;
+    --community-row-gap:     3vw;
+  }
+
+  .community-button-grid {
+    grid-template-columns: repeat(4, var(--community-button-size));
+    top: 54%;
+  }
+
+  .community-button-grid .icon-container.active-icon .icon-visual {
+    transform: translateY(-1.5vw) scale(1.1);
+  }
+}
+
+/* ── Tablet portrait / large phone: 3 per row, scrollable ───────────────── */
+/* Grid leaves fixed flow so the page can scroll on tall grids              */
+@media (max-width: 768px) {
+  :root {
+    --community-button-size: 22vw;
+    --community-button-gap:  4.5vw;
+    --community-row-gap:     5vw;
+  }
+
+  .community-button-grid {
+    position: static;
+    transform: none;
+    margin: 0 auto;
+    grid-template-columns: repeat(3, var(--community-button-size));
+  }
+
+  .community-button-grid .icon-container.active-icon .icon-visual {
+    transform: translateY(-2vw) scale(1.1);
+  }
+
+  /* Scale labels to fit narrower buttons */
+  .community-button-grid .text-label {
+    font-size: clamp(11px, 2.5vw, 16px);
+  }
+}
+
+/* ── Mobile portrait: 3 per row, tighter ────────────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --community-button-size: 24vw;
+    --community-button-gap:  4vw;
+    --community-row-gap:     5vw;
+  }
+
+  .community-button-grid .icon-container.active-icon .icon-visual {
+    transform: translateY(-2.5vw) scale(1.1);
+  }
+
+  .community-button-grid .text-label {
+    font-size: clamp(10px, 2.8vw, 13px);
+  }
+}

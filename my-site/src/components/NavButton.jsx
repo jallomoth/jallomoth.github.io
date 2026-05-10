@@ -9,7 +9,7 @@ const DRAG_THRESHOLD = 80;
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export default function NavButton({ image, hoverImage, to, alt, label, textImage }) {
+export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
 
@@ -39,6 +39,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
      FIXED NAVIGATION
   ----------------------------- */
   const navigateTo = () => {
+    if (onAction) { onAction(); return; }
+    if (!to || to === "#") return;
     if (isExternal) {
       window.open(to, "_blank", "noopener,noreferrer");
     } else {
@@ -250,19 +252,23 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
           />
         </div>
       </div>
-      {textImage && (
+      {(textImage || textLabel) && (
         <div
           className={`text-container ${isActive ? "active-text" : ""}`}
           onMouseEnter={handleEnter}
           onMouseLeave={handleLeave}
           onClick={navigateTo}
         >
-          <img
-            src={textImage}
-            className="text-image"
-            alt=""
-            draggable="false"
-          />
+          {textImage ? (
+            <img
+              src={textImage}
+              className="text-image"
+              alt=""
+              draggable="false"
+            />
+          ) : (
+            <span className="text-label">{textLabel}</span>
+          )}
         </div>
       )}
     </div>
