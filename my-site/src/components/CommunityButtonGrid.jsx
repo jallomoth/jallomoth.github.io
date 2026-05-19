@@ -1,3 +1,6 @@
+// Community links grid — social/external buttons plus action-only buttons
+// (email, P.O. box) that trigger an InfoPopover instead of navigating.
+// Action buttons have `to: null` and an `action` object describing the type.
 import "./CommunityButtonGrid.css";
 import NavButton from "./NavButton";
 

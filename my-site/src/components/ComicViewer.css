@@ -1,4 +1,4 @@
-/* ─── ComicViewer — complete layout ────────────────────────────────────────── */
+/* ComicViewer: full-page reader for Fool's Errand. CSS custom properties in :root. */
 
 :root {
   /* How far down to start below the fixed site header.
@@ -28,7 +28,7 @@
   --cv-nav-hover:   rgba(0, 0, 0, 0.58);
 }
 
-/* ── container ────────────────────────────────────────────────────────────── */
+/* --- Container --- */
 
 .comic-container {
   position: fixed;
@@ -44,7 +44,7 @@
 
 /* (variables defined above in the :root block) */
 
-/* ── topbar ───────────────────────────────────────────────────────────────── */
+/* --- Topbar --- */
 
 .comic-topbar {
   flex-shrink: 0;
@@ -184,7 +184,7 @@
   pointer-events: none;
 }
 
-/* ── comic stage ──────────────────────────────────────────────────────────── */
+/* --- Comic Stage --- */
 
 .comic-stage {
   flex: 1;
@@ -213,7 +213,7 @@
   min-width: 0;
 }
 
-/* ── image + nav wrapper ──────────────────────────────────────────────────── */
+/* --- Image + nav wrapper --- */
 
 .image-wrap {
   position: relative;
@@ -230,7 +230,7 @@
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
 }
 
-/* ── loading placeholder ──────────────────────────────────────────────────── */
+/* --- Loading placeholder --- */
 
 /* Matches the rendered size of a 2360×1640 comic image under the same
    max-width / max-height constraints as .comic-image.
@@ -254,7 +254,7 @@
   to   { background-position: -200% 0; }
 }
 
-/* ── prev / next ──────────────────────────────────────────────────────────── */
+/* --- Prev / Next --- */
 
 .nav {
   flex: 1;
@@ -293,7 +293,7 @@
   display: block;
 }
 
-/* ── page indicator ───────────────────────────────────────────────────────── */
+/* --- Page indicator --- */
 
 .page-indicator-below {
   color: #ccc;
@@ -304,7 +304,7 @@
   letter-spacing: 0.04em;
 }
 
-/* ── fullscreen ───────────────────────────────────────────────────────────── */
+/* --- Fullscreen --- */
 
 /* React-state class (reliable cross-browser) + CSS pseudo-class as fallback */
 .comic-container.is-fullscreen,
@@ -402,7 +402,7 @@
   box-shadow: none;
 }
 
-/* ── responsive ───────────────────────────────────────────────────────────── */
+/* --- Responsive --- */
 
 @media (max-width: 800px) {
   :root {
@@ -411,7 +411,7 @@
   }
 }
 
-/* ── Mobile portrait (<= 600px) ──────────────────────────────────────────── */
+/* --- Mobile portrait (<= 600px) --- */
 
 @media (max-width: 600px) {
   :root {
@@ -422,7 +422,7 @@
     --cv-image-max-w: calc(100vw - 80px);
   }
 
-  /* ── topbar: flex-wrap so items can form two lines ── */
+  /* --- Topbar: flex-wrap so items can form two lines --- */
   .comic-topbar {
     flex-wrap: wrap;
     padding: 0.5rem 0.75rem;

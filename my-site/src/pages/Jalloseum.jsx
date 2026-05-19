@@ -1,3 +1,6 @@
+// Jalloseum hub page — lists art sub-categories as navigation links.
+// Each entry's `to` must match a route in App.jsx and its display label
+// is shown directly on the link element.
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";

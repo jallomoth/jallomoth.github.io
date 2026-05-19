@@ -1,3 +1,4 @@
+// Renders one labeled section (year or category) within the Art Gallery.
 import GalleryItem from "./GalleryItem";
 import "./GallerySection.css";
 

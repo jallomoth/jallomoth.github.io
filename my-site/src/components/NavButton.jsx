@@ -1,3 +1,6 @@
+// Navigation button — supports internal routes, external links, and action
+// callbacks. Has a drag-and-fling physics system: buttons spring back to
+// their origin, and nearby buttons are magnetically repelled while dragging.
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAnimationFrame from "../hooks/useAnimationFrame";
@@ -35,9 +38,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   const src = isActive && hoverImage ? hoverImage : image;
   const altText = alt || label || "Navigation button";
 
-  /* -----------------------------
-     FIXED NAVIGATION
-  ----------------------------- */
+  // --- FIXED NAVIGATION ---
+  // Opens external URLs in a new tab; uses React Router for internal paths.
   const navigateTo = () => {
     if (onAction) { onAction(); return; }
     if (!to || to === "#") return;
@@ -48,10 +50,9 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     }
   };
 
-  // -----------------------------
-  // DRAG + SPRING + MAGNETIC
-  // -----------------------------
-  // Event listeners only — animation handled by useAnimationFrame below
+  // --- DRAG PHYSICS ---
+  // Mouse events only — the animation loop (useAnimationFrame below) does
+  // the actual position update every frame.
   useEffect(() => {
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
@@ -96,9 +97,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         velocity.current.x *= FLING_BOOST;
         velocity.current.y *= FLING_BOOST;
 
-        // -----------------------------
-        // DISTANCE CHECK
-        // -----------------------------
+        // --- DISTANCE CHECK ---
+        // Only navigate if the button was barely moved (treated as a click).
         const distance = Math.sqrt(
           pos.current.x * pos.current.x +
           pos.current.y * pos.current.y
@@ -185,9 +185,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     }
   });
 
-  // -----------------------------
-  // START DRAG
-  // -----------------------------
+  // --- START DRAG ---
   const handleMouseDown = (e) => {
     e.preventDefault();
 
@@ -209,9 +207,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     prevDragPosRef.current.y = pos.current.y;
   };
 
-  // -----------------------------
-  // HOVER CONTROL
-  // -----------------------------
+  // --- HOVER CONTROL ---
+  // Suppress hover state while any button is being dragged globally.
   const handleEnter = () => {
     if (!isDraggingButtonRef.current) setHovered(true);
   };

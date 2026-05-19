@@ -1,3 +1,7 @@
+// Jalloseum subpage — shows a scrollable image grid for one art category.
+// Clicking a thumbnail opens a fullscreen modal with an expand animation
+// that originates from the thumbnail's position. Supports keyboard
+// navigation (arrow keys), touch swipe, and pinch-to-zoom inside the modal.
 import { useCallback, useEffect, useRef, useState } from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
@@ -9,6 +13,11 @@ import usePageTitle from "../hooks/usePageTitle";
 import "./Jalloseum.css";
 
 export default function JalloseumSubpage({ subfolder, title }) {
+  // --- MODAL STATE ---
+  // imagePosition: thumbnail rect at the moment of click (animation start).
+  // finalImagePosition: 80% of the viewport (animation end).
+  // isModalClosing: true during the closing animation so the overlay stays
+  // mounted until the transition finishes.
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [finalImagePosition, setFinalImagePosition] = useState(null);
@@ -27,9 +36,13 @@ export default function JalloseumSubpage({ subfolder, title }) {
   const previousFocusRef = useRef(null);
   const modalOverlayRef = useRef(null);
 
+  // --- ZOOM STATE ---
+  // Stored in refs (not state) to avoid triggering re-renders on every touch
+  // event. Written directly to the DOM node via applyZoomTransform.
   const zoomScaleRef = useRef(1);
   const zoomOffsetRef = useRef({ x: 0, y: 0 });
 
+  // Apply current zoom/pan transform to the modal image DOM node.
   const applyZoomTransform = useCallback(() => {
     if (!modalImageRef.current) return;
     const s = zoomScaleRef.current;
@@ -39,6 +52,7 @@ export default function JalloseumSubpage({ subfolder, title }) {
       s === 1 ? "" : `scale(${s}) translate(${x / s}px, ${y / s}px)`;
   }, []);
 
+  // Reset zoom on every image change and on modal close.
   const resetZoom = useCallback(() => {
     zoomScaleRef.current = 1;
     zoomOffsetRef.current = { x: 0, y: 0 };
@@ -48,6 +62,8 @@ export default function JalloseumSubpage({ subfolder, title }) {
     }
   }, []);
 
+  // --- MODAL OPEN ---
+  // Records the thumbnail's current DOMRect as the animation start position.
   const handleImageClick = (img, index, rect) => {
     previousFocusRef.current = document.activeElement;
     setImagePosition({
@@ -67,6 +83,7 @@ export default function JalloseumSubpage({ subfolder, title }) {
     setTimeout(() => setIsModalOpen(true), 10);
   };
 
+  // --- MODAL CLOSE ---
   const handleCloseModal = () => {
     setIsModalClosing(true);
     const modalImage = modalImageRef.current;
@@ -119,7 +136,8 @@ export default function JalloseumSubpage({ subfolder, title }) {
     modalImage.style.height = `${finalImagePosition.height}px`;
   }, [selectedImage]);
 
-  // Keyboard navigation
+  // --- KEYBOARD NAVIGATION ---
+  // Arrow keys navigate between images while the modal is open.
   useEffect(() => {
     const onKey = (e) => {
       if (!isModalOpen) return;
@@ -153,7 +171,9 @@ export default function JalloseumSubpage({ subfolder, title }) {
   useEffect(() => { resetZoom(); }, [selectedImage, resetZoom]);
   useEffect(() => { if (!isModalOpen) resetZoom(); }, [isModalOpen, resetZoom]);
 
-  // Touch swipe + pinch-to-zoom
+  // --- TOUCH SWIPE + PINCH-TO-ZOOM ---
+  // Registered with passive:false on touchmove so preventDefault() can block
+  // the browser's native pinch-zoom while the modal is open.
   useEffect(() => {
     const el = modalOverlayRef.current;
     if (!el || !isModalOpen) return;
@@ -241,6 +261,8 @@ export default function JalloseumSubpage({ subfolder, title }) {
     };
   }, [isModalOpen, selectedIndex, images, applyZoomTransform, resetZoom]);
 
+  // Tab trap: only one focusable element in the modal (close button),
+  // so Tab simply keeps focus there rather than escaping to the background.
   const handleModalKeyDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();

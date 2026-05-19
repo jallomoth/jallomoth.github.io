@@ -1,3 +1,5 @@
+// Home page — shows the site logo and the main navigation button grid.
+// Background music starts on the first user interaction (browser autoplay policy).
 import { useEffect } from "react";
 import Logo from "../components/Logo";
 import ButtonGrid from "../components/ButtonGrid";

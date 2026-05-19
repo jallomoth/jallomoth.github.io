@@ -1,3 +1,7 @@
+// Discovers and groups gallery images at build time via Vite's import.meta.glob.
+// Returns a flat image list and a sorted array of [section, images] pairs.
+// SECTION_MAP and SORT_ORDER should be module-scope constants so the memoized
+// arrays are only recomputed when subfolder content actually changes.
 // components/gallery/useGalleryImages.js
 import { useMemo } from "react";
 

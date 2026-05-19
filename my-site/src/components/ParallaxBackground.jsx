@@ -1,3 +1,7 @@
+// Tiling parallax background — moves in response to mouse position (desktop)
+// or device orientation (mobile gyroscope). Uses a shared rAF loop and GPU
+// compositing (transform instead of backgroundPosition) so backdrop-filter
+// on overlapping elements can sample it correctly.
 import { useEffect, useRef } from "react";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 

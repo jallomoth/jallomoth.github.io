@@ -1,3 +1,6 @@
+// Site logo — draggable with spring physics and a fling effect on release.
+// Swaps to a hover image on mouse-over and plays a snap sound when thrown
+// far enough. Spawns a small pop image at the click point.
 import { useState, useRef, useEffect } from "react";
 import { useAudio } from "./audio/AudioContext";
 import useAnimationFrame from "../hooks/useAnimationFrame";
@@ -38,9 +41,8 @@ export default function Logo({
   const { isGrabbingRef } = useDrag();
   const lastTimeRef = useRef(performance.now());
 
-  // -----------------------------
-  // POPUP SCALE CALC
-  // -----------------------------
+  // --- POPUP SCALE ---
+  // Scale the popup image proportionally to the logo's rendered width.
   const getPopupSize = () => {
     // base reference = 60vw logo → 3vw popup
     const baseLogo = 60;

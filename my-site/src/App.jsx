@@ -1,3 +1,6 @@
+// Root component — defines the two layout shells and all client-side routes.
+// MainLayout wraps most pages with the parallax background, custom cursor,
+// and volume control. MinimalLayout is used for the 404 page.
 import './App.css';
 import { useEffect } from 'react';
 import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
@@ -18,9 +21,8 @@ import Backstage from './pages/Backstage';
 import NotFound from './pages/NotFound';
 
 
-// -----------------------------
-// MAIN LAYOUT (FULL EXPERIENCE)
-// -----------------------------
+// --- MAIN LAYOUT ---
+// Full site experience: parallax background, custom cursor, volume control.
 function MainLayout() {
   return (
     <>
@@ -34,9 +36,8 @@ function MainLayout() {
 }
 
 
-// -----------------------------
-// MINIMAL LAYOUT (NO UI)
-// -----------------------------
+// --- MINIMAL LAYOUT ---
+// Strips the background, volume control, and floating UI — used for the 404 page.
 function MinimalLayout() {
   return (
     <>
@@ -47,9 +48,8 @@ function MinimalLayout() {
 }
 
 
-// -----------------------------
-// APP ROUTES
-// -----------------------------
+// --- APP ROUTES ---
+// Fires a GA pageview on every navigation event, then declares all routes.
 function App() {
   const location = useLocation();
 

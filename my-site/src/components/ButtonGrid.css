@@ -42,7 +42,7 @@
   }
 }
 
-/* ── Mobile portrait (<= 540px): keep 4-per-row, scale everything down ────── */
+/* --- Mobile portrait (<= 540px): keep 4-per-row, scale everything down --- */
 @media (max-width: 540px) {
   :root {
     --button-size: 20vw;
@@ -71,7 +71,7 @@
   }
 }
 
-/* NORMAL ACTIVE DIM */
+/* --- Normal Active Dim --- */
 .button-grid:has(.active-icon)
   .icon-container:not(.active-icon) {
   opacity: 0.4;
@@ -93,7 +93,7 @@
   transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
 }
 
-/* DRAG MODE (LOCKED STATE) */
+/* --- Drag Mode (Locked State) --- */
 .button-grid.dragging .icon-container {
   opacity: 0.3;
   filter: grayscale(60%);

@@ -1,3 +1,5 @@
+// Community page — social/external links, plus a popover for actions that
+// cannot simply open a URL (email and P.O. box).
 import { useState } from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";

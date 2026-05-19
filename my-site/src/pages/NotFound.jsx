@@ -3,13 +3,15 @@ import Logo from "../components/Logo";
 import ParallaxBackground from "../components/ParallaxBackground";
 import ErrorBoundary from "../components/ErrorBoundary";
 
-// IMPORT ALL MEDIA FILES FROM FOLDER
+// --- MEDIA IMPORTS ---
+// import.meta.glob eagerly imports all media files so Vite bundles them.
+// The result is an array of resolved asset URLs.
 const mediaModules = import.meta.glob(
   "../assets/404/**/*.{png,jpg,jpeg,gif,webp,mp4,webm,PNG,JPG,JPEG,GIF,WEBP,MP4,WEBM,mov}",
   { eager: true }
 );
 
-// convert to usable URLs
+// Convert module map to a flat array of resolved asset URLs.
 const mediaList = Object.values(mediaModules).map((mod) => mod.default);
 
 export default function NotFound() {
@@ -23,11 +25,9 @@ export default function NotFound() {
 
   const [videoError, setVideoError] = useState(false);
 
-  // -----------------------------
-  // MEDIA STYLES
-  // -----------------------------
-  // min(50vh, 85vw) prevents horizontal overflow on portrait mobile
-  // where 50vh could exceed the viewport width.
+  // --- MEDIA STYLES ---
+  // min(50vh, 85vw) avoids horizontal overflow on portrait mobile where
+  // 50vh could exceed the viewport width.
   const mediaSize = "min(50vh, 85vw)";
   const mediaContainerStyle = {
     position: "fixed",

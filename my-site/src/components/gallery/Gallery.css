@@ -1,6 +1,4 @@
-/* ===========================
-   SCROLL CONTAINER
-   =========================== */
+/* --- Scroll Container --- */
 
 .gallery-scroll {
   position: fixed;
@@ -31,9 +29,7 @@
   );
 }
 
-/* ===========================
-   NAV BUTTON BAR
-   =========================== */
+/* --- Nav Button Bar --- */
 
 .gallery-nav {
   width: 90%;
@@ -71,9 +67,7 @@
   transform: scale(0.95);
 }
 
-/* ===========================
-   MODAL OVERLAY (SMOOTH BLUR)
-   =========================== */
+/* --- Modal Overlay --- */
 
 .modal-overlay {
   position: fixed;
@@ -97,15 +91,13 @@
   will-change: backdrop-filter, background;
 }
 
-/* OPEN STATE */
+/* --- Open State --- */
 .modal-overlay.open {
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(10px) saturate(120%);
 }
 
-/* ===========================
-   MODAL IMAGE
-   =========================== */
+/* --- Modal Image --- */
 
 .modal-image {
   position: absolute;
@@ -120,9 +112,7 @@
     height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ===========================
-   CLOSE BUTTON (FIXED)
-   =========================== */
+/* --- Close Button --- */
 
 .close-button {
   position: fixed;
@@ -184,9 +174,7 @@
   transform: scale(0.95);
 }
 
-/* ===========================
-   CLOSE ICON
-   =========================== */
+/* --- Close Icon --- */
 
 .close-icon {
   width: 100%;

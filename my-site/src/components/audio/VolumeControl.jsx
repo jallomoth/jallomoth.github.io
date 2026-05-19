@@ -3,7 +3,10 @@ import { useAudio } from "./AudioContext";
 import { useDrag } from "../../contexts/DragContext";
 import "./VolumeControl.css";
 
-// True on any touch-primary device (phones, tablets)
+// Volume control — fixed-position icon that toggles mute on click and
+// reveals a vertical slider on hover (desktop) or tap (touch devices).
+// Slider position maps directly to volume; drag is tracked globally so
+// the thumb does not lose the cursor if it moves off the slider track.
 const IS_TOUCH_DEVICE = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 export default function VolumeControl() {
@@ -61,9 +64,7 @@ export default function VolumeControl() {
 
   const sliderRef = useRef(null);
 
-  // -----------------------------
-  // VOLUME CALCULATION
-  // -----------------------------
+  // --- VOLUME CALCULATION ---
   const updateVolumeFromMouse = (clientY) => {
     if (!sliderRef.current) return;
     const rect = sliderRef.current.getBoundingClientRect();
@@ -126,26 +127,18 @@ export default function VolumeControl() {
     };
   }, [dragging]);
 
-  // -----------------------------
-  // THUMB POSITION
-  // -----------------------------
-  // top = TOP_PAD_FRAC% + (1 - volume) * usable%
-  // where usable% = (1 - TOP_PAD_FRAC - BOTTOM_PAD_FRAC) * 100%
-  // All values are % of rect.height, consistent at every zoom level.
+  // --- THUMB POSITION ---
+  // top = TOP_PAD_FRAC + (1 - volume) × usable, all as fractions of track height.
   const usableFrac = 1 - TOP_PAD_FRAC - BOTTOM_PAD_FRAC;
   const thumbPosition = `calc(${TOP_PAD_FRAC * 100}% + ${(1 - volume) * usableFrac * 100}%)`;
-  // -----------------------------
-  // THUMB IMAGE
-  // -----------------------------
+  // --- THUMB IMAGE ---
   const getThumbImage = () => {
     if (dragging) return "/volume/thumb-grab.png";
     if (thumbHovered) return "/volume/thumb-hover.png";
     return "/volume/thumb.png";
   };
 
-  // -----------------------------
-  // ICON IMAGE
-  // -----------------------------
+  // --- ICON IMAGE ---
   const getIconImage = () => {
     if (muted) {
       if (iconPressed) return "/volume/mute-grab.png";

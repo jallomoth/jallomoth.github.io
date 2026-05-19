@@ -1,4 +1,4 @@
-/* ITEM CONTAINER */
+/* --- Item Container --- */
 .gallery-item {
   break-inside: avoid;
   margin-bottom: 2vw;
@@ -16,7 +16,7 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* TILT SYSTEM */
+/* --- Tilt System --- */
 .tilt-outer {
   width: 100%;
   perspective: 900px;
@@ -40,7 +40,7 @@
   }
 }
 
-/* IMAGE */
+/* --- Image --- */
 .gallery-item img {
   width: 100%;
   display: block;
@@ -64,7 +64,7 @@
   to   { background-position: -200% 0; }
 }
 
-/* TEXT LABEL */
+/* --- Text Label --- */
 .gallery-item p {
   margin-top: clamp(6px, 1vw, 16px);
   text-align: center;

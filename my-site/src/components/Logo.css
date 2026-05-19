@@ -59,7 +59,7 @@
   opacity: 0;
 }
 
-/* CLICK EFFECT */
+/* --- Click Effect --- */
 .click-effect {
   position: fixed;
   pointer-events: none;

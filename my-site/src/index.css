@@ -100,7 +100,7 @@ img {
   -webkit-user-select: none;
 }
 
-/* ── Reduced motion (NTH-3) ──────────────────────────────────────────────── */
+/* --- Reduced motion (NTH-3) --- */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

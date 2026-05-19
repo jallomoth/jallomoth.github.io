@@ -1,3 +1,6 @@
+// Global audio context — manages background music and sound effects.
+// Persists volume and mute state to localStorage. Music starts deferred
+// until the first user interaction to satisfy browser autoplay policy.
 import {
   createContext,
   useContext,
@@ -10,9 +13,8 @@ import {
 const AudioContext = createContext();
 
 export function AudioProvider({ children }) {
-  /* -----------------------------
-     PERSISTED STATE (SAFE)
-  ----------------------------- */
+  // --- PERSISTED STATE ---
+  // Volume (0–1) and muted flag are read from localStorage on mount.
 
   const [volume, setVolume] = useState(() => {
     if (typeof window === "undefined") return 0.5;
@@ -30,9 +32,7 @@ export function AudioProvider({ children }) {
     return saved !== null ? JSON.parse(saved) : false;
   });
 
-  /* -----------------------------
-     SAVE TO LOCALSTORAGE
-  ----------------------------- */
+  // --- SAVE TO LOCALSTORAGE ---
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -46,9 +46,7 @@ export function AudioProvider({ children }) {
     }
   }, [muted]);
 
-  /* -----------------------------
-     OTHER STATE
-  ----------------------------- */
+  // --- STATE ---
 
   const [musicPlaying, setMusicPlaying] = useState(false);
 
@@ -65,9 +63,8 @@ export function AudioProvider({ children }) {
 
   const effectiveVolume = muted ? 0 : volume;
 
-  /* -----------------------------
-     PRELOAD SOUND EFFECTS INTO POOL
-  ----------------------------- */
+  // --- SOUND PRELOADING ---
+  // Pre-instantiate Audio objects so playback is immediate (no decode delay).
 
   useEffect(() => {
     ["/sounds/snap.mp3", "/sounds/click.mp3"].forEach((src) => {
@@ -78,9 +75,7 @@ export function AudioProvider({ children }) {
     });
   }, []);
 
-  /* -----------------------------
-     PLAY SOUND (SHARED HELPER)
-  ----------------------------- */
+  // --- PLAY SOUND ---
 
   const playSound = useCallback((src, volume) => {
     // Bail out when muted — iOS ignores audio.volume=0 and plays at full level anyway.
@@ -96,9 +91,9 @@ export function AudioProvider({ children }) {
     audio.play().catch(() => {});
   }, []);
 
-  /* -----------------------------
-     SYNC REFS
-  ----------------------------- */
+  // --- SYNC REFS ---
+  // Keep plain refs in sync with state so rAF loops and callbacks always
+  // read the current value without being listed as effect dependencies.
 
   useEffect(() => {
     effectiveVolumeRef.current = effectiveVolume;
@@ -112,9 +107,8 @@ export function AudioProvider({ children }) {
     musicPlayingRef.current = musicPlaying;
   }, [musicPlaying]);
 
-  /* -----------------------------
-     CLEANUP LISTENERS
-  ----------------------------- */
+  // --- CLEANUP ---
+  // Removes the one-time interaction listeners added by startMusic.
 
   const cleanupInteractionListeners = useCallback(() => {
     if (interactionStartRef.current) {
@@ -125,9 +119,9 @@ export function AudioProvider({ children }) {
     }
   }, []);
 
-  /* -----------------------------
-     START MUSIC
-  ----------------------------- */
+  // --- START MUSIC ---
+  // Creates the audio element, then waits for the first user interaction
+  // before playing (required by browser autoplay policy). Fades in from 0.
 
   const startMusic = useCallback(() => {
     if (audioRef.current || musicPlayingRef.current) return;
@@ -204,9 +198,7 @@ export function AudioProvider({ children }) {
     });
   }, [cleanupInteractionListeners]);
 
-  /* -----------------------------
-     STOP MUSIC
-  ----------------------------- */
+  // --- STOP MUSIC ---
 
   const stopMusic = useCallback(() => {
     cleanupInteractionListeners();
@@ -222,9 +214,7 @@ export function AudioProvider({ children }) {
     setMusicPlaying(false);
   }, [cleanupInteractionListeners]);
 
-  /* -----------------------------
-     SYNC VOLUME TO AUDIO
-  ----------------------------- */
+  // --- SYNC VOLUME TO AUDIO ---
 
   useEffect(() => {
     if (audioRef.current) {
@@ -236,9 +226,7 @@ export function AudioProvider({ children }) {
     }
   }, [muted, volume]);
 
-  /* -----------------------------
-     CONTEXT
-  ----------------------------- */
+  // --- CONTEXT VALUE ---
 
   return (
     <AudioContext.Provider
@@ -259,10 +247,7 @@ export function AudioProvider({ children }) {
   );
 }
 
-/* -----------------------------
-   HOOK
------------------------------ */
-
+// --- HOOK ---
 export function useAudio() {
   return useContext(AudioContext);
 }

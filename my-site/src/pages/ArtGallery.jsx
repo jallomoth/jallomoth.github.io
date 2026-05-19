@@ -1,3 +1,6 @@
+// Art Gallery page — shows fan-submitted artwork grouped by year and category.
+// Clicking a thumbnail opens a fullscreen modal with an expand animation.
+// Supports keyboard navigation, touch swipe, and pinch-to-zoom in the modal.
 import { useCallback, useEffect, useRef, useState } from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
@@ -9,18 +12,25 @@ import usePageTitle from "../hooks/usePageTitle";
 
 import "./ArtGallery.css";
 
+// Normalize special folder names to their display-label equivalents.
+// Keys are lowercased folder names; values are the canonical display labels.
 const SECTION_MAP = {
   "hall of fame": "Hall of Fame",
   "fools errand": "Fool's Errand",
   "fool's errand": "Fool's Errand",
 };
 
+// Defines the sort position of named sections. Unlisted sections sort to
+// priority 1, which places them between Hall of Fame (0) and Fool's Errand (2).
 const SORT_ORDER = {
   "Hall of Fame": 0,
   "Fool's Errand": 2,
 };
 
 export default function ArtGallery() {
+  // --- MODAL STATE ---
+  // imagePosition: thumbnail rect at click time (animation start).
+  // finalImagePosition: 80% of the viewport (animation end).
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [finalImagePosition, setFinalImagePosition] = useState(null);
@@ -56,13 +66,15 @@ export default function ArtGallery() {
   // Tracks what had focus before the modal opened so we can restore it on close
   const previousFocusRef = useRef(null);
 
-  // Modal overlay ref — needed for non-passive touchmove (pinch-to-zoom, NTH-6)
   const modalOverlayRef = useRef(null);
-  // Pinch-to-zoom state (refs for perf — avoids re-renders on every touch event)
+
+  // --- ZOOM STATE ---
+  // Refs rather than state so touch events can update them without
+  // causing re-renders; written directly to the DOM via applyZoomTransform.
   const zoomScaleRef = useRef(1);
   const zoomOffsetRef = useRef({ x: 0, y: 0 });
 
-  // Apply current zoom/pan transform directly to the modal image DOM node
+  // Apply current zoom/pan transform to the modal image DOM node.
   const applyZoomTransform = useCallback(() => {
     if (!modalImageRef.current) return;
     const s = zoomScaleRef.current;
@@ -72,7 +84,7 @@ export default function ArtGallery() {
       s === 1 ? '' : `scale(${s}) translate(${x / s}px, ${y / s}px)`;
   }, []);
 
-  // Reset zoom on every image navigation and on modal close
+  // Reset zoom on every image change and on modal close.
   const resetZoom = useCallback(() => {
     zoomScaleRef.current = 1;
     zoomOffsetRef.current = { x: 0, y: 0 };
@@ -82,9 +94,11 @@ export default function ArtGallery() {
     }
   }, []);
 
+  // --- MODAL OPEN ---
+  // Records the thumbnail's DOMRect as the animation start position.
   const handleImageClick = (img, index, rect) => {
     previousFocusRef.current = document.activeElement;
-    // Convert DOMRect to plain object with the values we need
+    // Convert DOMRect to a plain object (DOMRect properties are non-enumerable)
     setImagePosition({
       top: rect.top,
       left: rect.left,

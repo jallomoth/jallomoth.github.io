@@ -1,3 +1,6 @@
+// Art Gallery layout — renders section nav buttons at the top followed by
+// per-year GallerySection components. Accepts an external itemRefs array so
+// ArtGallery can look up thumbnail positions for the modal animation.
 import { useRef } from "react";
 import GallerySection from "./GallerySection";
 import "./Gallery.css";

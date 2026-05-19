@@ -1,3 +1,7 @@
+// Custom cursor — replaces the OS cursor with a site-branded image that
+// tracks the mouse with zero lag (position is set directly in rAF, not via
+// state). Switches to a grab image while a drag is in progress. Hidden on
+// touch devices where no pointer exists.
 import { useEffect, useRef } from "react";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { useDrag } from "../contexts/DragContext";
@@ -95,7 +99,8 @@ export default function Cursor() {
     pos.current.x = mouse.current.x;
     pos.current.y = mouse.current.y;
 
-    // SWITCH CURSOR IMAGE BASED ON GLOBAL STATE
+  // --- CURSOR IMAGE ---
+  // Switch to grab cursor while any draggable element is being held.
     const nextImage = isGrabbingRef.current
       ? "/cursor/CursorGrab.png"
       : "/cursor/Cursor.png";

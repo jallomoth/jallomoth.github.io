@@ -1,3 +1,6 @@
+// Home screen navigation grid — splits the BUTTONS list into rows of
+// BUTTONS_PER_ROW and renders each as a NavButton.
+// External URLs (http/https) are opened in a new tab by NavButton.
 import "./ButtonGrid.css";
 import NavButton from "./NavButton";
 
@@ -14,6 +17,7 @@ const BUTTONS = [
   { label: "Backstage", alt: "Backstage", to: "/backstage", image: "/icons/Backstage.png", textImage: "/icons/Backstage-text.png" },
 ];
 
+// Split a flat array into rows of BUTTONS_PER_ROW length.
 function chunkButtons(buttons) {
   const rows = [];
   for (let i = 0; i < buttons.length; i += BUTTONS_PER_ROW) {

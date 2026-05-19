@@ -1,3 +1,4 @@
+// Back button — swaps images for normal/hover/press states and navigates to `to`.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAudio } from "./audio/AudioContext";

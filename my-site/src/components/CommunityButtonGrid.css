@@ -1,4 +1,4 @@
-/* ── Community grid layout: 2 rows × 6 columns ────────────────────────── */
+/* --- Community grid layout: 2 rows × 6 columns --- */
 :root {
   --community-button-size: 9vw;
   --community-button-gap:  3.5vw;
@@ -35,12 +35,12 @@
   width: var(--community-button-size);
 }
 
-/* ── Hover: lift active button ─────────────────────────────────────────── */
+/* --- Hover: lift active button --- */
 .community-button-grid .icon-container.active-icon .icon-visual {
   transform: translateY(-1.2vw) scale(1.1);
 }
 
-/* ── Dim non-active buttons when one is hovered ────────────────────────── */
+/* --- Dim non-active buttons when one is hovered --- */
 .community-button-grid:has(.active-icon)
   .icon-container:not(.active-icon) {
   opacity: 0.4;
@@ -62,7 +62,7 @@
   transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
 }
 
-/* ── Wide tablet: 4 per row ─────────────────────────────────────────────── */
+/* --- Wide tablet: 4 per row --- */
 @media (max-width: 1100px) {
   :root {
     --community-button-size: 13vw;
@@ -80,7 +80,7 @@
   }
 }
 
-/* ── Tablet portrait / large phone: 3 per row, scrollable ───────────────── */
+/* --- Tablet portrait / large phone: 3 per row, scrollable --- */
 /* Grid leaves fixed flow so the page can scroll on tall grids              */
 @media (max-width: 768px) {
   :root {
@@ -106,7 +106,7 @@
   }
 }
 
-/* ── Mobile portrait: 3 per row, tighter ────────────────────────────────── */
+/* --- Mobile portrait: 3 per row, tighter --- */
 @media (max-width: 480px) {
   :root {
     --community-button-size: 24vw;

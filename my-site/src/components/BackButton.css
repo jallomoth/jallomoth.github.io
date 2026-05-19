@@ -1,6 +1,4 @@
-/* -----------------------------
-   BACK BUTTON
------------------------------ */
+/* --- Back Button --- */
 
 .back-button {
   position: fixed;
@@ -27,17 +25,17 @@
   outline: none;
 }
 
-/* HOVER = grow */
+/* --- Hover --- */
 .back-button:hover {
   transform: scale(1.1);
 }
 
-/* CLICK = shrink */
+/* --- Click --- */
 .back-button:active {
   transform: scale(0.95);
 }
 
-/* IMAGE */
+/* --- Image --- */
 .back-button-image {
   width: clamp(44px, 5vw, 100px);
   height: clamp(44px, 5vw, 100px);

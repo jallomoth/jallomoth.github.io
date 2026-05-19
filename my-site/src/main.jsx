@@ -1,3 +1,6 @@
+// Entry point — initializes Google Analytics and mounts the React app.
+// AudioProvider and DragProvider are placed above BrowserRouter so all
+// route components can access audio and drag context.
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

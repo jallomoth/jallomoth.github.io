@@ -9,9 +9,7 @@
   margin-top: clamp(20px, 2vw, 32px);
 }
 
-/* ===========================
-   HUB PAGE LINK GRID
-   =========================== */
+/* --- HUB PAGE LINK GRID --- */
 
 /* Outer wrapper: centers the grid using flexbox */
 .jalloseum-hub-outer {

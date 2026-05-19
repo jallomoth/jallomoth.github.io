@@ -1,3 +1,5 @@
+// Fool's Errand page — hosts the comic reader (ComicViewer).
+// Wrapped in an ErrorBoundary so a broken chapter does not crash the whole page.
 import './PlaceholderPage.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";

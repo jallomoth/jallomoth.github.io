@@ -12,7 +12,7 @@
   pointer-events: none;
 }
 
-/* ICON */
+/* --- Icon --- */
 .volume-icon {
   width: clamp(44px, 5vw, 100px);
   height: clamp(44px, 5vw, 100px);
@@ -35,7 +35,7 @@
   transform: scale(0.95);
 }
 
-/* SLIDER CONTAINER */
+/* --- Slider Container --- */
 @keyframes sliderFadeDown {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -59,7 +59,7 @@
   pointer-events: none;
 }
 
-/* TRACK WRAPPER */
+/* --- Track Wrapper --- */
 .slider-track {
   position: relative;
   width: clamp(36px, 4vw, 72px);
@@ -74,7 +74,7 @@
   touch-action: none;
 }
 
-/* TRACK IMAGE */
+/* --- Track Image --- */
 .slider-track-img {
   position: absolute;
   height: 100%;
@@ -84,7 +84,7 @@
   user-select: none;
 }
 
-/* THUMB */
+/* --- Thumb --- */
 .slider-thumb {
   position: absolute;
   left: 50%;

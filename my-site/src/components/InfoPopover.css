@@ -1,8 +1,8 @@
-/* ── Overlay ─────────────────────────────────────────────────────────────── */
+﻿/* --- Overlay --- */
 /* Start fully transparent; transition to visible via --visible class.
-   Using transition (not animation) is required because CSS keyframe animations
-   on the same element as backdrop-filter break the blur in GPU-composited
-   browsers (Chrome/Safari production). The gallery modal uses the same pattern. */
+   Using CSS transition instead of a keyframe animation is required because
+   animations on elements with backdrop-filter break the blur in Chrome/Safari.
+   The gallery modal uses the same pattern. */
 .info-popover-overlay {
   position: fixed;
   inset: 0;
@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
 
-  /* hidden state — matches gallery modal pattern exactly */
+  /* hidden state â€” matches gallery modal pattern exactly */
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(0px);
 
@@ -23,13 +23,13 @@
   will-change: backdrop-filter, background;
 }
 
-/* visible state — toggled by React after mount (and removed on close) */
+/* visible state â€” toggled by React after mount (and removed on close) */
 .info-popover-overlay--visible {
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(10px) saturate(120%);
 }
 
-/* ── Card ────────────────────────────────────────────────────────────────── */
+/* --- Card --- */
 .info-popover-card {
   position: relative;
   background: rgba(20, 16, 30, 0.92);
@@ -58,7 +58,7 @@
   to   { transform: translateY(16px); opacity: 0; }
 }
 
-/* ── Close button ────────────────────────────────────────────────────────── */
+/* --- Close button --- */
 .info-popover-close {
   position: absolute;
   top: 10px;
@@ -84,7 +84,7 @@
   -webkit-user-drag: none;
 }
 
-/* ── Content ─────────────────────────────────────────────────────────────── */
+/* --- Content --- */
 .info-popover-title {
   margin: 0 0 8px;
   font-family: "Chelsea Market", system-ui;
@@ -104,7 +104,7 @@
   letter-spacing: 0.03em;
 }
 
-/* ── Action buttons ──────────────────────────────────────────────────────── */
+/* --- Action buttons --- */
 .info-popover-actions {
   display: flex;
   gap: 12px;
@@ -145,7 +145,7 @@
   transform: scale(1.04);
 }
 
-/* ── Accessible live region (visually hidden) ────────────────────────────── */
+/* --- Accessible live region (visually hidden) --- */
 .info-popover-sr-live {
   position: absolute;
   width: 1px;
@@ -154,3 +154,5 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+

@@ -1,3 +1,6 @@
+// Vite build config — React + image optimization for GitHub Pages.
+// ViteImageOptimizer runs sharp on all images at build time to reduce file
+// sizes. PNG stays lossless; JPEG uses lossy compression.
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'

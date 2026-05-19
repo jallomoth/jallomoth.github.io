@@ -1,3 +1,7 @@
+// Discovers Jalloseum images at build time via Vite's import.meta.glob and
+// filters to the requested subfolder. Returns a sorted array of image objects.
+// The glob pattern must be static (a string literal) — Vite resolves it at
+// build time and cannot handle runtime-computed paths.
 // components/gallery/useJalloseumImages.js
 import { useMemo } from "react";
 

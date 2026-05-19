@@ -1,3 +1,6 @@
+// Comic reader — URL-driven page viewer for Fool's Errand chapters.
+// Chapter and page are derived from the URL path so links are shareable.
+// Reading position is persisted to localStorage and restored on next visit.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
@@ -21,7 +24,9 @@ export default function ComicViewer() {
 
   const { effectiveVolume, playSound } = useAudio();
 
-  // derive chapter + page from URL
+  // --- URL PARSING ---
+  // Derive chapter and page index from the URL path so the reader state is
+  // fully encoded in the URL and the back button works correctly.
   const { pageIndex, chapter } = useMemo(() => {
     const raw    = location.pathname.replace(/^\/fools-errand\/?/, "");
     const parts  = raw.split("/").filter(Boolean);
@@ -31,7 +36,9 @@ export default function ComicViewer() {
     return { pageIndex: page - 1, chapter: chapMeta };
   }, [location.pathname]);
 
-  // redirect bare /fools-errand to saved position (NTH-12) or first chapter page 1
+  // --- RESTORE SAVED POSITION ---
+  // On a bare /fools-errand visit, redirect to the last-read page if one
+  // exists and the chapter is still valid, otherwise go to chapter 1 page 1.
   useEffect(() => {
     if (
       location.pathname === "/fools-errand" ||
@@ -51,6 +58,7 @@ export default function ComicViewer() {
     }
   }, [location.pathname, navigate]);
 
+  // --- NAVIGATION HELPERS ---
   const total = chapter.images.length;
 
   const goTo = (cId, idx) => {
@@ -62,12 +70,15 @@ export default function ComicViewer() {
   const next = () => { if (pageIndex + 1 < total) goTo(chapter.id, pageIndex + 1); };
   const prev = () => { if (pageIndex > 0)          goTo(chapter.id, pageIndex - 1); };
 
+  // Build the nav button image path from a base name and interaction state.
   const navImg = (base, state) => {
     if (state === "hover")  return `/comic/${base}Hover.png`;
     if (state === "click")  return `/comic/${base}Select.png`;
     return `/comic/${base}.png`;
   };
 
+  // Returns mouse event handlers that drive a button's visual state and
+  // trigger navigation + sound on mouseup.
   const makeNavHandlers = (disabled, action, setState) => ({
     onMouseEnter: ()  => { if (!disabled) setState("hover"); },
     onMouseLeave: ()  => setState("normal"),
@@ -90,7 +101,7 @@ export default function ComicViewer() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // keyboard nav
+  // --- KEYBOARD NAVIGATION ---
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "ArrowRight") next();
@@ -101,14 +112,15 @@ export default function ComicViewer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [pageIndex, chapter]);
 
-  // fullscreen listener
+  // --- FULLSCREEN LISTENER ---
   useEffect(() => {
     const onFs = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", onFs);
     return () => document.removeEventListener("fullscreenchange", onFs);
   }, []);
 
-  // preload adjacent pages to eliminate switching lag
+  // --- PAGE PRELOADING ---
+  // Preload adjacent pages so navigation feels instant.
   useEffect(() => {
     const toPreload = [
       chapter.images[pageIndex + 1],
@@ -120,12 +132,13 @@ export default function ComicViewer() {
     });
   }, [chapter, pageIndex]);
 
-  // persist reading position to localStorage (NTH-12)
+  // --- PERSIST READING POSITION ---
   useEffect(() => {
     localStorage.setItem("fe-last-read", JSON.stringify({ chapterId: chapter.id, page: pageIndex }));
   }, [chapter.id, pageIndex]);
 
-  // track chapter page views in GA
+  // --- ANALYTICS ---
+  // Fire a GA event for each page read so chapter engagement is trackable.
   useEffect(() => {
     ReactGA.event({
       category: "Comic",
@@ -134,7 +147,7 @@ export default function ComicViewer() {
     });
   }, [chapter.id, pageIndex]);
 
-  // touch swipe navigation (NTH-4)
+  // --- TOUCH SWIPE ---
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -153,7 +166,9 @@ export default function ComicViewer() {
     };
   }, [pageIndex, chapter]);
 
-  // fullscreen cursor: the site-wide custom cursor lives outside the FS element, so we render our own
+  // --- FULLSCREEN CURSOR ---
+  // The site-wide custom cursor element is outside the fullscreen container,
+  // so it disappears in fullscreen mode. We render a duplicate cursor inside.
   useEffect(() => {
     if (!isFullscreen) return;
     let frame;

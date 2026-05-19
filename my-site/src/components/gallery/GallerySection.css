@@ -1,9 +1,9 @@
-/* SECTION CONTAINER */
+/* --- Section Container --- */
 .gallery-section {
   margin-bottom: clamp(8px, 1vw, 16px);
 }
 
-/* YEAR/SECTION HEADER */
+/* --- Year/Section Header --- */
 .gallery-year {
   width: 90%;
   margin: 0 auto clamp(8px, 1.5vw, 24px) auto;
@@ -24,7 +24,7 @@
   text-align: left;
 }
 
-/* LINE UNDER HEADER */
+/* --- Line Under Header --- */
 .gallery-year::after {
   content: "";
   display: block;
@@ -37,7 +37,7 @@
   background: var(--color-accent);
 }
 
-/* GALLERY CONTAINER (CSS COLUMNS) */
+/* --- Gallery Container (CSS Columns) --- */
 .gallery-container {
   column-count: 5;
   column-gap: 2vw;

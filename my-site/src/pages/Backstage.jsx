@@ -1,3 +1,4 @@
+// Backstage page — placeholder; content not yet implemented.
 import './PlaceholderPage.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";

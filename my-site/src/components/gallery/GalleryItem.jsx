@@ -1,3 +1,6 @@
+// Single gallery thumbnail — fades in on scroll (IntersectionObserver) and
+// applies a CSS 3D tilt effect on hover. Hides itself while its image is
+// expanded in the modal so the zoom transition looks seamless.
 import { useEffect, useRef, useState } from "react";
 import "./GalleryItem.css";
 

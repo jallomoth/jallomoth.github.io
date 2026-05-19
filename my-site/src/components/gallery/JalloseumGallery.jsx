@@ -1,3 +1,5 @@
+// Flat image grid for Jalloseum subpages — no sections or nav buttons,
+// just a single scrollable grid of all images in the given subfolder.
 import { useRef } from "react";
 import GalleryItem from "./GalleryItem";
 import "./Gallery.css";
