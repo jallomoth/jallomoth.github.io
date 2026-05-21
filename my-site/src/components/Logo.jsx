@@ -136,7 +136,7 @@ export default function Logo({
 
         if (distance > THRESHOLD) {
           const strength = Math.min(distance / 300, 1);
-          playSound("/sounds/snap.mp3", effectiveVolumeRef.current * (strength * 0.6));
+          playSound("/sounds/logo/Snap.mp3", effectiveVolumeRef.current * (strength * 0.6));
         }
       }
     };
