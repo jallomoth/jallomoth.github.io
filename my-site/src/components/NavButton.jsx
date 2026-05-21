@@ -12,7 +12,7 @@ const DRAG_THRESHOLD = 80;
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction }) {
+export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction, ssRef, ssIndex }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
 
@@ -52,7 +52,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
   // --- DRAG PHYSICS ---
   // Mouse events only — the animation loop (useAnimationFrame below) does
-  // the actual position update every frame.
+  // the actual position update every frame. Drag is skipped entirely when
+  // prefersReducedMotion is set; buttons still navigate on click.
   useEffect(() => {
     const handleMouseMove = (e) => {
       mouse.current.x = e.clientX;
@@ -132,6 +133,23 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     );
     lastTimeRef.current = currentTime;
 
+    // --- SCREENSAVER OVERRIDE ---
+    // When the screensaver is active the centralized physics engine in Home.jsx
+    // owns all positions. Read the entity offset and write it directly to the DOM,
+    // bypassing spring physics entirely.
+    if (ssRef?.current) {
+      const e = ssRef.current.entities?.[ssIndex];
+      if (e) {
+        pos.current.x = e.x - e.naturalX;
+        pos.current.y = e.y - e.naturalY;
+        if (iconRef.current) {
+          iconRef.current.style.setProperty("--translate-x", `${pos.current.x}px`);
+          iconRef.current.style.setProperty("--translate-y", `${pos.current.y}px`);
+        }
+        return;
+      }
+    }
+
     if (!isDragging.current) {
       const spring = 0.2;
       const damping = 0.7;
@@ -187,6 +205,18 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
   // --- START DRAG ---
   const handleMouseDown = (e) => {
+    // Skip drag entirely when the user prefers reduced motion; the button
+    // still navigates via click (mouseup distance check is never reached,
+    // so navigateTo() is called directly via the keyboard handler or click).
+    if (prefersReducedMotion) {
+      navigateTo();
+      return;
+    }
+
+    // During screensaver the global wake() handler (capture phase) has already
+    // deactivated it; don't start a drag on this first click — just let it wake.
+    if (ssRef?.current) return;
+
     e.preventDefault();
 
     isDragging.current = true;
@@ -236,6 +266,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       <div
         ref={iconRef}
         className={`icon-container ${isActive ? "active-icon" : ""}`}
+        data-ss-index={ssIndex}
         onMouseDown={handleMouseDown}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}

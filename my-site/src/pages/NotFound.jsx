@@ -49,7 +49,7 @@ export default function NotFound() {
     width: "100%",
     height: "100%",
     objectFit: "fill",
-    filter: "brightness(0.7) contrast(1.1)",
+    filter: "brightness(1) contrast(1)",
   };
 
   return (

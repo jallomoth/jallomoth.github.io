@@ -120,12 +120,20 @@ export default function ComicViewer() {
   }, []);
 
   // --- PAGE PRELOADING ---
-  // Preload adjacent pages so navigation feels instant.
+  // Preload adjacent pages so navigation feels instant. When on the last page,
+  // also preload the first image of the next chapter so the chapter transition
+  // has no visible loading delay.
   useEffect(() => {
+    const chapterIndex = chapters.findIndex((c) => c.id === chapter.id);
+    const nextChapter  = chapters[chapterIndex + 1];
+    const isLastPage   = pageIndex + 1 >= chapter.images.length;
+
     const toPreload = [
       chapter.images[pageIndex + 1],
       chapter.images[pageIndex - 1],
+      isLastPage && nextChapter ? nextChapter.images[0] : null,
     ].filter(Boolean);
+
     toPreload.forEach((src) => {
       const img = new Image();
       img.src = src;

@@ -73,6 +73,12 @@
   user-select: none;
 }
 
+/* Hide text labels during screensaver mode */
+.button-grid.screensaver .text-container {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .text-image {
   width: 100%;
   object-fit: contain;

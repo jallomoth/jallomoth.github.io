@@ -1,6 +1,8 @@
 // Site logo — draggable with spring physics and a fling effect on release.
 // Swaps to a hover image on mouse-over and plays a snap sound when thrown
 // far enough. Spawns a small pop image at the click point.
+// Tracks lifetime click count in localStorage and shows a milestone number
+// popup at certain thresholds.
 import { useState, useRef, useEffect } from "react";
 import { useAudio } from "./audio/AudioContext";
 import useAnimationFrame from "../hooks/useAnimationFrame";
@@ -8,6 +10,19 @@ import { useDrag } from "../contexts/DragContext";
 import "./Logo.css";
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Milestone click counts that trigger a number popup.
+const MILESTONES = new Set([1, 5, 10, 25, 50, 100, 250, 500, 1000]);
+
+function getClickCount() {
+  return parseInt(localStorage.getItem("logo-click-count") || "0", 10);
+}
+
+function incrementClickCount() {
+  const next = getClickCount() + 1;
+  localStorage.setItem("logo-click-count", String(next));
+  return next;
+}
 
 export default function Logo({
   top = "10%",
@@ -17,9 +32,12 @@ export default function Logo({
   className = "",
   src = "/logo/Jallogo.png",
   hoverSrc = "/logo/JallogoHover.png",
+  ssRef,
+  ssIndex,
 }) {
   const [hovered, setHovered] = useState(false);
   const [effects, setEffects] = useState([]);
+  const [milestonePopups, setMilestonePopups] = useState([]);
 
   const containerRef = useRef(null);
 
@@ -127,6 +145,25 @@ export default function Logo({
     );
     lastTimeRef.current = currentTime;
 
+    // --- SCREENSAVER OVERRIDE ---
+    // When the screensaver is active the centralized physics engine in Home.jsx
+    // owns the logo's position. Read the entity offset and write directly to DOM.
+    if (!isDragging.current && ssRef?.current) {
+      const e = ssRef.current.entities?.[ssIndex];
+      if (e !== undefined) {
+        pos.current.x = e.x - e.naturalX;
+        pos.current.y = e.y - e.naturalY;
+        if (containerRef.current) {
+          containerRef.current.style.transform = `
+            ${center ? "translate(-50%, -50%)" : ""}
+            translate(${pos.current.x}px, ${pos.current.y}px)
+            scale(${hoverScaleRef.current})
+          `;
+        }
+        return;
+      }
+    }
+
     if (!isDragging.current) {
       const spring = 0.16;
       const damping = 0.8;
@@ -169,6 +206,10 @@ export default function Logo({
   });
 
   const handleMouseDown = (e) => {
+    // During screensaver, don't start a drag — the global wake() handler (capture
+    // phase) will deactivate the screensaver before this fires.
+    if (ssRef?.current) return;
+
     e.preventDefault();
 
     isDragging.current = true;
@@ -181,6 +222,20 @@ export default function Logo({
     mouse.current.y = e.clientY;
 
     const id = Date.now();
+
+    // --- CLICK COUNTER ---
+    // Increment the lifetime click count and fire a milestone popup if needed.
+    const newCount = incrementClickCount();
+    if (MILESTONES.has(newCount)) {
+      const popupId = id + 1;
+      setMilestonePopups((prev) => [
+        ...prev,
+        { id: popupId, x: e.clientX, y: e.clientY - 40, text: String(newCount) },
+      ]);
+      setTimeout(() => {
+        setMilestonePopups((prev) => prev.filter((p) => p.id !== popupId));
+      }, 900);
+    }
 
     setEffects((prev) => [
       ...prev,
@@ -212,6 +267,7 @@ export default function Logo({
         ref={containerRef}
         className={`logo-container${className ? ` ${className}` : ""}`}
         style={{ top, left, width }}
+        data-ss-index={ssIndex}
         onMouseEnter={() => { setHovered(true); hoveredRef.current = true; }}
         onMouseLeave={() => { setHovered(false); hoveredRef.current = false; }}
         onMouseDown={handleMouseDown}
@@ -245,6 +301,17 @@ export default function Logo({
           }}
           alt=""
         />
+      ))}
+
+      {milestonePopups.map((popup) => (
+        <span
+          key={popup.id}
+          className="milestone-popup"
+          style={{ left: popup.x, top: popup.y }}
+          aria-live="polite"
+        >
+          {popup.text}
+        </span>
       ))}
     </>
   );

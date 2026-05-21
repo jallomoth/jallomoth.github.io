@@ -1,6 +1,8 @@
 // Home screen navigation grid — splits the BUTTONS list into rows of
 // BUTTONS_PER_ROW and renders each as a NavButton.
 // External URLs (http/https) are opened in a new tab by NavButton.
+// Screensaver state is managed by the parent (Home.jsx) and passed down
+// via the ssRef prop; this component just wires indices to each button.
 import "./ButtonGrid.css";
 import NavButton from "./NavButton";
 
@@ -26,16 +28,24 @@ function chunkButtons(buttons) {
   return rows;
 }
 
-export default function ButtonGrid() {
+export default function ButtonGrid({ ssRef, screensaverActive }) {
   const rows = chunkButtons(BUTTONS);
 
   return (
-    <div className="button-grid">
+    <div className={`button-grid${screensaverActive ? " screensaver" : ""}`}>
       {rows.map((row, rowIndex) => (
         <div key={rowIndex} className="button-row">
-          {row.map((btn, index) => (
-            <NavButton key={index} {...btn} />
-          ))}
+          {row.map((btn, colIndex) => {
+            const ssIndex = rowIndex * BUTTONS_PER_ROW + colIndex;
+            return (
+              <NavButton
+                key={colIndex}
+                {...btn}
+                ssRef={ssRef}
+                ssIndex={ssIndex}
+              />
+            );
+          })}
         </div>
       ))}
     </div>
