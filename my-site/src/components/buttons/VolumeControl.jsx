@@ -225,7 +225,7 @@ export default function VolumeControl() {
           draggable="false"
           onClick={toggleMusicMute}
           onMouseEnter={() => { setMusicNoteHovered(true); overControl.current = true; cancelHide(); }}
-          onMouseLeave={() => { setMusicNoteHovered(false); overControl.current = false; scheduleHide(); }}
+          onMouseLeave={() => setMusicNoteHovered(false)}
           onMouseDown={() => setMusicNotePressed(true)}
           onMouseUp={() => setMusicNotePressed(false)}
         />
