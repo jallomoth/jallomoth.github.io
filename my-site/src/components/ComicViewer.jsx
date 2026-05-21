@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
 import chapters from "../data/foolsErrand";
-import { useAudio } from "./audio/AudioContext";
+import { useAudio } from "../contexts/AudioContext";
 import "./ComicViewer.css";
 
 export default function ComicViewer() {
@@ -72,9 +72,9 @@ export default function ComicViewer() {
 
   // Build the nav button image path from a base name and interaction state.
   const navImg = (base, state) => {
-    if (state === "hover")  return `/comic/${base}Hover.png`;
-    if (state === "click")  return `/comic/${base}Select.png`;
-    return `/comic/${base}.png`;
+    if (state === "hover")  return `/buttons/comic/${base}-hover.png`;
+    if (state === "click")  return `/buttons/comic/${base}-select.png`;
+    return `/buttons/comic/${base}.png`;
   };
 
   // Returns mouse event handlers that drive a button's visual state and

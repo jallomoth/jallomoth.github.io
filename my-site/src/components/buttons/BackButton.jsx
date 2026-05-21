@@ -1,13 +1,13 @@
 // Back button — swaps images for normal/hover/press states and navigates to `to`.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAudio } from "./audio/AudioContext";
+import { useAudio } from "../../contexts/AudioContext";
 import "./BackButton.css";
 
 export default function BackButton({
-  normalImage = "/back/BackArrow.png",
-  hoverImage = "/back/BackArrowHover.png",
-  clickImage = "/back/BackArrowSelect.png",
+  normalImage = "/buttons/back/BackArrow.png",
+  hoverImage = "/buttons/back/BackArrow-hover.png",
+  clickImage = "/buttons/back/BackArrow-select.png",
   to = "/",
 }) {
   const navigate = useNavigate();

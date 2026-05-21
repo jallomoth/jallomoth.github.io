@@ -2,7 +2,7 @@
 // Wrapped in an ErrorBoundary so a broken chapter does not crash the whole page.
 import './PlaceholderPage.css';
 import Logo from "../components/Logo";
-import BackButton from "../components/BackButton";
+import BackButton from "../components/buttons/BackButton";
 import ComicViewer from "../components/ComicViewer";
 import ErrorBoundary from "../components/ErrorBoundary";
 import usePageTitle from "../hooks/usePageTitle";

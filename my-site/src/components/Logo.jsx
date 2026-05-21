@@ -4,7 +4,7 @@
 // Tracks lifetime click count in localStorage and shows a milestone number
 // popup at certain thresholds.
 import { useState, useRef, useEffect } from "react";
-import { useAudio } from "./audio/AudioContext";
+import { useAudio } from "../contexts/AudioContext";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { useDrag } from "../contexts/DragContext";
 import "./Logo.css";
@@ -12,11 +12,10 @@ import "./Logo.css";
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Milestone click counts that trigger a number popup.
-const MILESTONES = new Set([5, 10, 21, 25, 50, 67, 69, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 7500, 10000]);
+const MILESTONES = new Set([10, 21, 25, 50, 67, 69, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 7500, 10000]);
 
 // Sound to play for each milestone. Unspecified milestones fall back to snap.
 const MILESTONE_SOUNDS = {
-  5:     "/sounds/click.mp3",
   10:    "/sounds/click.mp3",
   21:    "/sounds/click.mp3",
   // 25-100 → snap (default)
@@ -148,7 +147,7 @@ export default function Logo({
 
         if (distance > THRESHOLD) {
           const strength = Math.min(distance / 300, 1);
-          playSound("/sounds/snap.mp3", effectiveVolumeRef.current * (0.4 + strength * 0.6));
+          playSound("/sounds/snap.mp3", effectiveVolumeRef.current * (strength * 0.6));
         }
       }
     };

@@ -8,7 +8,7 @@ import ReactGA from 'react-ga4';
 
 import Cursor from './components/Cursor';
 import ParallaxBackground from './components/ParallaxBackground';
-import VolumeControl from './components/audio/VolumeControl';
+import VolumeControl from './components/buttons/VolumeControl';
 
 import Home from './pages/Home';
 import FoolsErrand from './pages/FoolsErrand';

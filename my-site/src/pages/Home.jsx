@@ -6,7 +6,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Logo from "../components/Logo";
 import ButtonGrid from "../components/ButtonGrid";
-import { useAudio } from "../components/audio/AudioContext";
+import FullscreenButton from "../components/buttons/FullscreenButton";
+import { useAudio } from "../contexts/AudioContext";
 import usePageTitle from "../hooks/usePageTitle";
 
 // Screensaver only on desktop (pointer: fine = mouse/trackpad, not touchscreen).
@@ -179,6 +180,7 @@ export default function Home() {
       <main>
         <ButtonGrid ssRef={ssRef} screensaverActive={screensaverActive} />
       </main>
+      <FullscreenButton />
     </>
   );
 }

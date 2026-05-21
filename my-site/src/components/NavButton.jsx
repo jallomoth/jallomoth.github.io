@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { useDrag } from "../contexts/DragContext";
-import { useAudio } from "./audio/AudioContext";
+import { useAudio } from "../contexts/AudioContext";
 import "./NavButton.css";
 
 // threshold for treating a drag as a click (pixels)

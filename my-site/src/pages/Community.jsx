@@ -2,7 +2,7 @@
 // cannot simply open a URL (email and P.O. box).
 import { useState } from "react";
 import Logo from "../components/Logo";
-import BackButton from "../components/BackButton";
+import BackButton from "../components/buttons/BackButton";
 import CommunityButtonGrid from "../components/CommunityButtonGrid";
 import InfoPopover from "../components/InfoPopover";
 import usePageTitle from "../hooks/usePageTitle";

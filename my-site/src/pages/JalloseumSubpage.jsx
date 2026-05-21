@@ -4,7 +4,7 @@
 // navigation (arrow keys), touch swipe, and pinch-to-zoom inside the modal.
 import { useCallback, useEffect, useRef, useState } from "react";
 import Logo from "../components/Logo";
-import BackButton from "../components/BackButton";
+import BackButton from "../components/buttons/BackButton";
 import ErrorBoundary from "../components/ErrorBoundary";
 import JalloseumGallery from "../components/gallery/JalloseumGallery";
 import useJalloseumImages from "../components/gallery/useJalloseumImages";
@@ -460,9 +460,9 @@ export default function JalloseumSubpage({ subfolder, title }) {
               <img
                 className="close-icon"
                 src={
-                  closeState === "press" ? "/x/x-press.png"
-                  : closeState === "hover" ? "/x/x-hover.png"
-                  : "/x/x.png"
+                  closeState === "press" ? "/buttons/x/x-press.png"
+                  : closeState === "hover" ? "/buttons/x/x-hover.png"
+                  : "/buttons/x/x.png"
                 }
                 alt=""
               />

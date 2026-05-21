@@ -1,0 +1,40 @@
+.fullscreen-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+
+  /* Container itself doesn't block clicks on the page below */
+  pointer-events: none;
+
+  transition: opacity 0.6s ease;
+}
+
+/* Fade out during the home-page screensaver (mirrors VolumeControl) */
+body.screensaver-active .fullscreen-container {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- Icon --- */
+.fullscreen-icon {
+  width: clamp(44px, 5vw, 100px);
+  height: clamp(44px, 5vw, 100px);
+  cursor: none !important;
+  pointer-events: auto;
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  transform: scale(1);
+  transition: transform 0.2s ease;
+  will-change: transform;
+}
+
+.fullscreen-icon:hover {
+  transform: scale(1.1);
+}
+
+.fullscreen-icon:active {
+  transform: scale(0.95);
+}

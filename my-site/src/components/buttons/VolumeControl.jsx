@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useAudio } from "./AudioContext";
+import { useAudio } from "../../contexts/AudioContext";
 import { useDrag } from "../../contexts/DragContext";
 import "./VolumeControl.css";
 
@@ -133,21 +133,21 @@ export default function VolumeControl() {
   const thumbPosition = `calc(${TOP_PAD_FRAC * 100}% + ${(1 - volume) * usableFrac * 100}%)`;
   // --- THUMB IMAGE ---
   const getThumbImage = () => {
-    if (dragging) return "/volume/thumb-grab.png";
-    if (thumbHovered) return "/volume/thumb-hover.png";
-    return "/volume/thumb.png";
+    if (dragging) return "/buttons/volume/Thumb-select.png";
+    if (thumbHovered) return "/buttons/volume/Thumb-hover.png";
+    return "/buttons/volume/Thumb.png";
   };
 
   // --- ICON IMAGE ---
   const getIconImage = () => {
     if (muted) {
-      if (iconPressed) return "/volume/mute-grab.png";
-      if (iconHovered) return "/volume/mute-hover.png";
-      return "/volume/mute.png";
+      if (iconPressed) return "/buttons/volume/Mute-select.png";
+      if (iconHovered) return "/buttons/volume/Mute-hover.png";
+      return "/buttons/volume/Mute.png";
     } else {
-      if (iconPressed) return "/volume/on-grab.png";
-      if (iconHovered) return "/volume/on-hover.png";
-      return "/volume/on.png";
+      if (iconPressed) return "/buttons/volume/On-select.png";
+      if (iconHovered) return "/buttons/volume/On-hover.png";
+      return "/buttons/volume/On.png";
     }
   };
 
@@ -186,7 +186,7 @@ export default function VolumeControl() {
         >
           {/* TRACK */}
           <img
-            src="/volume/slider.png"
+            src="/buttons/volume/slider.png"
             className="slider-track-img"
             draggable="false"
           />

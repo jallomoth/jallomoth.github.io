@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import './PlaceholderPage.css';
 import './Jalloseum.css';
 import Logo from "../components/Logo";
-import BackButton from "../components/BackButton";
+import BackButton from "../components/buttons/BackButton";
 import usePageTitle from "../hooks/usePageTitle";
 
 const CLICK_COUNT_KEY = "logo-click-count";

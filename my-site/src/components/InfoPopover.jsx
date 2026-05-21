@@ -112,9 +112,9 @@ export default function InfoPopover({ action, onClose }) {
         >
           <img
             src={
-              closeState === "press" ? "/x/x-press.png"
-              : closeState === "hover" ? "/x/x-hover.png"
-              : "/x/x.png"
+              closeState === "press" ? "/buttons/x/x-press.png"
+              : closeState === "hover" ? "/buttons/x/x-hover.png"
+              : "/buttons/x/x.png"
             }
             alt=""
             className="info-popover-close-img"

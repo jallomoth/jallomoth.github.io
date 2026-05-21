@@ -3,7 +3,7 @@
 // is shown directly on the link element.
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
-import BackButton from "../components/BackButton";
+import BackButton from "../components/buttons/BackButton";
 import usePageTitle from "../hooks/usePageTitle";
 import "./Jalloseum.css";
 
