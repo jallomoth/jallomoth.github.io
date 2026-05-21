@@ -99,7 +99,7 @@
   z-index: 10001;
 
   font-family: 'Chelsea Market', system-ui, sans-serif;
-  font-size: clamp(2rem, 6vw, 5rem);
+  /* font-size is set inline, scaled proportionally to the logo width */
   color: #fff;
   text-shadow: 0 0 18px rgba(179, 161, 255, 0.9), 0 2px 8px rgba(0,0,0,0.6);
 

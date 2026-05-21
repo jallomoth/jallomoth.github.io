@@ -83,6 +83,11 @@ export default function Logo({
   };
 
   const popupSize = getPopupSize();
+  // Milestone number font size scales with the logo the same way popupSize does
+  // (popupSize = 3vw at 60vw logo; milestone font = 2× that = 6vw at 60vw logo).
+  const milestoneFontSize = popupSize.includes("vw")
+    ? `${parseFloat(popupSize) * 2}vw`
+    : "6vw";
 
   // Keep effectiveVolumeRef in sync so the physics closure reads the latest value
   useEffect(() => {
@@ -307,7 +312,7 @@ export default function Logo({
         <span
           key={popup.id}
           className="milestone-popup"
-          style={{ left: popup.x, top: popup.y }}
+          style={{ left: popup.x, top: popup.y, fontSize: milestoneFontSize }}
           aria-live="polite"
         >
           {popup.text}
