@@ -11,6 +11,18 @@ import "./NavButton.css";
 // threshold for treating a drag as a click (pixels)
 const DRAG_THRESHOLD = 80;
 
+const HIT_SOUNDS = [
+  "/sounds/hit/Clack-1.mp3",
+  "/sounds/hit/Clack-2.mp3",
+  "/sounds/hit/Clack-3.mp3",
+  "/sounds/hit/Clack-4.mp3",
+  "/sounds/hit/Clack-5.mp3",
+  "/sounds/hit/Clack-6.mp3",
+  "/sounds/hit/Clack-7.mp3",
+  "/sounds/hit/Clack-8.mp3",
+];
+const randomHitSound = () => HIT_SOUNDS[Math.floor(Math.random() * HIT_SOUNDS.length)];
+
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction, ssRef, ssIndex, clickSound = "/sounds/click.mp3" }) {
@@ -220,7 +232,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
       if (dist < HIT_RADIUS) {
         if (!wasInHitZoneRef.current && closingSpeed >= MIN_CLOSING_SPEED) {
           const vol = Math.min(closingSpeed / 20, 1) * effectiveVolumeRef.current * 0.65;
-          playSoundRef.current("/sounds/splat.mp3", vol);
+          playSoundRef.current(randomHitSound(), vol);
         }
         wasInHitZoneRef.current = true;
       } else {
