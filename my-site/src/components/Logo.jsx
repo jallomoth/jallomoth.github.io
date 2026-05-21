@@ -19,6 +19,7 @@ const MILESTONE_SOUNDS = {
   21:    "/sounds/logo/21.mp3",
   67:    "/sounds/logo/67.mp3",
   69:    "/sounds/logo/69.mp3",
+  100:   "/sounds/logo/100.mp3",
   500:   "/sounds/logo/500.mp3",
   1000:  "/sounds/logo/1000.mp3",
 };
