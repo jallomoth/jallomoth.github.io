@@ -7,7 +7,7 @@
   /* Container itself doesn't block clicks on the page below */
   pointer-events: none;
 
-  transition: opacity 0.6s ease;
+  transition: opacity 0.25s ease;
 }
 
 /* Fade out during the home-page screensaver (mirrors VolumeControl) */
