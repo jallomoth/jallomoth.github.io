@@ -14,24 +14,13 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // Milestone click counts that trigger a number popup.
 const MILESTONES = new Set([10, 21, 25, 50, 67, 69, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 7500, 10000]);
 
-// Sound to play for each milestone. Unspecified milestones fall back to snap.
+// Sound to play for each milestone. Unspecified milestones fall back to a default.
 const MILESTONE_SOUNDS = {
-  10:    "/sounds/click.mp3",
-  21:    "/sounds/click.mp3",
-  // 25-100 → snap (default)
-  250:   "/sounds/splat.mp3",
-  500:   "/sounds/splat.mp3",
-  1000:  "/sounds/splat.mp3",
-  1500:  "/sounds/splat.mp3",
-  2000:  "/sounds/splat.mp3",
-  2500:  "/sounds/splat.mp3",
-  3000:  "/sounds/splat.mp3",
-  3500:  "/sounds/splat.mp3",
-  4000:  "/sounds/splat.mp3",
-  4500:  "/sounds/splat.mp3",
-  5000:  "/sounds/splat.mp3",
-  7500:  "/sounds/splat.mp3",
-  10000: "/sounds/splat.mp3",
+  21:    "/sounds/logo/21.mp3",
+  67:    "/sounds/logo/67.mp3",
+  69:    "/sounds/logo/69.mp3",
+  500:   "/sounds/logo/500.mp3",
+  1000:  "/sounds/logo/1000.mp3",
 };
 
 function getClickCount() {
@@ -51,7 +40,7 @@ export default function Logo({
   center = true,
   className = "",
   src = "/logo/Jallogo.png",
-  hoverSrc = "/logo/JallogoHover.png",
+  hoverSrc = "/logo/Jallogo-hover.png",
   ssRef,
   ssIndex,
 }) {
@@ -256,7 +245,7 @@ export default function Logo({
     );
     if (MILESTONES.has(newCount)) {
       playSound(
-        MILESTONE_SOUNDS[newCount] ?? "/sounds/snap.mp3",
+        MILESTONE_SOUNDS[newCount] ?? "/sounds/logo/Counter.mp3",
         effectiveVolumeRef.current * 0.85
       );
       const popupId = id + 1;
@@ -323,7 +312,7 @@ export default function Logo({
       {effects.map((effect) => (
         <img
           key={effect.id}
-          src="/logo/popup.png"
+          src="/logo/Popup.png"
           className="click-effect"
           style={{
             left: effect.x,

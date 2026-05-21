@@ -186,7 +186,7 @@ export default function VolumeControl() {
         >
           {/* TRACK */}
           <img
-            src="/buttons/volume/slider.png"
+            src="/buttons/volume/Slider.png"
             className="slider-track-img"
             draggable="false"
           />

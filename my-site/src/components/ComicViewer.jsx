@@ -86,7 +86,7 @@ export default function ComicViewer() {
     onMouseUp:    ()  => {
       if (!disabled) {
         setState("hover");
-        playSound("/sounds/click.mp3", effectiveVolume * 0.2);
+        playSound("/sounds/misc/Click.mp3", effectiveVolume * 0.2);
         action();
       }
     },

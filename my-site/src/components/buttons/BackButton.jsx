@@ -20,7 +20,7 @@ export default function BackButton({
 
   const handleMouseUp = () => {
     setState("hover");
-    playSound("/sounds/click.mp3", effectiveVolume * 0.2);
+    playSound("/sounds/misc/Click.mp3", effectiveVolume * 0.2);
     navigate(to);
   };
 

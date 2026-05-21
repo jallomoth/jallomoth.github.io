@@ -4,12 +4,14 @@
 //   Fullscreen.png         FullscreenHover.png         FullscreenClick.png
 //   FullscreenExit.png     FullscreenExitHover.png     FullscreenExitClick.png
 import { useState, useEffect } from "react";
+import { useAudio } from "../../contexts/AudioContext";
 import "./FullscreenButton.css";
 
 export default function FullscreenButton() {
   const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
   const [hovered, setHovered]           = useState(false);
   const [pressed, setPressed]           = useState(false);
+  const { effectiveVolume, playSound }  = useAudio();
 
   // Keep isFullscreen in sync when the user presses Esc or the browser exits.
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function FullscreenButton() {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => { setHovered(false); setPressed(false); }}
         onMouseDown={() => setPressed(true)}
-        onMouseUp={() => setPressed(false)}
+        onMouseUp={() => { setPressed(false); playSound("/sounds/misc/Click.mp3", effectiveVolume * 0.2); }}
       />
     </div>
   );

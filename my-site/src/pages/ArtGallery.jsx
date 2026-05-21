@@ -538,9 +538,9 @@ export default function ArtGallery() {
             <img
               className="close-icon"
               src={
-                closeState === "press" ? "/buttons/x/x-press.png"
-                : closeState === "hover" ? "/buttons/x/x-hover.png"
-                : "/buttons/x/x.png"
+                closeState === "press" ? "/buttons/x/X-select.png"
+                : closeState === "hover" ? "/buttons/x/X-hover.png"
+                : "/buttons/x/X.png"
               }
               alt=""
             />
