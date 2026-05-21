@@ -32,6 +32,13 @@ export function AudioProvider({ children }) {
     return saved !== null ? JSON.parse(saved) : false;
   });
 
+  const [musicMuted, setMusicMuted] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    const saved = localStorage.getItem("music-muted");
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+
   // --- SAVE TO LOCALSTORAGE ---
 
   useEffect(() => {
@@ -46,6 +53,12 @@ export function AudioProvider({ children }) {
     }
   }, [muted]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("music-muted", JSON.stringify(musicMuted));
+    }
+  }, [musicMuted]);
+
   // --- STATE ---
 
   const [musicPlaying, setMusicPlaying] = useState(false);
@@ -58,8 +71,10 @@ export function AudioProvider({ children }) {
   const fadeIntervalRef = useRef(null);
   // Ref so playSound can check mute state without being recreated on every change.
   const mutedRef = useRef(muted);
+  const musicMutedRef = useRef(musicMuted);
 
   const toggleMute = useCallback(() => setMuted((prev) => !prev), []);
+  const toggleMusicMute = useCallback(() => setMusicMuted((prev) => !prev), []);
 
   const effectiveVolume = muted ? 0 : volume;
 
@@ -104,6 +119,10 @@ export function AudioProvider({ children }) {
   }, [muted]);
 
   useEffect(() => {
+    musicMutedRef.current = musicMuted;
+  }, [musicMuted]);
+
+  useEffect(() => {
     musicPlayingRef.current = musicPlaying;
   }, [musicPlaying]);
 
@@ -146,7 +165,8 @@ export function AudioProvider({ children }) {
         }
 
         // Read target dynamically so the fade always aims at the current volume.
-        const target = effectiveVolumeRef.current;
+        // Respect music-only mute independently of the main mute flag.
+        const target = musicMutedRef.current ? 0 : effectiveVolumeRef.current;
         currentVolume = Math.min(currentVolume + 0.001, target);
         audioRef.current.volume = currentVolume;
 
@@ -221,10 +241,11 @@ export function AudioProvider({ children }) {
       // Cancel any active fade so the user's manual change takes immediate effect.
       clearInterval(fadeIntervalRef.current);
       // Use .muted for reliable cross-platform muting (iOS Safari ignores .volume changes)
-      audioRef.current.muted = muted;
-      audioRef.current.volume = muted ? 0 : volume;
+      const silenced = muted || musicMuted;
+      audioRef.current.muted = silenced;
+      audioRef.current.volume = silenced ? 0 : volume;
     }
-  }, [muted, volume]);
+  }, [muted, musicMuted, volume]);
 
   // --- CONTEXT VALUE ---
 
@@ -235,6 +256,8 @@ export function AudioProvider({ children }) {
         setVolume,
         muted,
         toggleMute,
+        musicMuted,
+        toggleMusicMute,
         effectiveVolume,
         playSound,
         startMusic,

@@ -30,12 +30,12 @@ export default function FullscreenButton() {
 
   const getImage = () => {
     if (isFullscreen) {
-      if (pressed)  return "/buttons/fullscreen/FullscreenExitClick.png";
-      if (hovered)  return "/buttons/fullscreen/FullscreenExitHover.png";
+      if (pressed)  return "/buttons/fullscreen/FullscreenExit-select.png";
+      if (hovered)  return "/buttons/fullscreen/FullscreenExit-hover.png";
       return "/buttons/fullscreen/FullscreenExit.png";
     }
-    if (pressed)  return "/buttons/fullscreen/FullscreenClick.png";
-    if (hovered)  return "/buttons/fullscreen/FullscreenHover.png";
+    if (pressed)  return "/buttons/fullscreen/Fullscreen-select.png";
+    if (hovered)  return "/buttons/fullscreen/Fullscreen-hover.png";
     return "/buttons/fullscreen/Fullscreen.png";
   };
 

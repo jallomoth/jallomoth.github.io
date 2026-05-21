@@ -60,6 +60,7 @@ body.screensaver-active .volume-container {
   /* no horizontal padding — keeps layout width == 4vw (same as icon) so the
      container never changes width on mount/unmount, preventing the icon shift */
   padding: 10px 0;
+  pointer-events: auto;
 }
 
 .volume-slider.closing {
@@ -77,6 +78,7 @@ body.screensaver-active .volume-container {
   justify-content: center;
 
   cursor: pointer;
+  pointer-events: auto;
 
   /* Prevents the page from scrolling when the user drags the thumb on touch */
   touch-action: none;
@@ -113,4 +115,29 @@ body.screensaver-active .volume-container {
 
 .slider-thumb:active {
   transform: translate(-50%, -50%) scale(0.9);
+}
+
+/* --- Music Mute Toggle --- */
+.music-toggle {
+  width: clamp(36px, 4vw, 72px);
+  height: auto;
+  margin-top: 6px;
+
+  cursor: none !important;
+  pointer-events: auto;
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  transform: scale(1);
+  transition: transform 0.2s ease;
+  will-change: transform;
+}
+
+.music-toggle:hover {
+  transform: scale(1.1);
+}
+
+.music-toggle:active {
+  transform: scale(0.95);
 }

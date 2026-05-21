@@ -57,6 +57,10 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
   const wasInHitZoneRef = useRef(false);   // true while dragged cursor is inside HIT_RADIUS
   const prevDistToDragRef = useRef(null);  // distance last frame (for closing-speed gate)
 
+  // Navigation gate: true if the button left the DRAG_THRESHOLD zone at any
+  // point during this drag. Once set, releasing inside the zone won't navigate.
+  const hasLeftZoneRef = useRef(false);
+
   const isExternal = /^https?:\/\//.test(to) || to?.startsWith("//");
   const isActive = hovered || draggingState;
   const src = isActive && hoverImage ? hoverImage : image;
@@ -87,6 +91,12 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
       pos.current.x = mouse.current.x - dragOffset.current.x;
       pos.current.y = mouse.current.y - dragOffset.current.y;
+
+      // Track whether the button has ever left the navigate zone.
+      if (!hasLeftZoneRef.current) {
+        const d = Math.sqrt(pos.current.x ** 2 + pos.current.y ** 2);
+        if (d >= DRAG_THRESHOLD) hasLeftZoneRef.current = true;
+      }
 
       draggedButtonPosRef.current = {
         x: mouse.current.x,
@@ -122,14 +132,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         velocity.current.x *= FLING_BOOST;
         velocity.current.y *= FLING_BOOST;
 
-        // --- DISTANCE CHECK ---
-        // Only navigate if the button was barely moved (treated as a click).
-        const distance = Math.sqrt(
-          pos.current.x * pos.current.x +
-          pos.current.y * pos.current.y
-        );
-
-        const shouldNavigate = distance < DRAG_THRESHOLD;
+        // Only navigate if the button never left the navigate zone during this drag.
+        const shouldNavigate = !hasLeftZoneRef.current;
 
         if (shouldNavigate) {
           // Play a click sound the moment the user lifts their mouse to navigate.
@@ -283,6 +287,7 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
     velocity.current.y = 0;
     prevDragPosRef.current.x = pos.current.x;
     prevDragPosRef.current.y = pos.current.y;
+    hasLeftZoneRef.current = false;
   };
 
   // --- HOVER CONTROL ---

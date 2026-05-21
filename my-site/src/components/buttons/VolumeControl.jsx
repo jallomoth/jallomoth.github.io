@@ -10,7 +10,7 @@ import "./VolumeControl.css";
 const IS_TOUCH_DEVICE = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 export default function VolumeControl() {
-  const { volume, setVolume, muted, toggleMute } = useAudio();
+  const { volume, setVolume, muted, toggleMute, musicMuted, toggleMusicMute } = useAudio();
   const { isGrabbingRef } = useDrag();
 
   // Padding expressed as a fraction of the track's rendered height.
@@ -61,6 +61,8 @@ export default function VolumeControl() {
 
   const [thumbHovered, setThumbHovered] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [musicNoteHovered, setMusicNoteHovered] = useState(false);
+  const [musicNotePressed, setMusicNotePressed] = useState(false);
 
   const sliderRef = useRef(null);
 
@@ -151,6 +153,19 @@ export default function VolumeControl() {
     }
   };
 
+  // --- MUSIC NOTE IMAGE ---
+  const getMusicImage = () => {
+    if (musicMuted) {
+      if (musicNotePressed) return "/buttons/volume/MusicMuted-select.png";
+      if (musicNoteHovered) return "/buttons/volume/MusicMuted-hover.png";
+      return "/buttons/volume/MusicMuted.png";
+    } else {
+      if (musicNotePressed) return "/buttons/volume/Music-select.png";
+      if (musicNoteHovered) return "/buttons/volume/Music-hover.png";
+      return "/buttons/volume/Music.png";
+    }
+  };
+
   return (
     <div
       className="volume-container"
@@ -201,6 +216,19 @@ export default function VolumeControl() {
             onMouseLeave={() => setThumbHovered(false)}
           />
         </div>
+
+        {/* MUSIC MUTE TOGGLE */}
+        <img
+          src={getMusicImage()}
+          className="music-toggle"
+          alt={musicMuted ? "Unmute music" : "Mute music"}
+          draggable="false"
+          onClick={toggleMusicMute}
+          onMouseEnter={() => { setMusicNoteHovered(true); overControl.current = true; cancelHide(); }}
+          onMouseLeave={() => { setMusicNoteHovered(false); overControl.current = false; scheduleHide(); }}
+          onMouseDown={() => setMusicNotePressed(true)}
+          onMouseUp={() => setMusicNotePressed(false)}
+        />
       </div>
       )}
     </div>
