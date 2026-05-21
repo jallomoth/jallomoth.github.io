@@ -29,6 +29,18 @@
   );
 }
 
+/* Transparent fixed element that sits over the top fade zone.
+   z-index 10 = above gallery items (auto) but below BackButton (20) and Logo (9998).
+   Blocks pointer events so images behind the mask can't be clicked. */
+.gallery-top-shield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--ui-top-space) + var(--gallery-offset));
+  z-index: 10;
+}
+
 /* --- Nav Button Bar --- */
 
 .gallery-nav {
@@ -67,17 +79,15 @@
   transform: scale(0.95);
 }
 
-/* --- Modal Overlay --- */
+/* --- Modal Backdrop (dark blur, no closing mask so it fades uniformly) --- */
 
-.modal-overlay {
+.modal-backdrop {
   position: fixed;
   inset: 0;
 
   z-index: 10001;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  pointer-events: none;
 
   /* start invisible */
   background: rgba(0, 0, 0, 0);
@@ -91,10 +101,22 @@
   will-change: backdrop-filter, background;
 }
 
-/* --- Open State --- */
-.modal-overlay.open {
+.modal-backdrop.open {
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(10px) saturate(120%);
+}
+
+/* --- Modal Overlay (interaction + image container, above backdrop) --- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10002;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* --- Modal Image --- */
@@ -119,8 +141,8 @@
   top: 3vh;
   right: 3vw;
 
-  width: clamp(36px, 4vw, 64px);
-  height: clamp(36px, 4vw, 64px);
+  width: clamp(44px, 5vw, 76px);
+  height: clamp(44px, 5vw, 76px);
 
   background: transparent;
   border: none;
@@ -162,6 +184,26 @@
 /* fade out when closing */
 .modal-overlay.closing .close-button {
   opacity: 0;
+}
+
+/* Clip the closing overlay (and the modal image inside it) with the same
+   gradient mask used by gallery-scroll, so the image appears to slide
+   behind the top fade zone rather than floating above it. */
+.modal-overlay.closing {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--ui-top-space),
+    black calc(var(--ui-top-space) + var(--gallery-offset)),
+    black 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ui-top-space) + 12px),
+    black calc(var(--ui-top-space) + var(--gallery-offset)),
+    black 100%
+  );
 }
 
 /* hover grow */

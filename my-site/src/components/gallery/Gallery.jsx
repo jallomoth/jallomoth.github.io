@@ -50,6 +50,8 @@ export default function Gallery({ groupedImages, selectedIndex, isModalOpen, isM
   let globalIndex = 0;
 
   return (
+    <>
+    <div className="gallery-top-shield" aria-hidden="true" />
     <div className="gallery-scroll" ref={scrollRef}>
       {/* NAV */}
       <div className="gallery-nav">
@@ -87,5 +89,6 @@ export default function Gallery({ groupedImages, selectedIndex, isModalOpen, isM
         );
       })}
     </div>
+    </>
   );
 }

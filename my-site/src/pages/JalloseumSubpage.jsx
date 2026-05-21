@@ -9,6 +9,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import JalloseumGallery from "../components/gallery/JalloseumGallery";
 import useJalloseumImages from "../components/gallery/useJalloseumImages";
 import usePageTitle from "../hooks/usePageTitle";
+import { useDrag } from "../contexts/DragContext";
 
 import "./Jalloseum.css";
 
@@ -36,11 +37,16 @@ export default function JalloseumSubpage({ subfolder, title }) {
   const previousFocusRef = useRef(null);
   const modalOverlayRef = useRef(null);
 
+  const { isGrabbingRef } = useDrag();
+
   // --- ZOOM STATE ---
   // Stored in refs (not state) to avoid triggering re-renders on every touch
   // event. Written directly to the DOM node via applyZoomTransform.
   const zoomScaleRef = useRef(1);
   const zoomOffsetRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const hasDraggedRef = useRef(false);
 
   // Apply current zoom/pan transform to the modal image DOM node.
   const applyZoomTransform = useCallback(() => {
@@ -50,6 +56,7 @@ export default function JalloseumSubpage({ subfolder, title }) {
     modalImageRef.current.style.transformOrigin = "center center";
     modalImageRef.current.style.transform =
       s === 1 ? "" : `scale(${s}) translate(${x / s}px, ${y / s}px)`;
+    modalImageRef.current.style.cursor = s > 1 ? (isDraggingRef.current ? 'grabbing' : 'grab') : '';
   }, []);
 
   // Reset zoom on every image change and on modal close.
@@ -59,8 +66,33 @@ export default function JalloseumSubpage({ subfolder, title }) {
     if (modalImageRef.current) {
       modalImageRef.current.style.transform = "";
       modalImageRef.current.style.transformOrigin = "";
+      modalImageRef.current.style.cursor = '';
     }
   }, []);
+
+  // Start a mouse drag on the image (only when zoomed in, only on the image itself).
+  const handleImageMouseDown = useCallback((e) => {
+    if (e.button !== 0 || zoomScaleRef.current <= 1) return;
+    const imgEl = e.currentTarget;
+    const elRect = imgEl.getBoundingClientRect();
+    const nW = imgEl.naturalWidth;
+    const nH = imgEl.naturalHeight;
+    if (nW && nH) {
+      const s = Math.min(elRect.width / nW, elRect.height / nH);
+      const rW = nW * s;
+      const rH = nH * s;
+      const left = elRect.left + (elRect.width  - rW) / 2;
+      const top  = elRect.top  + (elRect.height - rH) / 2;
+      if (e.clientX < left || e.clientX > left + rW ||
+          e.clientY < top  || e.clientY > top  + rH) return;
+    }
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    e.preventDefault();
+    isGrabbingRef.current = true;
+    if (modalImageRef.current) modalImageRef.current.style.cursor = 'grabbing';
+  }, [isGrabbingRef]);
 
   // --- MODAL OPEN ---
   // Records the thumbnail's current DOMRect as the animation start position.
@@ -261,6 +293,71 @@ export default function JalloseumSubpage({ subfolder, title }) {
     };
   }, [isModalOpen, selectedIndex, images, applyZoomTransform, resetZoom]);
 
+  // Scroll-wheel zoom — desktop (hover+fine-pointer) devices only.
+  useEffect(() => {
+    const el = modalOverlayRef.current;
+    if (!el || !isModalOpen) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const oldScale = zoomScaleRef.current;
+      const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+      const newScale = Math.max(1, Math.min(4, oldScale * factor));
+      if (newScale === 1) {
+        resetZoom();
+        return;
+      }
+      const imgEl = modalImageRef.current;
+      if (!imgEl) return;
+      // Untransformed element center in viewport (offsetLeft/Top are layout values,
+      // unaffected by CSS transform, giving the pre-transform position).
+      const cx = imgEl.offsetLeft + imgEl.offsetWidth  / 2;
+      const cy = imgEl.offsetTop  + imgEl.offsetHeight / 2;
+      // Adjust pan offset so the viewport point under the cursor stays fixed.
+      const ratio = newScale / oldScale;
+      const { x, y } = zoomOffsetRef.current;
+      zoomOffsetRef.current = {
+        x: (e.clientX - cx) * (1 - ratio) + x * ratio,
+        y: (e.clientY - cy) * (1 - ratio) + y * ratio,
+      };
+      zoomScaleRef.current = newScale;
+      applyZoomTransform();
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [isModalOpen, applyZoomTransform, resetZoom]);
+
+  // Mouse drag to pan when zoomed in (desktop only).
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!isDraggingRef.current) return;
+      hasDraggedRef.current = true;
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
+      zoomOffsetRef.current = {
+        x: zoomOffsetRef.current.x + dx,
+        y: zoomOffsetRef.current.y + dy,
+      };
+      applyZoomTransform();
+    };
+    const onMouseUp = () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      isGrabbingRef.current = false;
+      requestAnimationFrame(() => { hasDraggedRef.current = false; });
+      if (modalImageRef.current && zoomScaleRef.current > 1) {
+        modalImageRef.current.style.cursor = 'grab';
+      }
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [applyZoomTransform, isGrabbingRef]);
+
   // Tab trap: only one focusable element in the modal (close button),
   // so Tab simply keeps focus there rather than escaping to the background.
   const handleModalKeyDown = (e) => {
@@ -290,6 +387,13 @@ export default function JalloseumSubpage({ subfolder, title }) {
           />
         </ErrorBoundary>
 
+        {/* DARK BLUR BACKDROP */}
+        {(selectedImage || isModalClosing) && (
+          <div
+            className={`modal-backdrop ${isModalOpen ? "open" : ""} ${isModalClosing ? "closing" : ""}`}
+          />
+        )}
+
         {(selectedImage || isModalClosing) && (
           <div
             ref={modalOverlayRef}
@@ -297,7 +401,31 @@ export default function JalloseumSubpage({ subfolder, title }) {
             aria-modal="true"
             aria-label="Image preview"
             className={`modal-overlay ${isModalOpen ? "open" : ""} ${isModalClosing ? "closing" : ""}`}
-            onClick={handleCloseModal}
+            onClick={(e) => {
+              if (hasDraggedRef.current) { hasDraggedRef.current = false; return; }
+              if (zoomScaleRef.current > 1) return;
+              const imgEl = modalImageRef.current;
+              if (imgEl) {
+                const elRect = imgEl.getBoundingClientRect();
+                const nW = imgEl.naturalWidth;
+                const nH = imgEl.naturalHeight;
+                let r = elRect;
+                if (nW && nH) {
+                  const s = Math.min(elRect.width / nW, elRect.height / nH);
+                  const rW = nW * s;
+                  const rH = nH * s;
+                  r = {
+                    left:   elRect.left + (elRect.width  - rW) / 2,
+                    top:    elRect.top  + (elRect.height - rH) / 2,
+                    right:  elRect.left + (elRect.width  + rW) / 2,
+                    bottom: elRect.top  + (elRect.height + rH) / 2,
+                  };
+                }
+                if (e.clientX >= r.left && e.clientX <= r.right &&
+                    e.clientY >= r.top  && e.clientY <= r.bottom) return;
+              }
+              handleCloseModal();
+            }}
             onKeyDown={handleModalKeyDown}
           >
             {selectedImage && (
@@ -306,6 +434,8 @@ export default function JalloseumSubpage({ subfolder, title }) {
                 className="modal-image"
                 src={selectedImage.src}
                 alt={selectedImage.label}
+                draggable="false"
+                onMouseDown={handleImageMouseDown}
                 style={{
                   top: `${imagePosition?.top ?? 0}px`,
                   left: `${imagePosition?.left ?? 0}px`,

@@ -9,6 +9,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import Gallery from "../components/gallery/Gallery";
 import useGalleryImages from "../components/gallery/useGalleryImages";
 import usePageTitle from "../hooks/usePageTitle";
+import { useDrag } from "../contexts/DragContext";
 
 import "./ArtGallery.css";
 
@@ -68,11 +69,16 @@ export default function ArtGallery() {
 
   const modalOverlayRef = useRef(null);
 
+  const { isGrabbingRef } = useDrag();
+
   // --- ZOOM STATE ---
   // Refs rather than state so touch events can update them without
   // causing re-renders; written directly to the DOM via applyZoomTransform.
   const zoomScaleRef = useRef(1);
   const zoomOffsetRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const hasDraggedRef = useRef(false);
 
   // Apply current zoom/pan transform to the modal image DOM node.
   const applyZoomTransform = useCallback(() => {
@@ -82,6 +88,7 @@ export default function ArtGallery() {
     modalImageRef.current.style.transformOrigin = 'center center';
     modalImageRef.current.style.transform =
       s === 1 ? '' : `scale(${s}) translate(${x / s}px, ${y / s}px)`;
+    modalImageRef.current.style.cursor = s > 1 ? (isDraggingRef.current ? 'grabbing' : 'grab') : '';
   }, []);
 
   // Reset zoom on every image change and on modal close.
@@ -91,8 +98,37 @@ export default function ArtGallery() {
     if (modalImageRef.current) {
       modalImageRef.current.style.transform = '';
       modalImageRef.current.style.transformOrigin = '';
+      modalImageRef.current.style.cursor = '';
     }
   }, []);
+
+  // Start a mouse drag on the image (only when zoomed in, only on the image itself).
+  const handleImageMouseDown = useCallback((e) => {
+    if (e.button !== 0 || zoomScaleRef.current <= 1) return;
+
+    // Restrict drag start to the actual rendered image pixels, not the
+    // letterbox area produced by object-fit: contain.
+    const imgEl = e.currentTarget;
+    const elRect = imgEl.getBoundingClientRect();
+    const nW = imgEl.naturalWidth;
+    const nH = imgEl.naturalHeight;
+    if (nW && nH) {
+      const s = Math.min(elRect.width / nW, elRect.height / nH);
+      const rW = nW * s;
+      const rH = nH * s;
+      const left   = elRect.left + (elRect.width  - rW) / 2;
+      const top    = elRect.top  + (elRect.height - rH) / 2;
+      if (e.clientX < left || e.clientX > left + rW ||
+          e.clientY < top  || e.clientY > top  + rH) return;
+    }
+
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    e.preventDefault(); // prevent browser text/image drag
+    isGrabbingRef.current = true; // switch custom cursor to grab image
+    if (modalImageRef.current) modalImageRef.current.style.cursor = 'grabbing';
+  }, [isGrabbingRef]);
 
   // --- MODAL OPEN ---
   // Records the thumbnail's DOMRect as the animation start position.
@@ -315,6 +351,80 @@ export default function ArtGallery() {
     };
   }, [isModalOpen, selectedIndex, grouped, applyZoomTransform, resetZoom]);
 
+  // Scroll-wheel zoom — desktop (hover+fine-pointer) devices only.
+  // Zooms in/out by 10% per tick; minimum scale is 1 (original open size).
+  useEffect(() => {
+    const el = modalOverlayRef.current;
+    if (!el || !isModalOpen) return;
+
+    // Skip on touch-only devices
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      const oldScale = zoomScaleRef.current;
+      const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+      const newScale = Math.max(1, Math.min(4, oldScale * factor));
+      if (newScale === 1) {
+        resetZoom();
+        return;
+      }
+      const imgEl = modalImageRef.current;
+      if (!imgEl) return;
+      // Untransformed element center in viewport (offsetLeft/Top are layout values,
+      // unaffected by CSS transform, giving the pre-transform position).
+      const cx = imgEl.offsetLeft + imgEl.offsetWidth  / 2;
+      const cy = imgEl.offsetTop  + imgEl.offsetHeight / 2;
+      // Adjust pan offset so the viewport point under the cursor stays fixed.
+      const ratio = newScale / oldScale;
+      const { x, y } = zoomOffsetRef.current;
+      zoomOffsetRef.current = {
+        x: (e.clientX - cx) * (1 - ratio) + x * ratio,
+        y: (e.clientY - cy) * (1 - ratio) + y * ratio,
+      };
+      zoomScaleRef.current = newScale;
+      applyZoomTransform();
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [isModalOpen, applyZoomTransform, resetZoom]);
+
+  // Mouse drag to pan when zoomed in (desktop only).
+  // Attached to the document so dragging outside the image keeps working.
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!isDraggingRef.current) return;
+      hasDraggedRef.current = true; // mark that real movement occurred
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
+      zoomOffsetRef.current = {
+        x: zoomOffsetRef.current.x + dx,
+        y: zoomOffsetRef.current.y + dy,
+      };
+      applyZoomTransform();
+    };
+
+    const onMouseUp = () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      isGrabbingRef.current = false; // restore custom cursor
+      // Defer the hasDragged reset so the click event (if any) fires first
+      requestAnimationFrame(() => { hasDraggedRef.current = false; });
+      if (modalImageRef.current && zoomScaleRef.current > 1) {
+        modalImageRef.current.style.cursor = 'grab';
+      }
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [applyZoomTransform]);
+
   // Tab-key trap: keep focus locked inside the modal while it is open.
   // Only one focusable element exists (the close button), so Tab simply
   // stays on it rather than escaping to background content.
@@ -345,6 +455,14 @@ export default function ArtGallery() {
       />
       </ErrorBoundary>
 
+      {/* DARK BLUR BACKDROP — separate element so the closing mask on
+           .modal-overlay doesn't clip the blur; it fades out uniformly */}
+      {(selectedImage || isModalClosing) && (
+        <div
+          className={`modal-backdrop ${isModalOpen ? "open" : ""} ${isModalClosing ? "closing" : ""}`}
+        />
+      )}
+
       {/* MODAL OVERLAY */}
       {(selectedImage || isModalClosing) && (
         <div
@@ -353,7 +471,39 @@ export default function ArtGallery() {
           aria-modal="true"
           aria-label="Image preview"
           className={`modal-overlay ${isModalOpen ? "open" : ""} ${isModalClosing ? "closing" : ""}`}
-          onClick={handleCloseModal}
+          onClick={(e) => {
+            // If the user just finished dragging, swallow the stray click
+            if (hasDraggedRef.current) {
+              hasDraggedRef.current = false;
+              return;
+            }
+            // When zoomed in don't close on overlay click — use X or Escape
+            if (zoomScaleRef.current > 1) return;
+            // Close only when clicking outside the actual rendered image pixels.
+            // The element box is 80vw×80vh; object-fit:contain letterboxes the
+            // image inside it, so we must compute the true content rect.
+            const imgEl = modalImageRef.current;
+            if (imgEl) {
+              const elRect = imgEl.getBoundingClientRect();
+              const nW = imgEl.naturalWidth;
+              const nH = imgEl.naturalHeight;
+              let r = elRect;
+              if (nW && nH) {
+                const s = Math.min(elRect.width / nW, elRect.height / nH);
+                const rW = nW * s;
+                const rH = nH * s;
+                r = {
+                  left:   elRect.left + (elRect.width  - rW) / 2,
+                  top:    elRect.top  + (elRect.height - rH) / 2,
+                  right:  elRect.left + (elRect.width  + rW) / 2,
+                  bottom: elRect.top  + (elRect.height + rH) / 2,
+                };
+              }
+              if (e.clientX >= r.left && e.clientX <= r.right &&
+                  e.clientY >= r.top  && e.clientY <= r.bottom) return;
+            }
+            handleCloseModal();
+          }}
           onKeyDown={handleModalKeyDown}
         >
           {selectedImage && (
@@ -362,6 +512,8 @@ export default function ArtGallery() {
               className="modal-image"
               src={selectedImage.src}
               alt={selectedImage.label}
+              draggable="false"
+              onMouseDown={handleImageMouseDown}
               style={{
                 top: `${imagePosition?.top ?? 0}px`,
                 left: `${imagePosition?.left ?? 0}px`,

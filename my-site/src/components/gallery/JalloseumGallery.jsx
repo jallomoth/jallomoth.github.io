@@ -25,6 +25,8 @@ export default function JalloseumGallery({
   };
 
   return (
+    <>
+    <div className="gallery-top-shield" aria-hidden="true" />
     <div className="gallery-scroll" ref={scrollRef}>
       <div className="gallery-container jalloseum-grid">
         {images.map((img, index) => (
@@ -41,6 +43,5 @@ export default function JalloseumGallery({
           />
         ))}
       </div>
-    </div>
-  );
+    </div>    </>  );
 }
