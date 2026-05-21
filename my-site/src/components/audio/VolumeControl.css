@@ -10,6 +10,14 @@
 
   /* don't block clicks on elements below — only icon/slider handle their own events */
   pointer-events: none;
+
+  transition: opacity 0.25s ease;
+}
+
+/* Fade out during the home-page screensaver */
+body.screensaver-active .volume-container {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* --- Icon --- */

@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { useDrag } from "../contexts/DragContext";
+import { useAudio } from "./audio/AudioContext";
 import "./NavButton.css";
 
 // threshold for treating a drag as a click (pixels)
@@ -12,7 +13,7 @@ const DRAG_THRESHOLD = 80;
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction, ssRef, ssIndex }) {
+export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction, ssRef, ssIndex, clickSound = "/sounds/click.mp3" }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
 
@@ -32,6 +33,17 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
 
   const { isGrabbingRef, isDraggingButtonRef, draggedButtonPosRef } = useDrag();
   const lastTimeRef = useRef(performance.now());
+
+  const { effectiveVolume, playSound } = useAudio();
+  // Refs so the event-handler closure always reads the latest values.
+  const playSoundRef = useRef(playSound);
+  const effectiveVolumeRef = useRef(effectiveVolume);
+  playSoundRef.current = playSound;
+  effectiveVolumeRef.current = effectiveVolume;
+
+  // Hit-detection refs for drag-mode collision sound.
+  const wasInHitZoneRef = useRef(false);   // true while dragged cursor is inside HIT_RADIUS
+  const prevDistToDragRef = useRef(null);  // distance last frame (for closing-speed gate)
 
   const isExternal = /^https?:\/\//.test(to) || to?.startsWith("//");
   const isActive = hovered || draggingState;
@@ -108,6 +120,8 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         const shouldNavigate = distance < DRAG_THRESHOLD;
 
         if (shouldNavigate) {
+          // Play a click sound the moment the user lifts their mouse to navigate.
+          playSoundRef.current(clickSound, effectiveVolumeRef.current * 0.6);
           setTimeout(() => {
             navigateTo();
           }, 180);
@@ -195,6 +209,28 @@ export default function NavButton({ image, hoverImage, to, alt, label, textImage
         pos.current.x += (dx / dist) * force * 20 * deltaTime;
         pos.current.y += (dy / dist) * force * 20 * deltaTime;
       }
+
+      // Collision sound: fires once when the cursor enters HIT_RADIUS fast enough.
+      const HIT_RADIUS = 110;
+      const MIN_CLOSING_SPEED = 4; // px per 60fps-equivalent frame
+      const closingSpeed = prevDistToDragRef.current !== null
+        ? prevDistToDragRef.current - dist
+        : 0;
+
+      if (dist < HIT_RADIUS) {
+        if (!wasInHitZoneRef.current && closingSpeed >= MIN_CLOSING_SPEED) {
+          const vol = Math.min(closingSpeed / 20, 1) * effectiveVolumeRef.current * 0.65;
+          playSoundRef.current("/sounds/splat.mp3", vol);
+        }
+        wasInHitZoneRef.current = true;
+      } else {
+        wasInHitZoneRef.current = false;
+      }
+      prevDistToDragRef.current = dist;
+    } else if (!isDragging.current) {
+      // No button being dragged — reset hit-zone tracking.
+      wasInHitZoneRef.current = false;
+      prevDistToDragRef.current = null;
     }
 
     if (iconRef.current) {

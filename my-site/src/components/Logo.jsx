@@ -12,7 +12,28 @@ import "./Logo.css";
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Milestone click counts that trigger a number popup.
-const MILESTONES = new Set([1, 5, 10, 25, 50, 100, 250, 500, 1000]);
+const MILESTONES = new Set([5, 10, 21, 25, 50, 67, 69, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 7500, 10000]);
+
+// Sound to play for each milestone. Unspecified milestones fall back to snap.
+const MILESTONE_SOUNDS = {
+  5:     "/sounds/click.mp3",
+  10:    "/sounds/click.mp3",
+  21:    "/sounds/click.mp3",
+  // 25-100 → snap (default)
+  250:   "/sounds/splat.mp3",
+  500:   "/sounds/splat.mp3",
+  1000:  "/sounds/splat.mp3",
+  1500:  "/sounds/splat.mp3",
+  2000:  "/sounds/splat.mp3",
+  2500:  "/sounds/splat.mp3",
+  3000:  "/sounds/splat.mp3",
+  3500:  "/sounds/splat.mp3",
+  4000:  "/sounds/splat.mp3",
+  4500:  "/sounds/splat.mp3",
+  5000:  "/sounds/splat.mp3",
+  7500:  "/sounds/splat.mp3",
+  10000: "/sounds/splat.mp3",
+};
 
 function getClickCount() {
   return parseInt(localStorage.getItem("logo-click-count") || "0", 10);
@@ -231,7 +252,14 @@ export default function Logo({
     // --- CLICK COUNTER ---
     // Increment the lifetime click count and fire a milestone popup if needed.
     const newCount = incrementClickCount();
+    window.dispatchEvent(
+      new CustomEvent("logo-click-count-changed", { detail: { count: newCount } })
+    );
     if (MILESTONES.has(newCount)) {
+      playSound(
+        MILESTONE_SOUNDS[newCount] ?? "/sounds/snap.mp3",
+        effectiveVolumeRef.current * 0.85
+      );
       const popupId = id + 1;
       setMilestonePopups((prev) => [
         ...prev,

@@ -42,28 +42,34 @@ export default function Home() {
       .sort((a, b) => Number(a.dataset.ssIndex) - Number(b.dataset.ssIndex));
     if (nodes.length === 0) return;
 
-    const entities = nodes.map((el) => {
-      const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const radius = Math.min(rect.width, rect.height) * 0.45;
-      const speed = 2.5 + Math.random() * 2;
-      const angle = Math.random() * Math.PI * 2;
-      return {
-        x: cx, y: cy,
-        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-        naturalX: cx, naturalY: cy,
-        radius,
-      };
-    });
+    const entities = nodes
+      // Logo stays stationary — exclude it from the physics simulation.
+      // Logo.jsx reads entities[LOGO_SS_INDEX]; undefined → spring to natural pos.
+      .filter((el) => Number(el.dataset.ssIndex) !== LOGO_SS_INDEX)
+      .map((el) => {
+        const rect = el.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const radius = Math.min(rect.width, rect.height) * 0.45;
+        const speed = 2.5 + Math.random() * 2;
+        const angle = Math.random() * Math.PI * 2;
+        return {
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+          naturalX: cx, naturalY: cy,
+          radius,
+        };
+      });
 
     ssRef.current = { entities };
     setScreensaverActive(true);
+    document.body.classList.add("screensaver-active");
   }, []);
 
   const deactivate = useCallback(() => {
     ssRef.current = null;
     setScreensaverActive(false);
+    document.body.classList.remove("screensaver-active");
   }, []);
 
   // Inactivity timer — desktop only, registered once with stable callbacks.
