@@ -83,7 +83,7 @@ export function AudioProvider({ children }) {
   // Pre-instantiate Audio objects so playback is immediate (no decode delay).
 
   useEffect(() => {
-    ["/sounds/snap.mp3", "/sounds/click.mp3"].forEach((src) => {
+    ["/sounds/logo/Snap.mp3", "/sounds/misc/Click.mp3"].forEach((src) => {
       const audio = new Audio(src);
       audio.preload = "auto";
       audio.load();

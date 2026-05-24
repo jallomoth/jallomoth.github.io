@@ -119,9 +119,10 @@ body.screensaver-active .volume-container {
 
 /* --- Music Mute Toggle --- */
 .music-toggle {
-  width: clamp(36px, 4vw, 72px);
+  width: clamp(28px, 3vw, 48px);
   height: auto;
-  margin-top: 6px;
+  display: block;
+  margin: 6px auto 0;
 
   cursor: none !important;
   pointer-events: auto;

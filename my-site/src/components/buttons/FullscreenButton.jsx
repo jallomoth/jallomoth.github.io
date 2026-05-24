@@ -7,7 +7,10 @@ import { useState, useEffect } from "react";
 import { useAudio } from "../../contexts/AudioContext";
 import "./FullscreenButton.css";
 
+const IS_DESKTOP = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
 export default function FullscreenButton() {
+  if (!IS_DESKTOP) return null;
   const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
   const [hovered, setHovered]           = useState(false);
   const [pressed, setPressed]           = useState(false);

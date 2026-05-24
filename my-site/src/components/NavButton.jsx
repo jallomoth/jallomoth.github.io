@@ -25,7 +25,7 @@ const randomHitSound = () => HIT_SOUNDS[Math.floor(Math.random() * HIT_SOUNDS.le
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction, ssRef, ssIndex, clickSound = "/sounds/click.mp3" }) {
+export default function NavButton({ image, hoverImage, to, alt, label, textImage, textLabel, onAction, ssRef, ssIndex, clickSound = "/sounds/misc/Click.mp3" }) {
   const [hovered, setHovered] = useState(false);
   const [draggingState, setDraggingState] = useState(false);
 
