@@ -67,6 +67,7 @@ export function AudioProvider({ children }) {
   const soundPoolRef = useRef({});
   const effectiveVolumeRef = useRef(0.5);
   const musicPlayingRef = useRef(false);
+  const currentMusicSrcRef = useRef(null);
   const interactionStartRef = useRef(null);
   const fadeIntervalRef = useRef(null);
   // Ref so playSound can check mute state without being recreated on every change.
@@ -152,6 +153,7 @@ export function AudioProvider({ children }) {
 
     audioRef.current = audio;
 
+    currentMusicSrcRef.current = "/music/home.mp3";
     let started = false;
 
     const fadeIn = () => {
@@ -232,7 +234,60 @@ export function AudioProvider({ children }) {
 
     musicPlayingRef.current = false;
     setMusicPlaying(false);
+    currentMusicSrcRef.current = null;
   }, [cleanupInteractionListeners]);
+
+  // --- SWITCH MUSIC ---
+  // Swaps to a new looping track immediately with fade-in.
+  // No interaction guard — the caller is responsible for ensuring the user
+  // has already interacted. Pass null/undefined to stop music entirely.
+  // Skips the swap if the requested track is already playing.
+
+  const switchMusic = useCallback((src) => {
+    if (!src) {
+      stopMusic();
+      return;
+    }
+
+    // Already playing this track — nothing to do.
+    if (src === currentMusicSrcRef.current && musicPlayingRef.current) return;
+
+    cleanupInteractionListeners();
+    clearInterval(fadeIntervalRef.current);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    musicPlayingRef.current = false;
+    setMusicPlaying(false);
+    currentMusicSrcRef.current = src;
+
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.volume = 0;
+    audioRef.current = audio;
+
+    const silenced = musicMutedRef.current || mutedRef.current;
+    audio.muted = silenced;
+
+    audio
+      .play()
+      .then(() => {
+        musicPlayingRef.current = true;
+        setMusicPlaying(true);
+        // Fade in — mirrors startMusic's fadeIn logic.
+        clearInterval(fadeIntervalRef.current);
+        let vol = 0;
+        fadeIntervalRef.current = setInterval(() => {
+          if (!audioRef.current) { clearInterval(fadeIntervalRef.current); return; }
+          const target = (musicMutedRef.current || mutedRef.current) ? 0 : effectiveVolumeRef.current;
+          vol = Math.min(vol + 0.001, target);
+          audioRef.current.volume = vol;
+          if (vol >= target) clearInterval(fadeIntervalRef.current);
+        }, 10);
+      })
+      .catch((err) => console.error("Failed to switch music:", err));
+  }, [cleanupInteractionListeners, stopMusic]);
 
   // --- SYNC VOLUME TO AUDIO ---
 
@@ -262,6 +317,7 @@ export function AudioProvider({ children }) {
         playSound,
         startMusic,
         stopMusic,
+        switchMusic,
         musicPlaying,
       }}
     >

@@ -65,6 +65,7 @@ const chapters = Object.keys(groups)
       id,
       label,
       pageTitle,
+      music: (manifest && manifest.music) ? manifest.music : null,
       images,
     };
   });

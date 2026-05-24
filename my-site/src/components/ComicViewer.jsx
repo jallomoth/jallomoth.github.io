@@ -22,7 +22,7 @@ export default function ComicViewer() {
   const [nextState,    setNextState]    = useState("normal");
   const [imageLoaded,  setImageLoaded]  = useState(false);
 
-  const { effectiveVolume, playSound } = useAudio();
+  const { effectiveVolume, playSound, switchMusic } = useAudio();
 
   // --- URL PARSING ---
   // Derive chapter and page index from the URL path so the reader state is
@@ -35,6 +35,18 @@ export default function ComicViewer() {
     const chapMeta = chapters.find((c) => c.id === chapId) || chapters[0];
     return { pageIndex: page - 1, chapter: chapMeta };
   }, [location.pathname]);
+
+  // --- CHAPTER MUSIC ---
+  // Switch to chapter-specific music when the chapter changes.
+  // Falls back to home music for chapters without a music field.
+  // Restores home music when the component unmounts (user leaves the page).
+  useEffect(() => {
+    switchMusic(chapter.music || "/music/home.mp3");
+  }, [chapter.id]);
+
+  useEffect(() => {
+    return () => { switchMusic("/music/home.mp3"); };
+  }, []);
 
   // --- RESTORE SAVED POSITION ---
   // On a bare /fools-errand visit, redirect to the last-read page if one
