@@ -13,7 +13,7 @@ import usePageTitle from "../hooks/usePageTitle";
 // Screensaver only on desktop (pointer: fine = mouse/trackpad, not touchscreen).
 const IS_DESKTOP = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-const SCREENSAVER_DELAY = 5_000; // ms of inactivity before screensaver activates
+const SCREENSAVER_DELAY = 30_000; // ms of inactivity before screensaver activates
 
 // Logo is entity index 8 in the screensaver array (buttons are 0–7).
 const LOGO_SS_INDEX = 8;
@@ -36,6 +36,7 @@ export default function Home() {
   useEffect(() => { screensaverActiveRef.current = screensaverActive; }, [screensaverActive]);
 
   const timerRef = useRef(null);
+  const logoFadeTimerRef = useRef(null);
 
   // Measure every [data-ss-index] element and initialize the physics entities.
   const activate = useCallback(() => {
@@ -65,12 +66,18 @@ export default function Home() {
     ssRef.current = { entities };
     setScreensaverActive(true);
     document.body.classList.add("screensaver-active");
+    // Fade the logo out after 1 minute of screensaver inactivity.
+    logoFadeTimerRef.current = setTimeout(() => {
+      document.body.classList.add("logo-faded");
+    }, 60_000);
   }, []);
 
   const deactivate = useCallback(() => {
     ssRef.current = null;
     setScreensaverActive(false);
     document.body.classList.remove("screensaver-active");
+    clearTimeout(logoFadeTimerRef.current);
+    document.body.classList.remove("logo-faded");
   }, []);
 
   // Inactivity timer — desktop only, registered once with stable callbacks.

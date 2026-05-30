@@ -59,6 +59,13 @@
   opacity: 0;
 }
 
+/* --- Screensaver logo fade --- */
+body.logo-faded .logo-container {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 3s ease;
+}
+
 /* --- Click Effect --- */
 .click-effect {
   position: fixed;

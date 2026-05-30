@@ -121,7 +121,8 @@ export default function Cursor() {
           scale(${scale.current})
         `;
 
-        cursorRef.current.style.opacity = visible.current ? "1" : "0";
+        const ssActive = document.body.classList.contains('screensaver-active');
+        cursorRef.current.style.opacity = (visible.current && !ssActive) ? "1" : "0";
       }
   });
 
@@ -147,7 +148,7 @@ export default function Cursor() {
         willChange: "transform",
         display: "block",
         opacity: 0,
-        transition: "opacity 0.15s ease",
+        transition: "opacity 0.25s ease",
 
         userSelect: "none",
         WebkitUserSelect: "none",
