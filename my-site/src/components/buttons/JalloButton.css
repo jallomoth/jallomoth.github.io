@@ -1,0 +1,126 @@
+.jalloseum-hub-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: var(--jallo-btn-height, auto);
+
+  padding: clamp(10px, 1.5vw, 22px) clamp(14px, 2vw, 32px);
+
+  background: rgba(150, 150, 150, 0.1);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(179, 161, 255, 0.25);
+  border-radius: 12px;
+
+  color: var(--color-accent);
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(13px, 1.4vw, 22px);
+  font-optical-sizing: auto;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+
+  /* Reset <button> default styles */
+  background-color: rgba(150, 150, 150, 0.1);
+  cursor: pointer;
+
+  position: relative;
+  overflow: visible;
+
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+}
+
+/* Shimmer sweep — reduced, clipped to rounded corners */
+.jalloseum-hub-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  transition: background-position 0.6s ease;
+  border-radius: inherit;
+  clip-path: inset(0 round 12px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Rotating conic-gradient border — shown on hover */
+.jalloseum-hub-link::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: conic-gradient(
+    from var(--jalloseum-border-angle),
+    #b3a1ff,
+    #4ba0a7,
+    #4ba0a7,
+    #b3a1ff,
+    #b3a1ff
+  );
+
+  /* Cut out the interior so only the 2px ring edge shows */
+  padding: 2px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  /* Paused by default — running animation promotes a compositor layer that
+     can block backdrop-filter on the parent. Only run on hover. */
+  animation: jalloseum-border-spin 3s linear infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+}
+
+@property --jalloseum-border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes jalloseum-border-spin {
+  to { --jalloseum-border-angle: 360deg; }
+}
+
+@media (hover: hover) {
+  .jalloseum-hub-link:hover {
+    background: rgba(10, 8, 20, 0.75);
+    border-color: transparent;
+    color: #ffffff;
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 8px 28px rgba(179, 161, 255, 0.2);
+  }
+
+  .jalloseum-hub-link:hover::before {
+    background-position: -200% 0;
+  }
+
+  .jalloseum-hub-link:hover::after {
+    opacity: 1;
+    animation-play-state: running;
+  }
+}
+
+.jalloseum-hub-link:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}

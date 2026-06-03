@@ -1,9 +1,9 @@
 // Backstage page — placeholder; content not yet implemented.
 import { useState, useEffect } from "react";
 import './PlaceholderPage.css';
-import './Jalloseum.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/buttons/BackButton";
+import JalloButton from "../components/buttons/JalloButton";
 import usePageTitle from "../hooks/usePageTitle";
 
 const CLICK_COUNT_KEY = "logo-click-count";
@@ -39,13 +39,11 @@ export default function Backstage() {
         <p style={{ marginTop: "2rem", opacity: 0.8 }}>
           Logo clicks: <strong>{clickCount}</strong>
         </p>
-        <button
-          onClick={handleReset}
-          className="jalloseum-hub-link"
-          style={{ marginTop: "0.75rem" }}
-        >
-          Reset click counter
-        </button>
+        <div style={{ "--jallo-btn-height": "60px", display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
+          <JalloButton onClick={handleReset}>
+            Reset click counter
+          </JalloButton>
+        </div>
       </main>
     </>
   );
