@@ -30,8 +30,17 @@
   pointer-events: auto;
 }
 
+.jalloseum-hub .jalloseum-hub-link {
+  --jallo-btn-height: 100px;
+}
+
 @media (max-width: 700px) {
   .jalloseum-hub {
     grid-template-columns: repeat(2, 1fr);
+    margin-top: clamp(60px, 12vw, 100px);
+  }
+
+  .jalloseum-hub .jalloseum-hub-link {
+    --jallo-btn-height: 60px;
   }
 }

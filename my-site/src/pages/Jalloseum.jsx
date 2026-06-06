@@ -29,7 +29,7 @@ export default function Jalloseum() {
         <div className="jalloseum-hub-outer">
           <nav className="jalloseum-hub" aria-label="Jalloseum sections">
             {SUBPAGES.map(({ label, to }) => (
-              <JalloButton key={to} to={to} style={{ "--jallo-btn-height": "80px" }}>
+              <JalloButton key={to} to={to}>
                 {label}
               </JalloButton>
             ))}
