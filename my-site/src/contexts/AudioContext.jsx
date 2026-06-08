@@ -65,6 +65,7 @@ export function AudioProvider({ children }) {
 
   const audioRef = useRef(null);
   const soundPoolRef = useRef({});
+  const activeSoundsRef = useRef(new Set());
   const effectiveVolumeRef = useRef(0.5);
   const musicPlayingRef = useRef(false);
   const currentMusicSrcRef = useRef(null);
@@ -102,9 +103,14 @@ export function AudioProvider({ children }) {
       soundPoolRef.current[src] = audio;
     }
     const audio = soundPoolRef.current[src];
-    audio.volume = Math.max(0, Math.min(1, volume ?? effectiveVolumeRef.current));
+    const requestedVol = Math.max(0, Math.min(1, volume ?? effectiveVolumeRef.current));
+    // Store ratio relative to master so live sync can scale correctly.
+    audio._volumeRatio = effectiveVolumeRef.current > 0 ? requestedVol / effectiveVolumeRef.current : 1;
+    audio.volume = requestedVol;
     audio.currentTime = 0;
-    audio.play().catch(() => {});
+    activeSoundsRef.current.add(audio);
+    audio.onended = () => activeSoundsRef.current.delete(audio);
+    audio.play().catch(() => { activeSoundsRef.current.delete(audio); });
   }, []);
 
   // --- SYNC REFS ---
@@ -292,6 +298,7 @@ export function AudioProvider({ children }) {
   // --- SYNC VOLUME TO AUDIO ---
 
   useEffect(() => {
+    // Sync background music.
     if (audioRef.current) {
       // Cancel any active fade so the user's manual change takes immediate effect.
       clearInterval(fadeIntervalRef.current);
@@ -299,6 +306,11 @@ export function AudioProvider({ children }) {
       const silenced = muted || musicMuted;
       audioRef.current.muted = silenced;
       audioRef.current.volume = silenced ? 0 : volume;
+    }
+    // Sync in-flight sound effects.
+    for (const audio of activeSoundsRef.current) {
+      audio.muted = muted;
+      audio.volume = muted ? 0 : Math.max(0, Math.min(1, volume * (audio._volumeRatio ?? 1)));
     }
   }, [muted, musicMuted, volume]);
 
