@@ -4,6 +4,56 @@ import "./InfoPopover.css";
 
 const EXIT_DURATION = 180; // ms — must match CSS animation duration
 
+/*
+  NOTE (why blur sometimes broke in production):
+
+  Background: The InfoPopover overlay uses `backdrop-filter` to blur
+  content behind the modal. This works locally, but in production builds a
+  combination of CSS minification, bundling, and certain animations can
+  cause the blur to stop working.
+
+  Root causes we've observed and guarded against here:
+  - Minifier bug: `blur(0px)` in the "hidden" state can be rewritten by
+    some postcss/minifiers to `blur()` (missing argument), which makes the
+    `-webkit-backdrop-filter` declaration invalid and the browser ignores
+    the whole property. Fix: use `none` for the hidden state and include
+    an explicit `-webkit-backdrop-filter` value for the visible state.
+
+  - Extraction/optimization: some bundlers only keep vendor-prefixed
+    properties if they're present in certain rules; writing the critical
+    backdrop-filter values directly to the overlay DOM node (inline
+    styles) ensures they survive extraction and appear at runtime.
+
+  - Compositing/animation interaction: running `@keyframes` animations on
+    descendants of an element that has `backdrop-filter` can promote a
+    compositor layer that prevents sampling the page behind the overlay
+    (Chrome/Safari quirk). Fix: use `transition` for overlay/card enter/exit
+    animations and avoid continuous keyframe animations inside the overlay
+    (or pause them by default and only run on hover).
+
+  - Portal placement: the overlay must be rendered at the top-level (e.g.
+    `document.body`) so it can sample the page behind it — `createPortal`
+    is used for this.
+
+  What we changed in this file to address the above:
+  - Render via `createPortal` into `document.body`.
+  - Use `requestAnimationFrame` + timeout fallback to toggle the visible
+    class, matching the gallery modal pattern (avoids running animations
+    immediately on mount and ensures transitions run).
+  - Write `backdrop-filter` and `-webkit-backdrop-filter` values directly
+    to the overlay DOM node in `useEffect` so production CSS extraction
+    cannot remove them.
+
+  Future checklist if blur stops working again:
+  - Inspect compiled CSS for `-webkit-backdrop-filter: blur();` (invalid)
+  - Ensure hidden state uses `none` (not `blur(0px)`)
+  - Confirm overlay is portaled to `document.body`
+  - Search for `@keyframes` or continuous `animation:` on overlay
+    descendants — pause or convert to `transition` if present
+  - If needed, set inline styles on the overlay as a last-resort fix.
+
+*/
+
 export default function InfoPopover({ action, onClose }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -12,10 +62,37 @@ export default function InfoPopover({ action, onClose }) {
   const overlayRef = useRef(null);
   const closeRef = useRef(null);
 
+  const overlayStyle = {
+    background: visible ? "rgba(0, 0, 0, 0.55)" : "rgba(0, 0, 0, 0)",
+    backdropFilter: visible ? "blur(10px) saturate(120%)" : "none",
+    WebkitBackdropFilter: visible ? "blur(10px) saturate(120%)" : "none",
+  };
+
+  // Ensure inline styles are applied directly to the DOM node so production
+  // CSS minification / extraction cannot remove backdrop-filter. This
+  // mirrors the style object but writes it directly to the element.
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+    el.style.background = visible ? "rgba(0, 0, 0, 0.55)" : "rgba(0, 0, 0, 0)";
+    // set both standard and WebKit-prefixed properties on the style object
+    try {
+      el.style.backdropFilter = visible ? "blur(10px) saturate(120%)" : "none";
+    } catch (e) {}
+    try {
+      el.style.WebkitBackdropFilter = visible ? "blur(10px) saturate(120%)" : "none";
+    } catch (e) {}
+  }, [visible]);
+
   // Trigger enter transition on the next frame (matches gallery modal pattern)
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(id);
+    // Fallback for environments where rAF may be paused or delayed
+    const t = setTimeout(() => setVisible(true), 60);
+    return () => {
+      cancelAnimationFrame(id);
+      clearTimeout(t);
+    };
   }, []);
 
   // Trigger exit animation, then unmount
@@ -92,6 +169,7 @@ export default function InfoPopover({ action, onClose }) {
       (
         <div
           ref={overlayRef}
+          style={overlayStyle}
           className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
           onClick={handleOverlayClick}
           role="dialog"
@@ -146,6 +224,7 @@ export default function InfoPopover({ action, onClose }) {
       (
         <div
           ref={overlayRef}
+          style={overlayStyle}
           className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
           onClick={handleOverlayClick}
           role="dialog"
@@ -208,6 +287,7 @@ export default function InfoPopover({ action, onClose }) {
     (
       <div
         ref={overlayRef}
+        style={overlayStyle}
         className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
         onClick={handleOverlayClick}
         role="dialog"

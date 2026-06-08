@@ -97,7 +97,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
           <span className="backstage-heading-word">
             {headingImgAvailable ? (
               <img
-                src="/logo/Jallogo.png"
+                src="/logo/Jallogo-hover.png"
                 alt="JALLOMOTH"
                 className="backstage-heading-img"
                 onError={() => setHeadingImgAvailable(false)}

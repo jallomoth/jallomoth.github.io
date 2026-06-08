@@ -12,25 +12,36 @@
   align-items: center;
   justify-content: center;
 
-  /* hidden state â€” matches gallery modal pattern exactly */
+  /* hidden state — matches gallery modal pattern exactly */
   background: rgba(0, 0, 0, 0);
-  backdrop-filter: blur(0px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   transition:
     background 0.18s ease,
-    backdrop-filter 0.18s ease;
+    backdrop-filter 0.18s ease,
+    -webkit-backdrop-filter 0.18s ease;
 
   will-change: backdrop-filter, background;
 }
 
-/* visible state â€” toggled by React after mount (and removed on close) */
+/* visible state — toggled by React after mount (and removed on close) */
 .info-popover-overlay--visible {
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(10px) saturate(120%);
   -webkit-backdrop-filter: blur(10px) saturate(120%);
+  /* Force inclusion in some production minifiers that strip vendor props
+     or drop them when they appear only in one state. Using !important
+     and repeating the rule helps ensure the property remains in the
+     compiled CSS bundle. */
+  backdrop-filter: blur(10px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(120%) !important;
 }
 
 /* --- Card --- */
+/* Use transition (not @keyframes animation) — a running keyframe animation
+   on any child of a backdrop-filter element breaks the blur in GPU-composited
+   browsers (Chrome/Safari production). Transition is safe. */
 .info-popover-card {
   position: relative;
   background: rgba(20, 16, 30, 0.92);
@@ -42,21 +53,22 @@
   width: 100%;
   text-align: center;
 
-  animation: popover-slide-up 0.2s ease forwards;
+  /* Hidden state — slide down and fade out */
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+/* Visible state — driven by the overlay's --visible class on the parent */
+.info-popover-overlay--visible .info-popover-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Exit state — slide back down; driven by removing --visible on the overlay */
 .info-popover-card--exit {
-  animation: popover-slide-down 0.18s ease forwards;
-}
-
-@keyframes popover-slide-up {
-  from { transform: translateY(16px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
-@keyframes popover-slide-down {
-  from { transform: translateY(0);    opacity: 1; }
-  to   { transform: translateY(16px); opacity: 0; }
+  opacity: 0;
+  transform: translateY(16px);
 }
 
 /* --- Close button --- */
