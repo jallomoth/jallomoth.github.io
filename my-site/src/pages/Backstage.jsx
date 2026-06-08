@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import './Backstage.css';
+import { useAudio } from "../contexts/AudioContext";
 import Logo from "../components/Logo";
 import BackButton from "../components/buttons/BackButton";
 import JalloButton from "../components/buttons/JalloButton";
 import usePageTitle from "../hooks/usePageTitle";
+import InfoPopover from "../components/InfoPopover";
 
 const CLICK_COUNT_KEY = "logo-click-count";
 
@@ -18,6 +20,9 @@ export default function Backstage() {
 
   const [clickCount, setClickCount] = useState(getClickCount);
   const [headingImgAvailable, setHeadingImgAvailable] = useState(true);
+  const { playSound, effectiveVolume, muted } = useAudio();
+  const [iconHovered, setIconHovered] = useState(false);
+  const [iconPressed, setIconPressed] = useState(false);
 
   // Keep the displayed count in sync when the Logo component fires a click.
   useEffect(() => {
@@ -30,6 +35,8 @@ export default function Backstage() {
     localStorage.removeItem(CLICK_COUNT_KEY);
     setClickCount(0);
   };
+
+  const [activeAction, setActiveAction] = useState(null);
 
   return (
     <>
@@ -49,7 +56,7 @@ export default function Backstage() {
           <span className="backstage-heading-word">
             {headingImgAvailable ? (
               <img
-                src="/logo-jallomoth-text.png"
+                src="/logo/Jallogo.png"
                 alt="JALLOMOTH"
                 className="backstage-heading-img"
                 onError={() => setHeadingImgAvailable(false)}
@@ -65,7 +72,7 @@ export default function Backstage() {
           {/* Replace src with the actual image path when ready */}
           <img
             className="backstage-bio-image"
-            src=""
+            src="/misc/Portrait.png"
             alt="JALLOMOTH"
           />
           <div className="backstage-bio-text">
@@ -80,9 +87,82 @@ than a garish , anxiety-ridden , scoliosis-enfeebled , neuro-physiologically-imb
 casadastraphobic dyscalculoid ?
 The turbulent marriage between Man and Moth was born , and ever since the pair have used their powers to ... to complain about bullshit on the internet ?
 
-If you'd like to contact either party for any reason , be it a commission inqueery , digital fan-letter or anything in between , you can find out how <Link to="/community">here</Link>.</p>
+If you'd like to contact either party for any reason , be it a commission inqueery , digital fan-letter or anything in between , you can find out how <Link to="/community">here</Link> .</p>
           </div>
         </div>
+
+
+        {/* Website section */}
+        <h2 className="backstage-section-heading">About 
+          <span className="backstage-heading-word">
+            {headingImgAvailable ? (
+              <img
+                src="/logo/Jallogo.png"
+                alt="JALLOMOTH"
+                className="backstage-heading-img"
+                onError={() => setHeadingImgAvailable(false)}
+                onLoad={() => setHeadingImgAvailable(true)}
+              />
+            ) : (
+              <span>Jallomoth.com</span>
+            )}
+          </span>
+        </h2>
+        <hr className="backstage-divider" />
+        <div className="backstage-bio-text">
+          <p className="backstage-bio-text-center">
+            So you wanna know about the website , huh ? Hear from the old crone herself !
+            <img
+              src={
+                  iconPressed ? "/buttons/volume/On-select.png" : iconHovered ? "/buttons/volume/On-hover.png" : "/buttons/volume/On.png"
+              }
+              alt="play sound"
+              draggable="false"
+              onClick={() => playSound('/sounds/misc/Click.mp3', effectiveVolume * 0.7)}
+              onMouseEnter={() => setIconHovered(true)}
+              onMouseLeave={() => { setIconHovered(false); setIconPressed(false); }}
+              onMouseDown={() => setIconPressed(true)}
+              onMouseUp={() => setIconPressed(false)}
+              onTouchStart={() => setIconPressed(true)}
+              onTouchEnd={() => setIconPressed(false)}
+            />
+          </p>
+        </div>
+        <div className="backstage-bio">
+          {/* Replace src with the actual image path when ready */}
+          <img
+            className="backstage-bio-image"
+            src=""
+            alt="JALLOMOTH"
+          />
+          <div className="backstage-bio-text">
+            <p>Jallomoth.com was hand-battered and fried by one evbg with love . An L. Ron-Hubbardian Cybergenius from on-high 
+who has gone by over 10 brazillion names — from Xeno Yellow to 埃博格 . No one knows what planet he came from , 
+but I think it got gentrified by some morally inferior aliens , so don't bring it up around him ok it's kind of a sore subject .
+He coded the entire site in just under 13 hours with nothing but a steamdeck with Trove downloaded on it and a stylus fashioned 
+out of the first ever tech deck produced in America & 2 and a half Sillybandz .
+It's rumored that anyone who sees him in real life has a 1/600 chance to be petrified to stone — but if you're lucky ... and pure of heart 
+... there's a chance his true form may be revealed to you .
+If you encounter any bugs that need squashing or just have a trillion-dollar suggestion for the site to empower our swag and bolster our 
+bitch count , you can reach out to the man behind the magic <button
+              className="backstage-inline-action"
+              onClick={() => setActiveAction({
+                type: "links",
+                label: "Find evbg",
+                value: [
+                  { label: "Jallomoth Channel", url: "https://youtube.com/@jallomoth",  image: "/community/Jallomoth Channel.png" },
+                  { label: "Jalloplaza Discord", url: "https://discord.gg/jallomoth",    image: "/community/Jalloplaza Discord.png" },
+                  { label: "Jallomoth Instagram", url: "https://instagram.com/jallomoth", image: "/community/Jallomoth Instagram.png" },
+                  { label: "Twitter / X",          url: "https://x.com/jallomoth",         image: "/community/Twitter.png" },
+                  { label: "Email",                url: "mailto:jallomoth@gmail.com",       image: "/community/Email.png" },
+                ],
+              })}
+            >here</button> .</p>
+          </div>
+        </div>
+        {activeAction && (
+          <InfoPopover action={activeAction} onClose={() => setActiveAction(null)} />
+        )}
         </main>
       </div>
       <div className="backstage-top-shield" />

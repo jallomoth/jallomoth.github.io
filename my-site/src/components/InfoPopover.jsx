@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import "./InfoPopover.css";
 
 const EXIT_DURATION = 180; // ms — must match CSS animation duration
@@ -85,61 +86,182 @@ export default function InfoPopover({ action, onClose }) {
   const actionLabel =
     action.type === "mailto" ? "Open in Mail" : "Open in Maps";
 
-  return (
-    <div
-      ref={overlayRef}
-      className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
-      onClick={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-      aria-label={action.label}
-    >
-      {/* ARIA live region announces copy confirmation to screen readers */}
-      <div aria-live="polite" className="info-popover-sr-live">
-        {copied ? "Copied to clipboard!" : ""}
-      </div>
-
-      <div className={`info-popover-card${exiting ? " info-popover-card--exit" : ""}`}>
-        <button
-          ref={closeRef}
-          className="info-popover-close"
-          onClick={requestClose}
-          onMouseEnter={() => setCloseState("hover")}
-          onMouseLeave={() => setCloseState("normal")}
-          onMouseDown={() => setCloseState("press")}
-          onMouseUp={() => setCloseState("hover")}
-          aria-label="Close"
+  // ---- text type --------------------------------------------------------
+  if (action.type === "text") {
+    return createPortal(
+      (
+        <div
+          ref={overlayRef}
+          className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
+          onClick={handleOverlayClick}
+          role="dialog"
+          aria-modal="true"
+          aria-label={action.label}
         >
-          <img
-            src={
-              closeState === "press" ? "/buttons/x/X-select.png"
-              : closeState === "hover" ? "/buttons/x/X-hover.png"
-              : "/buttons/x/X.png"
-            }
-            alt=""
-            className="info-popover-close-img"
-            draggable="false"
-          />
-        </button>
+          <div aria-live="polite" className="info-popover-sr-live">
+            {copied ? "Copied to clipboard!" : ""}
+          </div>
+          <div className={`info-popover-card${exiting ? " info-popover-card--exit" : ""}`}>
+            <button
+              ref={closeRef}
+              className="info-popover-close"
+              onClick={requestClose}
+              onMouseEnter={() => setCloseState("hover")}
+              onMouseLeave={() => setCloseState("normal")}
+              onMouseDown={() => setCloseState("press")}
+              onMouseUp={() => setCloseState("hover")}
+              aria-label="Close"
+            >
+              <img
+                src={
+                  closeState === "press" ? "/buttons/x/X-select.png"
+                  : closeState === "hover" ? "/buttons/x/X-hover.png"
+                  : "/buttons/x/X.png"
+                }
+                alt=""
+                className="info-popover-close-img"
+                draggable="false"
+              />
+            </button>
+            <p className="info-popover-title">{action.label}</p>
+            <p className="info-popover-value info-popover-value--text">{action.value}</p>
+            {action.copyable !== false && (
+              <div className="info-popover-actions">
+                <button className="info-popover-btn info-popover-btn--copy" onClick={copyToClipboard}>
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+      document.body
+    );
+  }
 
-        <p className="info-popover-title">{action.label}</p>
-        <p className="info-popover-value">{action.value}</p>
+  // ---- links type -------------------------------------------------------
+  // action.value: Array<{ label: string, url: string, image?: string }>
+  if (action.type === "links") {
+    return createPortal(
+      (
+        <div
+          ref={overlayRef}
+          className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
+          onClick={handleOverlayClick}
+          role="dialog"
+          aria-modal="true"
+          aria-label={action.label}
+        >
+          <div className={`info-popover-card info-popover-card--links${exiting ? " info-popover-card--exit" : ""}`}>
+            <button
+              ref={closeRef}
+              className="info-popover-close"
+              onClick={requestClose}
+              onMouseEnter={() => setCloseState("hover")}
+              onMouseLeave={() => setCloseState("normal")}
+              onMouseDown={() => setCloseState("press")}
+              onMouseUp={() => setCloseState("hover")}
+              aria-label="Close"
+            >
+              <img
+                src={
+                  closeState === "press" ? "/buttons/x/X-select.png"
+                  : closeState === "hover" ? "/buttons/x/X-hover.png"
+                  : "/buttons/x/X.png"
+                }
+                alt=""
+                className="info-popover-close-img"
+                draggable="false"
+              />
+            </button>
+            <p className="info-popover-title">{action.label}</p>
+            <ul className="info-popover-links">
+              {action.value.map((link) => (
+                <li key={link.url} className="info-popover-link-item">
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="info-popover-link"
+                  >
+                    {link.image && (
+                      <img
+                        src={link.image}
+                        alt=""
+                        className="info-popover-link-icon"
+                        draggable="false"
+                      />
+                    )}
+                    <span>{link.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ),
+      document.body
+    );
+  }
 
-        <div className="info-popover-actions">
+  return createPortal(
+    (
+      <div
+        ref={overlayRef}
+        className={`info-popover-overlay${visible ? " info-popover-overlay--visible" : ""}`}
+        onClick={handleOverlayClick}
+        role="dialog"
+        aria-modal="true"
+        aria-label={action.label}
+      >
+        {/* ARIA live region announces copy confirmation to screen readers */}
+        <div aria-live="polite" className="info-popover-sr-live">
+          {copied ? "Copied to clipboard!" : ""}
+        </div>
+
+        <div className={`info-popover-card${exiting ? " info-popover-card--exit" : ""}`}>
           <button
-            className="info-popover-btn info-popover-btn--copy"
-            onClick={copyToClipboard}
+            ref={closeRef}
+            className="info-popover-close"
+            onClick={requestClose}
+            onMouseEnter={() => setCloseState("hover")}
+            onMouseLeave={() => setCloseState("normal")}
+            onMouseDown={() => setCloseState("press")}
+            onMouseUp={() => setCloseState("hover")}
+            aria-label="Close"
           >
-            {copied ? "Copied!" : "Copy"}
+            <img
+              src={
+                closeState === "press" ? "/buttons/x/X-select.png"
+                : closeState === "hover" ? "/buttons/x/X-hover.png"
+                : "/buttons/x/X.png"
+              }
+              alt=""
+              className="info-popover-close-img"
+              draggable="false"
+            />
           </button>
-          <button
-            className="info-popover-btn info-popover-btn--open"
-            onClick={openAction}
-          >
-            {actionLabel}
-          </button>
+
+          <p className="info-popover-title">{action.label}</p>
+          <p className="info-popover-value">{action.value}</p>
+
+          <div className="info-popover-actions">
+            <button
+              className="info-popover-btn info-popover-btn--copy"
+              onClick={copyToClipboard}
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+            <button
+              className="info-popover-btn info-popover-btn--open"
+              onClick={openAction}
+            >
+              {actionLabel}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    ),
+    document.body
   );
 }

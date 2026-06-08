@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 100%;
   margin: 0;
-  padding: 0 6rem 6rem;
+  padding: 0 3rem 3rem;
   color: var(--color-accent-light);
   box-sizing: border-box;
 }
@@ -15,21 +15,21 @@
   overflow-y: auto;
   overflow-x: hidden;
 
-  padding-top: calc(var(--ui-top-space) + var(--gallery-offset));
+  padding-top: calc(var(--ui-top-space) + var(--gallery-offset) + 1vw);
 
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    transparent var(--ui-top-space),
-    black calc(var(--ui-top-space) + var(--gallery-offset)),
+    transparent calc(var(--ui-top-space) + 2.5vw),
+    black calc(var(--ui-top-space) + var(--gallery-offset) + 2.5vw),
     black 100%
   );
 
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    transparent calc(var(--ui-top-space) + 12px),
-    black calc(var(--ui-top-space) + var(--gallery-offset)),
+    transparent calc(var(--ui-top-space) + 2.5vw),
+    black calc(var(--ui-top-space) + var(--gallery-offset) + 2.5vw),
     black 100%
   );
 }
@@ -40,7 +40,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: calc(var(--ui-top-space) + var(--gallery-offset));
+  height: calc(var(--ui-top-space) + var(--gallery-offset) + 2.5vw);
   z-index: 10;
 }
 
@@ -50,12 +50,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1vw;
+  gap: clamp(8px, 1.2vw, 20px);
   /* Fixed so it doesn't scroll and sits above the content */
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  top: 7.5vw;
+  /* position uses vw so it scales with the logo width (which uses vw) */
+  top: calc(var(--ui-top-space) - 0.75vw);
   pointer-events: auto;
   z-index: 11;
   color: var(--color-accent-light);
@@ -63,20 +64,22 @@
 
 .backstage-counter-row p {
   margin: 0;
-  font-size: 1vw;
-  opacity: 0.85;
+  /* scale text proportionally to viewport width so it appears in sync with logo */
+  font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+  opacity: 0.95;
 }
 
 .backstage-reset-btn.jalloseum-hub-link {
-  font-size: 0.8vw;
-  padding: 0.5vw 1vw;
+  /* scale button to match logo sizing */
+  font-size: clamp(0.75rem, 1.4vw, 1rem);
+  padding: clamp(6px, 0.5vw, 10px) clamp(8px, 1.0vw, 14px);
   min-height: unset;
 }
 
 /* ---- Section header ----------------------------------------------------- */
 
 .backstage-section-heading {
-  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-size: clamp(1.4rem, 2vw, 3rem);
   margin: 3rem 0 0.4rem;
   color: var(--color-accent);
   text-align: left;
@@ -86,12 +89,12 @@
 .backstage-heading-word {
   display: inline-block;
   vertical-align: middle;
-  margin-left: 0.5ch;
+  margin-left: 0ch;
   color: var(--color-vibrant);
 }
 
 .backstage-heading-img {
-  height: 1em;
+  height: 1.5em;
   display: inline-block;
   vertical-align: -0.08em;
   object-fit: contain;
@@ -112,7 +115,8 @@
 }
 
 .backstage-bio-image {
-  flex: 0 0 clamp(160px, 28%, 400px);
+  flex: 0 0 clamp(160px, 18vw, 340px);
+  width: clamp(160px, 18vw, 340px);
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border: 2px solid var(--color-accent-glow);
@@ -141,6 +145,59 @@
   margin: 0 0 1rem 0;
 }
 
+/* Inline volume icon inside bio paragraph: match text height and sit inline */
+.backstage-bio-text-center img {
+  height: 2em;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.6ch;
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.2s ease;
+}
+
+.backstage-bio-text-center img:hover {
+  transform: scale(1.05);
+}
+
+.backstage-bio-text-center img:active {
+  transform: scale(0.95);
+}
+
+/* Inline action button used for InfoPopover triggers */
+.backstage-inline-action {
+  display: inline;
+  border: none;
+  background: transparent;
+  color: var(--color-vibrant);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  padding: 0 0.15ch;
+}
+
+.backstage-inline-action:focus {
+  outline: 2px solid rgba(179,161,255,0.35);
+  outline-offset: 2px;
+}
+
+/* Force links on Backstage page to always be the vibrant pink */
+.backstage-wrapper a,
+.backstage-wrapper a:visited,
+.backstage-wrapper a:hover,
+.backstage-wrapper a:active {
+  color: var(--color-vibrant) !important;
+  text-decoration: underline !important;
+}
+
+.backstage-bio-text-center {
+  margin: 0 0 1rem 0;
+  text-align: center;
+  font-size: clamp(0.9rem, 1.4vw, 2rem);
+  color: var(--color-vibrant);
+}
+
 /* ---- Responsive --------------------------------------------------------- */
 
 @media (max-width: 600px) {
@@ -149,8 +206,8 @@
   }
 
   .backstage-bio-image {
-    width: 100%;
+    width: clamp(160px, 60vw, 380px);
     flex: unset;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 4;
   }
 }

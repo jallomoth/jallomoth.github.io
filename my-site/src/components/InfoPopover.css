@@ -27,6 +27,7 @@
 .info-popover-overlay--visible {
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
 }
 
 /* --- Card --- */
@@ -86,7 +87,7 @@
 
 /* --- Content --- */
 .info-popover-title {
-  margin: 0 0 8px;
+  margin: -20px 0 20px;
   font-family: "Chelsea Market", system-ui;
   font-size: clamp(14px, 2vw, 18px);
   letter-spacing: 0.06em;
@@ -153,6 +154,64 @@
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* --- text type: left-align body, allow longer card --- */
+.info-popover-value--text {
+  text-align: left;
+  font-size: clamp(13px, 1.7vw, 16px);
+  color: var(--color-accent-light, #e0d8ff);
+  line-height: 1.65;
+}
+
+/* --- links type --- */
+.info-popover-card--links {
+  max-width: min(520px, 90vw);
+}
+
+.info-popover-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-popover-link-item {
+  width: 100%;
+}
+
+.info-popover-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(179, 161, 255, 0.08);
+  border: 1px solid rgba(179, 161, 255, 0.2);
+  color: var(--color-accent-light, #e0d8ff);
+  font-family: "Chelsea Market", system-ui;
+  font-size: clamp(13px, 1.7vw, 16px);
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  box-sizing: border-box;
+}
+
+.info-popover-link:hover {
+  background: rgba(179, 161, 255, 0.2);
+  border-color: rgba(179, 161, 255, 0.55);
+  transform: scale(1.02);
+}
+
+.info-popover-link-icon {
+  width: clamp(20px, 2.4vw, 28px);
+  height: clamp(20px, 2.4vw, 28px);
+  object-fit: contain;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 
