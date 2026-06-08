@@ -118,7 +118,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
               }
               alt="play sound"
               draggable="false"
-              onClick={() => playSound('/sounds/misc/Click.mp3', effectiveVolume * 0.7)}
+              onClick={() => playSound('/sounds/misc/Website.mp3', effectiveVolume * 0.7)}
               onMouseEnter={() => setIconHovered(true)}
               onMouseLeave={() => { setIconHovered(false); setIconPressed(false); }}
               onMouseDown={() => setIconPressed(true)}
@@ -132,11 +132,11 @@ If you'd like to contact either party for any reason , be it a commission inquee
           {/* Replace src with the actual image path when ready */}
           <img
             className="backstage-bio-image"
-            src=""
+            src="/images/evbg.png"
             alt="JALLOMOTH"
           />
           <div className="backstage-bio-text">
-            <p>Jallomoth.com was hand-battered and fried by one evbg with love . An L. Ron-Hubbardian Cybergenius from on-high 
+            <p>Jallomoth.com was hand-battered and fried by one evbg with love 💛 . An L. Ron-Hubbardian Cybergenius from on-high 
 who has gone by over 10 brazillion names — from Xeno Yellow to 埃博格 . No one knows what planet he came from , 
 but I think it got gentrified by some morally inferior aliens , so don't bring it up around him ok it's kind of a sore subject .
 He coded the entire site in just under 13 hours with nothing but a steamdeck with Trove downloaded on it and a stylus fashioned 
@@ -150,11 +150,8 @@ bitch count , you can reach out to the man behind the magic <button
                 type: "links",
                 label: "Find evbg",
                 value: [
-                  { label: "Jallomoth Channel", url: "https://youtube.com/@jallomoth",  image: "/community/Jallomoth Channel.png" },
-                  { label: "Jalloplaza Discord", url: "https://discord.gg/jallomoth",    image: "/community/Jalloplaza Discord.png" },
-                  { label: "Jallomoth Instagram", url: "https://instagram.com/jallomoth", image: "/community/Jallomoth Instagram.png" },
-                  { label: "Twitter / X",          url: "https://x.com/jallomoth",         image: "/community/Twitter.png" },
-                  { label: "Email",                url: "mailto:jallomoth@gmail.com",       image: "/community/Email.png" },
+                  { label: "Discord", url: "https://discord.com/users/250777175593189377",    image: "/community/Jalloplaza Discord.png" },
+                  { label: "Email",   url: "mailto:evinpbj@gmail.com",                        image: "/community/Email.png" },
                 ],
               })}
             >here</button> .</p>
