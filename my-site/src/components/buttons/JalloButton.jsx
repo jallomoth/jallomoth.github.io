@@ -6,6 +6,7 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useParallaxPos } from "../../contexts/ParallaxContext";
+import { useAudio } from "../../contexts/AudioContext";
 import useAnimationFrame from "../../hooks/useAnimationFrame";
 import "./JalloButton.css";
 
@@ -20,6 +21,12 @@ export default function JalloButton({ to, onClick, children, className = "", ...
 
   const parallaxRef = useRef(null);
   const pos = useParallaxPos();
+  const { effectiveVolume, playSound } = useAudio();
+
+  const handleClick = (e) => {
+    playSound("/sounds/misc/Click.mp3", effectiveVolume * 0.2);
+    if (onClick) onClick(e);
+  };
 
   // Per-instance random starting offset so each button looks different.
   // Using backgroundPosition rather than touching the transform keeps the
@@ -58,7 +65,7 @@ export default function JalloButton({ to, onClick, children, className = "", ...
 
   if (to) {
     return (
-      <Link to={to} className={cls} {...rest}>
+      <Link to={to} className={cls} onClick={handleClick} {...rest}>
         {parallaxLayer}
         <span className="jallo-btn-content">{children}</span>
       </Link>
@@ -66,7 +73,7 @@ export default function JalloButton({ to, onClick, children, className = "", ...
   }
 
   return (
-    <button type="button" className={cls} onClick={onClick} {...rest}>
+    <button type="button" className={cls} onClick={handleClick} {...rest}>
       {parallaxLayer}
       <span className="jallo-btn-content">{children}</span>
     </button>
