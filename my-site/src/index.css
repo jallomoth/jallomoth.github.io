@@ -11,6 +11,7 @@ body {
 
   /* Accent palette (NTH-15) */
   --color-accent:        #b3a1ff;
+  --color-vibrant:       #ff00ff;
   --color-accent-subtle: rgba(179, 161, 255, 0.14);
   --color-accent-mid:    rgba(179, 161, 255, 0.20);
   --color-accent-glow:   rgba(179, 161, 255, 0.25);

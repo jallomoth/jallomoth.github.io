@@ -1,0 +1,156 @@
+.backstage-wrapper {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 6rem 6rem;
+  color: var(--color-accent-light);
+  box-sizing: border-box;
+}
+
+/* Scroll container with top fade to clear fixed UI elements */
+.backstage-scroll {
+  position: fixed;
+  inset: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-top: calc(var(--ui-top-space) + var(--gallery-offset));
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--ui-top-space),
+    black calc(var(--ui-top-space) + var(--gallery-offset)),
+    black 100%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ui-top-space) + 12px),
+    black calc(var(--ui-top-space) + var(--gallery-offset)),
+    black 100%
+  );
+}
+
+/* Transparent fixed element over the top fade zone to block pointer events */
+.backstage-top-shield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--ui-top-space) + var(--gallery-offset));
+  z-index: 10;
+}
+
+/* ---- Click counter row -------------------------------------------------- */
+
+.backstage-counter-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  /* Fixed so it doesn't scroll and sits above the content */
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 7.5vw;
+  pointer-events: auto;
+  z-index: 11;
+  color: var(--color-accent-light);
+}
+
+.backstage-counter-row p {
+  margin: 0;
+  font-size: 1vw;
+  opacity: 0.85;
+}
+
+.backstage-reset-btn.jalloseum-hub-link {
+  font-size: 0.8vw;
+  padding: 0.5vw 1vw;
+  min-height: unset;
+}
+
+/* ---- Section header ----------------------------------------------------- */
+
+.backstage-section-heading {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin: 3rem 0 0.4rem;
+  color: var(--color-accent);
+  text-align: left;
+}
+
+/* Heading image that matches text height and falls back to text */
+.backstage-heading-word {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5ch;
+  color: var(--color-vibrant);
+}
+
+.backstage-heading-img {
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.08em;
+  object-fit: contain;
+}
+
+.backstage-divider {
+  border: none;
+  border-top: 3px solid var(--color-accent);
+  margin: 0 0 1.5rem;
+}
+
+/* ---- Image + text layout ------------------------------------------------ */
+
+.backstage-bio {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.backstage-bio-image {
+  flex: 0 0 clamp(160px, 28%, 400px);
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border: 2px solid var(--color-accent-glow);
+  border-radius: 4px;
+  background: rgba(179, 161, 255, 0.06);
+}
+
+.backstage-bio-text {
+  flex: 1;
+  font-size: clamp(0.9rem, 1.4vw, 1.5rem);
+  line-height: 1.7;
+  opacity: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+    text-shadow:
+    -2px -2px 0 rgba(0, 0, 0, 0.8),
+     2px -2px 0 rgba(0, 0, 0, 0.8),
+    -2px  2px 0 rgba(0, 0, 0, 0.8),
+     2px  2px 0 rgba(0, 0, 0, 0.8);
+}
+
+.backstage-bio-text p {
+  margin: 0 0 1rem 0;
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .backstage-bio {
+    flex-direction: column;
+  }
+
+  .backstage-bio-image {
+    width: 100%;
+    flex: unset;
+    aspect-ratio: 4 / 3;
+  }
+}
