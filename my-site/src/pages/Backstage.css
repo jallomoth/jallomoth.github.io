@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 100%;
   margin: 0;
-  padding: 0 3rem 3rem;
+  padding: 0 3rem calc(3rem + env(safe-area-inset-bottom, 0px));
   color: var(--color-accent-light);
   box-sizing: border-box;
 }
@@ -14,8 +14,10 @@
 
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 
-  padding-top: calc(var(--ui-top-space) + var(--gallery-offset) + 1vw);
+  padding-top: calc(var(--ui-top-space) + var(--gallery-offset) + 0vw);
 
   mask-image: linear-gradient(
     to bottom,
@@ -114,6 +116,27 @@
   align-items: flex-start;
 }
 
+.backstage-subsection {
+  margin-top: clamp(1.25rem, 3vw, 2.5rem);
+  /* per-subsection accent color (customize via modifier classes) */
+  --sub-accent: var(--color-accent);
+}
+
+.backstage-subheading {
+  margin: 0 0 0.5rem 0;
+  font-size: clamp(1.25rem, 3vw, 2.6rem);
+  color: var(--sub-accent);
+}
+
+/* subsection accent modifiers */
+.backstage-subsection--accent0 { --sub-accent: #ffff00; }
+.backstage-subsection--accent1 { --sub-accent: #4ba0a7; }
+
+/* img border uses subsection accent when present */
+.backstage-subsection .backstage-bio-image {
+  border-color: color-mix(in srgb, var(--sub-accent) 40%, transparent);
+}
+
 .backstage-bio-image {
   flex: 0 0 clamp(160px, 18vw, 340px);
   width: clamp(160px, 18vw, 340px);
@@ -145,24 +168,39 @@
   margin: 0 0 1rem 0;
 }
 
-/* Inline volume icon inside bio paragraph: match text height and sit inline */
-.backstage-bio-text-center img {
-  height: 2em;
-  width: auto;
+/* Inline sound button inside bio paragraph */
+.backstage-sound-btn {
   display: inline-block;
   vertical-align: middle;
   margin-left: 0.6ch;
-  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0.2em; /* increase hit area on touch devices */
   transform: scale(1);
   transition: transform 0.2s ease;
+  touch-action: manipulation;
 }
 
-.backstage-bio-text-center img:hover {
+.backstage-sound-btn:hover {
   transform: scale(1.05);
 }
 
-.backstage-bio-text-center img:active {
+.backstage-sound-btn:active {
   transform: scale(0.95);
+}
+
+.backstage-sound-btn:focus-visible {
+  outline: 2px solid rgba(179, 161, 255, 0.5);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.backstage-sound-btn img {
+  /* Responsive visual size: min, fluid, max */
+  height: clamp(1.6rem, 3.2vw, 2.6rem);
+  width: auto;
+  display: block;
+  pointer-events: none;
 }
 
 /* Inline action button used for InfoPopover triggers */
@@ -191,8 +229,13 @@
   text-decoration: underline !important;
 }
 
+.backstage-bio-text .backstage-bio-text-center {
+  /* More specific selector to override .backstage-bio-text p margin rules */
+  margin: 0;
+}
+
 .backstage-bio-text-center {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0 0;
   text-align: center;
   font-size: clamp(0.9rem, 1.4vw, 2rem);
   color: var(--color-vibrant);
@@ -201,13 +244,209 @@
 /* ---- Responsive --------------------------------------------------------- */
 
 @media (max-width: 600px) {
+  .backstage-wrapper {
+    padding: 0 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .backstage-bio {
     flex-direction: column;
+    align-items: center; /* center images and content on mobile */
   }
 
   .backstage-bio-image {
     width: clamp(160px, 60vw, 380px);
     flex: unset;
+    margin: 0 auto; /* center the image */
     aspect-ratio: 3 / 4;
   }
+
+  .backstage-section-heading {
+    margin-top: 2rem;
+  }
+
+  /* Center headings on small screens for better layout */
+  .backstage-section-heading,
+  .backstage-subheading,
+  .backstage-qa h3 {
+    text-align: center;
+  }
+
+  /* Center body text in mobile view for a cleaner layout */
+  .backstage-bio-text {
+    text-align: center;
+  }
+
+  /* Mobile-only: extend top fade so the fixed counter sits above it */
+  .backstage-scroll {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) + 7vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) + 8.5vw),
+      black 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) + 7vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) + 8.5vw),
+      black 100%
+    );
+  }
+
+  /* Make the shield cover the extended fade on mobile */
+  .backstage-top-shield {
+    height: calc(var(--ui-top-space) + var(--gallery-offset) + 4.5vw);
+  }
+
+  /* Nudge the fixed logo click counter slightly lower on mobile */
+  .backstage-counter-row {
+    top: calc(var(--ui-top-space) + 0.4rem);
+  }
+}
+
+/* ---- Q&A collapsible section ------------------------------------------ */
+.backstage-qa {
+  margin: 2.5rem 0 1.5rem;
+}
+
+.backstage-qa-toggle {
+  background: transparent;
+  border: none;
+  color: var(--color-accent-light);
+  font: inherit;
+  font-size: clamp(1rem, 1.6vw, 1.4rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6ch;
+  cursor: pointer;
+  padding: 0.15rem 0.25rem;
+}
+
+/* Make Q&A header visually match main section headings */
+.backstage-qa h3 .backstage-qa-toggle {
+  font-size: clamp(1.4rem, 2vw, 3rem);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.backstage-qa-caret {
+  margin-left: 0.1ch;
+  transition: transform 0.18s ease;
+  transform-origin: center;
+  /* larger caret for better tappability and visibility */
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1;
+  font-weight: 700;
+}
+.backstage-qa-caret.open {
+  transform: rotate(-180deg);
+}
+
+.backstage-qa-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
+  opacity: 0;
+}
+/* Direct child needs min-height: 0 so grid can shrink it to nothing */
+.backstage-qa-content > ul {
+  min-height: 0;
+  overflow: hidden;
+}
+.backstage-qa-content.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.backstage-qa-list {
+  list-style: none;
+  margin: 1rem 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.backstage-qa-question {
+  display: block;
+  /* match bio text sizing so Q&A reads at the same scale */
+  font-size: clamp(0.9rem, 1.4vw, 1.5rem);
+  color: var(--color-accent);
+  margin-bottom: 0.25rem;
+}
+.backstage-qa-answer {
+  margin: 0;
+  color: var(--color-accent-light);
+  font-size: clamp(0.9rem, 1.4vw, 1.5rem);
+  line-height: 1.7;
+}
+
+/* decorative divider under the Q&A header */
+.backstage-qa h3 {
+  margin: 0 0 0.2rem 0;
+}
+.backstage-qa h3::after {
+  content: "";
+  display: block;
+  /* span the full content width so it lines up with bio sections */
+  width: 100%;
+  height: 3px;
+  background: var(--color-accent);
+  margin-top: 0.6rem;
+  margin-bottom: 0.9rem;
+  border-radius: 3px;
+}
+
+/* ---- Bottom-centered hover note ------------------------------------- */
+.backstage-bottom-note {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  z-index: 12;
+  color: var(--color-accent-light);
+  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+  line-height: 1;
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  cursor: default;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backstage-bottom-note .backstage-bottom-note-primary,
+.backstage-bottom-note .backstage-bottom-note-hover {
+  display: inline-block;
+  transition: opacity 180ms ease, transform 180ms ease;
+  will-change: opacity, transform;
+}
+.backstage-bottom-note .backstage-bottom-note-hover {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.backstage-bottom-note:hover .backstage-bottom-note-primary,
+.backstage-bottom-note:focus .backstage-bottom-note-primary,
+.backstage-bottom-note:focus-within .backstage-bottom-note-primary {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.backstage-bottom-note:hover .backstage-bottom-note-hover,
+.backstage-bottom-note:focus .backstage-bottom-note-hover,
+.backstage-bottom-note:focus-within .backstage-bottom-note-hover {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Simple SR-only utility scoped here so screen-readers get the default text */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }

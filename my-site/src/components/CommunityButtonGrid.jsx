@@ -5,9 +5,9 @@ import "./CommunityButtonGrid.css";
 import NavButton from "./NavButton";
 
 const COMMUNITY_BUTTONS = [
-  { label: "Jallomoth Channel",   alt: "Jallomoth Channel",   to: "https://youtube.com/@jallomoth", image: "/community/Jallomoth Channel.png" },
+  { label: "Jallomoth Channel",   alt: "Jallomoth Channel",   to: "https://youtube.com/@jallomoth", image: "/community/YouTube.png" },
   { label: "Jallomoth UNTUCKED",  alt: "Jallomoth UNTUCKED",  to: "https://youtube.com/@jallomoth2", image: "/community/Jallomoth UNTUCKED.png" },
-  { label: "Jalloplaza Discord",  alt: "Jalloplaza Discord",  to: "https://discord.gg/jallomoth", image: "/community/Jalloplaza Discord.png" },
+  { label: "Jalloplaza Discord",  alt: "Jalloplaza Discord",  to: "https://discord.gg/jallomoth", image: "/community/Discord.png" },
   {
     label: "Email",
     alt: "Email",
@@ -15,7 +15,7 @@ const COMMUNITY_BUTTONS = [
     image: "/community/Email.png",
     action: { type: "mailto", value: "jallomoth@gmail.com", label: "Email" },
   },
-  { label: "Jallomoth Instagram", alt: "Jallomoth Instagram", to: "https://instagram.com/jallomoth", image: "/community/Jallomoth Instagram.png" },
+  { label: "Jallomoth Instagram", alt: "Jallomoth Instagram", to: "https://instagram.com/jallomoth", image: "/community/Instagram.png" },
   { label: "Personal Instagram",  alt: "Personal Instagram",  to: "https://instagram.com/kincade.gif", image: "/community/Personal Instagram.png" },
   { label: "Plasticamra",         alt: "Plasticamra",         to: "https://instagram.com/plasticamra", image: "/community/Plasticamra.png" },
   { label: "Twitter",             alt: "Twitter",             to: "https://x.com/jallomoth", image: "/community/Twitter.png" },

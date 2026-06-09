@@ -226,4 +226,18 @@
   -webkit-user-drag: none;
 }
 
+/* Mobile tweaks: ensure the title lines up with the close button */
+@media (max-width: 600px) {
+  .info-popover-title {
+    /* remove negative top margin so title sits within card padding */
+    margin: -4px 0 20px 0;
+  }
+
+  .info-popover-close {
+    /* nudge the close button down slightly to align with title */
+    top: 14px;
+    right: 10px;
+  }
+}
+
 

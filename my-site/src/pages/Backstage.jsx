@@ -19,7 +19,8 @@ export default function Backstage() {
   usePageTitle("Jallomoth — Backstage");
 
   const [clickCount, setClickCount] = useState(getClickCount);
-  const [headingImgAvailable, setHeadingImgAvailable] = useState(true);
+  const [heading1ImgAvailable, setHeading1ImgAvailable] = useState(true);
+  const [heading2ImgAvailable, setHeading2ImgAvailable] = useState(true);
   const { playSound, effectiveVolume, muted } = useAudio();
   const [iconHovered, setIconHovered] = useState(false);
   const [iconPressed, setIconPressed] = useState(false);
@@ -37,6 +38,12 @@ export default function Backstage() {
   };
 
   const [activeAction, setActiveAction] = useState(null);
+  const [qaOpen, setQaOpen] = useState(false);
+
+  const faqs = [
+    { q: 'Why is the site so noisy ?', a: 'Because Jallomoth loves chaos. You can mute music and SFX via the volume control in the UI.' },
+    { q: 'Is that true ?', a: 'Look it up I don\'t know look it up' },
+  ];
 
   return (
     <>
@@ -54,13 +61,13 @@ export default function Backstage() {
         {/* About section */}
         <h2 className="backstage-section-heading">About 
           <span className="backstage-heading-word">
-            {headingImgAvailable ? (
+            {heading1ImgAvailable ? (
               <img
                 src="/logo/Jallogo.png"
                 alt="JALLOMOTH"
                 className="backstage-heading-img"
-                onError={() => setHeadingImgAvailable(false)}
-                onLoad={() => setHeadingImgAvailable(true)}
+                onError={() => setHeading1ImgAvailable(false)}
+                onLoad={() => setHeading1ImgAvailable(true)}
               />
             ) : (
               <span>JALLOMOTH</span>
@@ -95,13 +102,13 @@ If you'd like to contact either party for any reason , be it a commission inquee
         {/* Website section */}
         <h2 className="backstage-section-heading">About 
           <span className="backstage-heading-word">
-            {headingImgAvailable ? (
+            {heading2ImgAvailable ? (
               <img
                 src="/logo/Jallogo-hover.png"
                 alt="JALLOMOTH"
                 className="backstage-heading-img"
-                onError={() => setHeadingImgAvailable(false)}
-                onLoad={() => setHeadingImgAvailable(true)}
+                onError={() => setHeading2ImgAvailable(false)}
+                onLoad={() => setHeading2ImgAvailable(true)}
               />
             ) : (
               <span>Jallomoth.com</span>
@@ -112,56 +119,132 @@ If you'd like to contact either party for any reason , be it a commission inquee
         <div className="backstage-bio-text">
           <p className="backstage-bio-text-center">
             So you wanna know about the website , huh ? Hear from the old crone herself !
-            <img
-              src={
-                  iconPressed ? "/buttons/volume/On-select.png" : iconHovered ? "/buttons/volume/On-hover.png" : "/buttons/volume/On.png"
-              }
-              alt="play sound"
-              draggable="false"
-              onClick={() => playSound('/sounds/misc/Website.mp3', effectiveVolume * 0.7)}
+            <button
+              className="backstage-sound-btn"
+              aria-label="Play website sound clip"
+              onClick={() => playSound('/sounds/misc/Website.mp3', effectiveVolume * 0.8)}
               onMouseEnter={() => setIconHovered(true)}
               onMouseLeave={() => { setIconHovered(false); setIconPressed(false); }}
               onMouseDown={() => setIconPressed(true)}
               onMouseUp={() => setIconPressed(false)}
               onTouchStart={() => setIconPressed(true)}
-              onTouchEnd={() => setIconPressed(false)}
-            />
+              onTouchEnd={() => { setIconPressed(false); setIconHovered(false); }}
+            >
+              <img
+                src={
+                  iconPressed ? "/buttons/volume/On-select.png" : iconHovered ? "/buttons/volume/On-hover.png" : "/buttons/volume/On.png"
+                }
+                alt=""
+                draggable="false"
+              />
+            </button>
           </p>
         </div>
-        <div className="backstage-bio">
+        <div className="backstage-bio backstage-subsection backstage-subsection--accent0">
           {/* Replace src with the actual image path when ready */}
           <img
             className="backstage-bio-image"
             src="/images/evbg.png"
-            alt="JALLOMOTH"
+            alt="evbg"
           />
           <div className="backstage-bio-text">
+            <h4 className="backstage-subheading">evbg</h4>
             <p>Jallomoth.com was hand-battered and fried by one evbg with love 💛 . An L. Ron-Hubbardian Cybergenius from on-high 
-who has gone by over 10 brazillion names — from Xeno Yellow to 埃博格 . No one knows what planet he came from , 
-but I think it got gentrified by some morally inferior aliens , so don't bring it up around him ok it's kind of a sore subject .
-He coded the entire site in just under 13 hours with nothing but a steamdeck with Trove downloaded on it and a stylus fashioned 
-out of the first ever tech deck produced in America & 2 and a half Sillybandz .
-It's rumored that anyone who sees him in real life has a 1/600 chance to be petrified to stone — but if you're lucky ... and pure of heart 
-... there's a chance his true form may be revealed to you .
-If you encounter any bugs that need squashing or just have a trillion-dollar suggestion for the site to empower our swag and bolster our 
-bitch count , you can reach out to the man behind the magic <button
+              who has gone by over 10 brazillion names — from Xeno Yellow to 埃博格 . No one knows what planet he came from , 
+              but I think it got gentrified by some morally inferior aliens , so don't bring it up around him ok it's kind of a sore subject .
+              He coded the entire site in just under 13 hours with nothing but a steamdeck with Trove downloaded on it and a stylus fashioned 
+              out of the first ever tech deck produced in America & 2 and a half Sillybandz .
+              It's rumored that anyone who sees him in real life has a 1/600 chance to be petrified to stone — but if you're lucky ... and pure of heart 
+              ... there's a chance his true form may be revealed to you .
+              If you encounter any bugs that need squashing or just have a trillion-dollar suggestion for the site to empower our swag and bolster our 
+              bitch count , you can reach out to the man behind the magic <button
               className="backstage-inline-action"
               onClick={() => setActiveAction({
                 type: "links",
-                label: "Find evbg",
+                label: "Find evbg ...",
                 value: [
-                  { label: "Discord", url: "https://discord.com/users/250777175593189377",    image: "/community/Jalloplaza Discord.png" },
-                  { label: "Email",   url: "mailto:evinpbj@gmail.com",                        image: "/community/Email.png" },
+                  { label: "Discord — evbg", url: "https://discord.com/users/250777175593189377", image: "/community/Discord.png" },
+                  { label: "Email — evinpbj@gmail.com",   url: "mailto:evinpbj@gmail.com",                     image: "/community/Email.png" },
                 ],
               })}
             >here</button> .</p>
           </div>
         </div>
+        
+
+        <div className="backstage-bio backstage-subsection backstage-subsection--accent1">
+          <img
+            className="backstage-bio-image"
+            src="/images/neveraom.png"
+            alt="Neveraom"
+          />
+          <div className="backstage-bio-text">
+            <h4 className="backstage-subheading">Neveraom</h4>
+            <p>Neveraom of Vancelot is a labyrinthine striped-beast of many fangs and faces birthed 
+              from the ancient fog . The last born woman and first born man , it's a 100% synthetic 
+              and another 100% natural creature of comfort . It bleeds music itself , spewing the most 
+              simplistically complicated transmissions to ever grace the webscape in a chimerically-hazed frenzy — 
+              fabulous fanfare fed from a fascinatingly frantic fiasco of a friend . Basically , the kid made 
+              the music . Wanna prod the producer ? Be my guest , find it <button
+              className="backstage-inline-action"
+              onClick={() => setActiveAction({
+                type: "links",
+                label: "Find Neveraom ...",
+                value: [
+                  { label: "Youtube — neveraomnesia",   url: "https://youtube.com/@neveraomnesia", image: "/community/YouTube.png" },
+                  { label: "Instagram — imparsthetic", url: "https://instagram.com/imparsthetic", image: "/community/Instagram.png" },
+                ],
+              })}
+            >here</button> .
+            </p>
+          </div>
+        </div>
         {activeAction && (
           <InfoPopover action={activeAction} onClose={() => setActiveAction(null)} />
         )}
+
+        {/* Q&A section (collapsible) */}
+        <section className="backstage-qa" aria-labelledby="backstage-qa-heading">
+          <h3>
+            <button
+              className="backstage-qa-toggle"
+              aria-expanded={qaOpen}
+              aria-controls="backstage-qa-content"
+              onClick={() => setQaOpen((s) => !s)}
+            >
+              Question & Answer (Q&amp;A — just using slang)
+              <span className={`backstage-qa-caret ${qaOpen ? 'open' : ''}`} aria-hidden="true">▾</span>
+            </button>
+          </h3>
+          <div
+            id="backstage-qa-content"
+            className={`backstage-qa-content${qaOpen ? ' open' : ''}`}
+            role="region"
+            aria-hidden={!qaOpen}
+          >
+            <ul className="backstage-qa-list">
+              {faqs.map((f, i) => (
+                <li key={i} className="backstage-qa-item">
+                  <strong className="backstage-qa-question">{f.q}</strong>
+                  <p className="backstage-qa-answer">{f.a}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
         </main>
       </div>
+      <div
+        className="backstage-bottom-note"
+        tabIndex={0}
+        role="note"
+        aria-label="More coming soon"
+      >
+        <span className="backstage-bottom-note-primary" aria-hidden="true">always more coming soon ...</span>
+        <span className="backstage-bottom-note-hover" aria-hidden="true">and stay curious ..</span>
+        <span className="backstage-bottom-note-sr sr-only">always more coming soon ...</span>
+      </div>
+
       <div className="backstage-top-shield" />
     </>
   );
