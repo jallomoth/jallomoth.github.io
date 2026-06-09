@@ -57,8 +57,9 @@
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  /* position uses vw so it scales with the logo width (which uses vw) */
-  top: calc(var(--ui-top-space) - 0.75vw);
+  /* use a rem-based offset (stable across viewport zoom changes) */
+  /* nudged slightly higher */
+  top: calc(var(--ui-top-space) - 2rem);
   pointer-events: auto;
   z-index: 11;
   color: var(--color-accent-light);
@@ -301,7 +302,7 @@
 
   /* Nudge the fixed logo click counter slightly lower on mobile */
   .backstage-counter-row {
-    top: calc(var(--ui-top-space) + 0.4rem);
+    top: calc(var(--ui-top-space) + 0.45rem);
   }
 }
 

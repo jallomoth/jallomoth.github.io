@@ -9,7 +9,7 @@ export default function Commissions() {
 
   return (
     <>
-      <Logo top="20px" left="50%" width="20vw" center={true} />
+      <Logo className="subpage-logo" top="2rem" left="50%" width="clamp(18vw, 35vw, 35rem)" center={true} />
       <BackButton />
       <main className="page-content">
         <h1>Commissions</h1>

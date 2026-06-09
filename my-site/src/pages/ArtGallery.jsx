@@ -440,7 +440,7 @@ export default function ArtGallery() {
 
   return (
     <>
-      <Logo top="20px" left="50%" width="35vw" center />
+      <Logo className="subpage-logo" top="2rem" left="50%" width="clamp(18vw, 35vw, 35rem)" center />
       <BackButton />
 
       <main>

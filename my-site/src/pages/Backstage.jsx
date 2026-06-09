@@ -47,7 +47,7 @@ export default function Backstage() {
 
   return (
     <>
-      <Logo top="20px" left="50%" width="35vw" center={true} />
+      <Logo className="subpage-logo" top="2rem" left="50%" width="clamp(18vw, 35vw, 35rem)" center={true} />
       <BackButton />
       {/* Counter row (fixed, placed outside the masked scroll container so it's clickable) */}
       <div className="backstage-counter-row">
@@ -192,7 +192,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
                 label: "Find Neveraom ...",
                 value: [
                   { label: "Youtube — neveraomnesia",   url: "https://youtube.com/@neveraomnesia", image: "/community/YouTube.png" },
-                  { label: "Instagram — imparsthetic", url: "https://instagram.com/imparsthetic", image: "/community/Instagram.png" },
+                  { label: "Instagram — neveraomnesia", url: "https://instagram.com/neveraomnesia", image: "/community/Instagram.png" },
                 ],
               })}
             >here</button> .

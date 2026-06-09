@@ -32,6 +32,13 @@
   }
 }
 
+/* Slightly reduce spacing above subpage logos on small screens */
+@media (max-width: 600px) {
+  .subpage-logo {
+    top: 1.4rem !important;
+  }
+}
+
 .logo-container:active {
   cursor: grabbing;
 }

@@ -14,7 +14,7 @@ export default function Community() {
 
   return (
     <>
-      <Logo top="20px" left="50%" width="35vw" center={true} />
+      <Logo className="subpage-logo" top="2rem" left="50%" width="clamp(18vw, 35vw, 35rem)" center={true} />
       <BackButton />
       <main className="community-main">
         <CommunityButtonGrid onAction={setActiveAction} />
