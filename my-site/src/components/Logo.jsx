@@ -70,34 +70,47 @@ export default function Logo({
   const lastTimeRef = useRef(performance.now());
 
   // --- POPUP SCALE ---
-  // Scale the popup image proportionally to the logo's rendered width.
-  const getPopupSize = () => {
-    // base reference = 60vw logo → 3vw popup
-    const baseLogo = 60;
-    const basePopup = 3;
+  // Compute popup size from the actual rendered logo width so popups
+  // stay proportional across pages (handles clamp(), rem, vw, etc.).
+  const [popupSize, setPopupSize] = useState(() => {
+    // initial fallback in px
+    return '48px';
+  });
 
-    if (width.includes("vw")) {
-      const value = parseFloat(width);
-      const scale = value / baseLogo;
-      return `${basePopup * scale}vw`;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const el = containerRef.current;
+    const computeAndSet = (w) => {
+      const sizePx = Math.max(16, Math.round(w * 0.07)); // 8% of logo width (smaller)
+      setPopupSize(`${sizePx}px`);
+    };
+
+    // If ResizeObserver available, observe the container for size changes.
+    let ro;
+    if (window.ResizeObserver && el) {
+      ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          computeAndSet(entry.contentRect.width);
+        }
+      });
+      ro.observe(el);
+      // set initial
+      computeAndSet(el.getBoundingClientRect().width);
+    } else if (el) {
+      // fallback: use bounding rect and window resize
+      computeAndSet(el.getBoundingClientRect().width);
+      const onResize = () => computeAndSet(el.getBoundingClientRect().width);
+      window.addEventListener('resize', onResize);
+      return () => window.removeEventListener('resize', onResize);
     }
 
-    // fallback for px
-    if (width.includes("px")) {
-      const value = parseFloat(width);
-      const scale = value / 600; // assume ~600px = 60vw baseline
-      return `${basePopup * scale}vw`;
-    }
+    return () => {
+      if (ro) ro.disconnect();
+    };
+  }, [width]);
 
-    return "3vw";
-  };
-
-  const popupSize = getPopupSize();
-  // Milestone number font size scales with the logo the same way popupSize does
-  // (popupSize = 3vw at 60vw logo)
-  const milestoneFontSize = popupSize.includes("vw")
-    ? `${parseFloat(popupSize) * 1.6}vw`
-    : "4.8vw";
+  const milestoneFontSize = `${Math.round(parseFloat(popupSize) * 1.1)}px`;
 
   // Keep effectiveVolumeRef in sync so the physics closure reads the latest value
   useEffect(() => {
