@@ -398,55 +398,60 @@
   border-radius: 3px;
 }
 
-/* ---- Bottom-centered hover note ------------------------------------- */
-.backstage-bottom-note {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
-  z-index: 12;
-  color: var(--color-accent-light);
-  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+/* ---- End-of-page CTA -------------------------------------------------- */
+.backstage-end-cta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 1rem 0 1rem; /* ensure it sits below main content so user must scroll */
+}
+
+.backstage-end-cta__text {
+  position: relative;
+  display: inline-block;
+  /* larger, responsive text */
+  font-size: clamp(1.25rem, 2.2vw, 2rem);
+  color: #ffb800;
+  text-align: center;
   line-height: 1;
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  cursor: default;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  /* expand to fit the content so the replacement text isn't clipped */
+  width: max-content;
+  padding: 0 0.6ch;
+  white-space: nowrap;
 }
 
-.backstage-bottom-note .backstage-bottom-note-primary,
-.backstage-bottom-note .backstage-bottom-note-hover {
-  display: inline-block;
-  transition: opacity 180ms ease, transform 180ms ease;
-  will-change: opacity, transform;
+.backstage-end-cta__text .cta-primary,
+.backstage-end-cta__text .cta-hover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 220ms ease, transform 220ms ease;
+  white-space: nowrap;
 }
-.backstage-bottom-note .backstage-bottom-note-hover {
+
+.backstage-end-cta__text .cta-primary { opacity: 1; }
+.backstage-end-cta__text .cta-hover {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translate(-50%, -50%) scale(0.98);
 }
-.backstage-bottom-note:hover .backstage-bottom-note-primary,
-.backstage-bottom-note:focus .backstage-bottom-note-primary,
-.backstage-bottom-note:focus-within .backstage-bottom-note-primary {
+
+.backstage-end-cta__text:hover .cta-primary,
+.backstage-end-cta__text:focus-within .cta-primary {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translate(-50%, -50%) scale(1.02);
 }
-.backstage-bottom-note:hover .backstage-bottom-note-hover,
-.backstage-bottom-note:focus .backstage-bottom-note-hover,
-.backstage-bottom-note:focus-within .backstage-bottom-note-hover {
+
+.backstage-end-cta__text:hover .cta-hover,
+.backstage-end-cta__text:focus-within .cta-hover {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, -50%) scale(1);
 }
 
-/* Simple SR-only utility scoped here so screen-readers get the default text */
-.sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+@media (prefers-reduced-motion: reduce) {
+  .backstage-end-cta__text .cta-primary,
+  .backstage-end-cta__text .cta-hover {
+    transition: none;
+  }
 }

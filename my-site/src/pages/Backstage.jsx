@@ -232,19 +232,15 @@ If you'd like to contact either party for any reason , be it a commission inquee
             </ul>
           </div>
         </section>
+        {/* End-of-page CTA: centered text that swaps on hover */}
+        <div className="backstage-end-cta" role="contentinfo">
+          <span className="backstage-end-cta__text" tabIndex={0}>
+            <span className="cta-primary">always more coming soon ...</span>
+            <span className="cta-hover" aria-hidden="true">and stay curious ..</span>
+          </span>
+        </div>
         </main>
       </div>
-      <div
-        className="backstage-bottom-note"
-        tabIndex={0}
-        role="note"
-        aria-label="More coming soon"
-      >
-        <span className="backstage-bottom-note-primary" aria-hidden="true">always more coming soon ...</span>
-        <span className="backstage-bottom-note-hover" aria-hidden="true">and stay curious ..</span>
-        <span className="backstage-bottom-note-sr sr-only">always more coming soon ...</span>
-      </div>
-
       <div className="backstage-top-shield" />
     </>
   );
