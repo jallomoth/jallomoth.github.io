@@ -1,0 +1,173 @@
+/* ---- Scroll container with top fade to clear fixed UI elements ---------- */
+
+.commissions-scroll {
+  position: fixed;
+  inset: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+
+  padding-top: calc(var(--ui-top-space) + var(--gallery-offset) - 1vw);
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ui-top-space) +-0.5vw),
+    black calc(var(--ui-top-space) + var(--gallery-offset) - 0.5vw),
+    black 100%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ui-top-space) - 0.5vw),
+    black calc(var(--ui-top-space) + var(--gallery-offset) - 0.5vw),
+    black 100%
+  );
+}
+
+/* Transparent fixed element over the top fade zone to block pointer events */
+.commissions-top-shield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--ui-top-space) + var(--gallery-offset) - 0.5vw);
+  z-index: 10;
+}
+
+/* ---- Page content wrapper ---------------------------------------------- */
+
+.commissions-content {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 3rem calc(3rem + env(safe-area-inset-bottom, 0px));
+  color: var(--color-accent-light);
+  box-sizing: border-box;
+}
+
+/* ---- Questions section (centered) -------------------------------------- */
+
+.commissions-questions {
+  max-width: 100ch;
+  margin: 0rem auto 3rem auto;
+  text-align: center;
+  color: var(--color-vibrant);
+  line-height: 1.8;
+  font-size: clamp(0.9rem, 1.4vw, 1.5rem);
+}
+
+.commissions-questions p {
+  margin: 0 0 0.6rem 0;
+}
+
+.commissions-answer {
+  margin-top: 1.25rem !important;
+  font-weight: 700;
+}
+
+/* ---- Brass Tacks section (left aligned) -------------------------------- */
+
+.commissions-brass-tacks {
+  text-align: left;
+  font-size: clamp(0.9rem, 1.4vw, 1.5rem);
+  line-height: 1.7;
+}
+
+.commissions-brass-tacks-heading {
+  font-size: clamp(1.4rem, 2vw, 3rem);
+  margin: 0 0 0.4rem;
+  color: #ffb800;
+}
+
+.commissions-brass-tacks-divider {
+  border: none;
+  border-top: 3px solid var(--color-accent);
+  margin: 0 0 1.5rem;
+}
+
+.commissions-brass-tacks p {
+  margin: 0.75rem 0;
+  color: var(--color-accent-light);
+  text-shadow:
+    -2px -2px 0 rgba(0, 0, 0, 0.8),
+     2px -2px 0 rgba(0, 0, 0, 0.8),
+    -2px  2px 0 rgba(0, 0, 0, 0.8),
+     2px  2px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Green dollar sign for monetary amounts */
+.commissions-content .money {
+  color: #5ad36a;
+  font-weight: 600;
+}
+
+.commissions-brass-tacks a,
+.commissions-brass-tacks a:visited,
+.commissions-brass-tacks a:hover,
+.commissions-brass-tacks a:active {
+  color: var(--color-vibrant) !important;
+  text-decoration: underline !important;
+}
+
+/* ---- Divider before gallery -------------------------------------------- */
+
+.commissions-gallery-divider {
+  border: none;
+  border-top: 3px solid var(--color-accent);
+  margin: 2rem 0 2rem;
+}
+
+/* ---- Masonry commission gallery ---------------------------------------- */
+
+.commissions-gallery {
+  column-count: 4;
+  column-gap: 2vw;
+}
+
+@media (max-width: 1200px) {
+  .commissions-gallery { column-count: 3; }
+}
+@media (max-width: 800px) {
+  .commissions-gallery { column-count: 2; }
+}
+@media (max-width: 500px) {
+  .commissions-gallery { column-count: 1; }
+}
+
+/* ---- Mobile ------------------------------------------------------------ */
+
+@media (max-width: 600px) {
+  .commissions-content {
+    padding: 0 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .commissions-brass-tacks-heading,
+  .commissions-questions {
+    text-align: center;
+  }
+
+  .commissions-scroll {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) - 0.5vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) + 1.5vw),
+      black 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) - 0.5vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) + 1.5vw),
+      black 100%
+    );
+  }
+
+  .commissions-top-shield {
+    height: calc(var(--ui-top-space) + var(--gallery-offset) - 0.5vw);
+  }
+}
