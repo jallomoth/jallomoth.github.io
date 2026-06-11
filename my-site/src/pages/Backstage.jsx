@@ -63,7 +63,7 @@ export default function Backstage() {
           <span className="backstage-heading-word">
             {heading1ImgAvailable ? (
               <img
-                src="/logo/Jallogo.png"
+                src="/misc/Jallomoth.png"
                 alt="JALLOMOTH"
                 className="backstage-heading-img"
                 onError={() => setHeading1ImgAvailable(false)}
@@ -76,7 +76,6 @@ export default function Backstage() {
         </h2>
         <hr className="backstage-divider" />
         <div className="backstage-bio">
-          {/* Replace src with the actual image path when ready */}
           <img
             className="backstage-bio-image"
             src="/misc/Portrait.png"
@@ -104,7 +103,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
           <span className="backstage-heading-word">
             {heading2ImgAvailable ? (
               <img
-                src="/logo/Jallogo-hover.png"
+                src="/misc/Jallomoth.com.png"
                 alt="JALLOMOTH"
                 className="backstage-heading-img"
                 onError={() => setHeading2ImgAvailable(false)}
