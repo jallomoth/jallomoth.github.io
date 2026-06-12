@@ -30,20 +30,6 @@ export function ParallaxProvider({ children }) {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Device orientation tracking (mobile gyroscope)
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-    if (!('DeviceOrientationEvent' in window)) return;
-
-    const handleOrientation = (e) => {
-      if (e.gamma === null || e.beta === null) return;
-      target.current.x = Math.max(-0.5, Math.min(0.5,  e.gamma         / 45));
-      target.current.y = Math.max(-0.5, Math.min(0.5, (e.beta - 30)    / 45));
-    };
-    window.addEventListener("deviceorientation", handleOrientation);
-    return () => window.removeEventListener("deviceorientation", handleOrientation);
-  }, []);
-
   // Physics update — runs on the shared rAF loop
   useAnimationFrame((currentTime) => {
     if (prefersReducedMotion) return;
