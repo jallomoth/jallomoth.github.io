@@ -160,10 +160,18 @@ export default function ComicViewer() {
   // --- PAGE SOUNDS ---
   // Play a chapter-specific sound when landing on a particular page.
   // The manifest maps 1-based page numbers (as string keys) to sound paths.
+  // Depend on location.pathname so the effect fires on every real URL change,
+  // including when a redirect resolves to the same chapter/page as the
+  // pre-redirect default. The bare /fools-errand path is skipped because
+  // chapter/page haven't resolved yet at that point.
   useEffect(() => {
+    if (
+      location.pathname === "/fools-errand" ||
+      location.pathname === "/fools-errand/"
+    ) return;
     const sound = chapter.pageSounds?.[String(pageIndex + 1)];
     if (sound) playSound(sound, effectiveVolume);
-  }, [chapter.id, pageIndex]);
+  }, [location.pathname]);
 
   // --- ANALYTICS ---
   // Fire a GA event for each page read so chapter engagement is trackable.
