@@ -14,5 +14,8 @@
     "9.png",
     "10.png",
     "11.png"
-  ]
+  ],
+  "pageSounds": {
+    "1": "/sounds/misc/404-2.mp3"
+  }
 }

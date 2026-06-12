@@ -6,5 +6,8 @@
     "001.png",
     "002.png"
   ],
-  "music": "/music/home-off.mp3"
+  "music": "/music/home-off.mp3",
+  "pageSounds": {
+    "1": "/sounds/misc/Website.mp3"
+  }
 }

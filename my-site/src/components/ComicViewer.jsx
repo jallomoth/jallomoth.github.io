@@ -157,6 +157,14 @@ export default function ComicViewer() {
     localStorage.setItem("fe-last-read", JSON.stringify({ chapterId: chapter.id, page: pageIndex }));
   }, [chapter.id, pageIndex]);
 
+  // --- PAGE SOUNDS ---
+  // Play a chapter-specific sound when landing on a particular page.
+  // The manifest maps 1-based page numbers (as string keys) to sound paths.
+  useEffect(() => {
+    const sound = chapter.pageSounds?.[String(pageIndex + 1)];
+    if (sound) playSound(sound, effectiveVolume);
+  }, [chapter.id, pageIndex]);
+
   // --- ANALYTICS ---
   // Fire a GA event for each page read so chapter engagement is trackable.
   useEffect(() => {
