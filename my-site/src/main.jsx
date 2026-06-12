@@ -11,9 +11,11 @@ import { AudioProvider } from "./contexts/AudioContext";
 import { DragProvider } from "./contexts/DragContext";
 
 ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
+
 // Easter egg: print an ASCII banner in the console on site load
 if (typeof window !== "undefined" && window.console) {
-  console.log(`
+
+console.log(`
    _       _ _                       _   _                               
   (_)     | | |                     | | | |                              
    _  __ _| | | ___  _ __ ___   ___ | |_| |__         ___ ___  _ __ ___  
