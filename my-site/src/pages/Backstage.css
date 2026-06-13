@@ -1,3 +1,11 @@
+/* Ensure --ui-top-space is always defined for this page regardless of CSS bundle
+   load order (lazy-routing means ArtGallery.css may not be loaded yet). */
+:root {
+  /* Button bottom + gap — same formula as all other subpages. */
+  --ui-top-space: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem);
+  --gallery-offset: clamp(24px, 2vw, 40px);
+}
+
 .backstage-wrapper {
   width: 100%;
   max-width: 100%;
@@ -17,7 +25,7 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 
-  padding-top: calc(var(--ui-top-space) + var(--gallery-offset) + 0vw);
+  padding-top: calc(var(--ui-top-space) + var(--gallery-offset) + 1vw);
 
   mask-image: linear-gradient(
     to bottom,
@@ -30,7 +38,7 @@
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    transparent calc(var(--ui-top-space) + 2.5vw),
+    transparent calc(var(--ui-top-space) + 3.5vw),
     black calc(var(--ui-top-space) + var(--gallery-offset) + 2.5vw),
     black 100%
   );
@@ -59,7 +67,7 @@
   transform: translateX(-50%);
   /* use a rem-based offset (stable across viewport zoom changes) */
   /* nudged slightly higher */
-  top: calc(var(--ui-top-space) - 2rem);
+  top: calc(var(--ui-top-space) - 0rem);
   pointer-events: auto;
   z-index: 11;
   color: var(--color-accent-light);
@@ -243,70 +251,6 @@
   color: var(--color-vibrant);
 }
 
-/* ---- Responsive --------------------------------------------------------- */
-
-@media (max-width: 600px) {
-  .backstage-wrapper {
-    padding: 0 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .backstage-bio {
-    flex-direction: column;
-    align-items: center; /* center images and content on mobile */
-  }
-
-  .backstage-bio-image {
-    width: clamp(160px, 60vw, 380px);
-    flex: unset;
-    margin: 0 auto; /* center the image */
-    aspect-ratio: 3 / 4;
-  }
-
-  .backstage-section-heading {
-    margin-top: 2rem;
-  }
-
-  /* Center headings on small screens for better layout */
-  .backstage-section-heading,
-  .backstage-subheading,
-  .backstage-qa h3 {
-    text-align: center;
-  }
-
-  /* Center body text in mobile view for a cleaner layout */
-  .backstage-bio-text {
-    text-align: center;
-  }
-
-  /* Mobile-only: extend top fade so the fixed counter sits above it */
-  .backstage-scroll {
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(var(--ui-top-space) + var(--gallery-offset) + 7vw),
-      black calc(var(--ui-top-space) + var(--gallery-offset) + 8.5vw),
-      black 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(var(--ui-top-space) + var(--gallery-offset) + 7vw),
-      black calc(var(--ui-top-space) + var(--gallery-offset) + 8.5vw),
-      black 100%
-    );
-  }
-
-  /* Make the shield cover the extended fade on mobile */
-  .backstage-top-shield {
-    height: calc(var(--ui-top-space) + var(--gallery-offset) + 4.5vw);
-  }
-
-  /* Nudge the fixed logo click counter slightly lower on mobile */
-  .backstage-counter-row {
-    top: calc(var(--ui-top-space) + 0.45rem);
-  }
-}
-
 /* ---- Q&A collapsible section ------------------------------------------ */
 .backstage-qa {
   margin: 2.5rem 0 1.5rem;
@@ -449,6 +393,72 @@
 .backstage-end-cta__text:focus-within .cta-hover {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+
+@media (max-width: 950px) {
+  .backstage-wrapper {
+    padding: 0 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .backstage-bio {
+    flex-direction: column;
+    align-items: center; /* center images and content on mobile */
+  }
+
+  .backstage-bio-image {
+    width: clamp(160px, 60vw, 380px);
+    flex: unset;
+    margin: 0 auto; /* center the image */
+    aspect-ratio: 3 / 4;
+  }
+
+  .backstage-section-heading {
+    margin-top: 2rem;
+  }
+
+  /* Center headings on small screens for better layout */
+  .backstage-section-heading,
+  .backstage-subheading,
+  .backstage-qa h3 {
+    text-align: center;
+  }
+
+  /* Center body text in mobile view for a cleaner layout */
+  .backstage-bio-text {
+    text-align: center;
+  }
+
+  /* Mobile-only: extend top fade so the fixed counter sits above it */
+  .backstage-scroll {
+    padding-top: calc(var(--ui-top-space) + var(--gallery-offset) + 3vw);
+
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) + 4vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) + 8.5vw),
+      black 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) + 4vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) + 8.5vw),
+      black 100%
+    );
+  }
+
+  /* Make the shield cover the extended fade on mobile */
+  .backstage-top-shield {
+    height: calc(var(--ui-top-space) + var(--gallery-offset) + 4.5vw);
+  }
+
+  /* Nudge the fixed logo click counter slightly lower on mobile */
+  .backstage-counter-row {
+    top: calc(var(--ui-top-space) + 0rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

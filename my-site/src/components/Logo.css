@@ -4,27 +4,21 @@
   height: auto;
   z-index: 9998;
 
-  /* Prevent logo from becoming untappably small on very narrow viewports.
-     min-width overrides the inline width prop when vw math produces a smaller value. */
-  min-width: 80px;
+/* min-width fallback so the logo is never untappably small */
 
   pointer-events: auto;
   cursor: grab;
 }
 
-/* On mobile, subpage logos (20vw ≈ 78px) are too small to read.
-   Bump the minimum so they're always at least 150px wide. */
-@media (max-width: 600px) {
-  .logo-container {
-    min-width: 200px;
-  }
-}
+/* On mobile, subpage logos are sized by the button formula (min 254px wide)
+   so the old 200px bump is no longer needed. Base min-width of 80px is
+   kept only as an absolute safety net. */
 
 /* Home page logo: on portrait/narrow screens center it vertically in
    the empty space between the fixed header buttons and the button grid.
    calc(32px + 16vh) ≈ midpoint of (header-bottom ≈ 64px) and (grid-top ≈ 30vh).
    !important is needed to override the inline `top` style set by the prop. */
-@media (max-width: 860px) {
+@media (max-width: 950px) {
   .home-logo {
     top: calc(20px + 10vh) !important;
     /* Match the nav button grid width (4 × 20vw + 3 × 3vw = 89vw) */
@@ -32,11 +26,21 @@
   }
 }
 
-/* Slightly reduce spacing above subpage logos on small screens */
-@media (max-width: 600px) {
-  .subpage-logo {
-    top: 1.4rem !important;
-  }
+/* Subpage logo: same height as the back/volume buttons, horizontally centered,
+   top-edge aligned with the buttons. Works at every screen size — no media
+   query needed.
+     Button: top 20px, height = clamp(44px, 5vw, 100px)
+     Logo AR 5.78:1 → width = height × 5.78
+     center={true} applies translate(-50%,-50%), so setting top to the
+     button's center Y makes the logo's top/bottom edges match the buttons. */
+.subpage-logo {
+  width:  calc(clamp(44px, 5vw, 100px) * 5.78) !important;
+  /* Both logo images are position:absolute, so the container collapses to 0 height.
+     Setting height explicitly makes translate(-50%,-50%) shift by the right amount,
+     so top = center Y and the logo's edges align with the back/volume buttons. */
+  height: clamp(44px, 5vw, 100px) !important;
+  top:    calc(20px + clamp(44px, 5vw, 100px) / 2) !important;
+  left:   50% !important;
 }
 
 .logo-container:active {

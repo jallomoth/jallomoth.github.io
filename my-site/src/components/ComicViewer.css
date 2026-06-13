@@ -2,10 +2,15 @@
 
 :root {
   /* How far down to start below the fixed site header.
-     Logo center is now at calc(20px + clamp(22px, 2.5vw, 50px)).
-     At 1920px: 68px center + ~34px logo half-height ≈ 100px → 7vw ≈ 134px is fine.
-     The comment below is kept for context. */
-  --cv-header-clearance: 7vw;
+     Formula: logo_center + logo_half_height + gap_below
+       logo is center={true}, top="2rem"  →  center at 2rem from viewport top
+       logo width = clamp(16vw, 30vw, 30rem); aspect ratio ≈ 4.5:1
+       half-height  = width / (2 × 4.5) = width / 9
+       gap below logo = 1.5rem
+     At 1920px: 32px + 64px + 24px ≈ 120px.
+     Scales continuously with the logo as the viewport resizes. */
+  /* Button bottom + gap — mirrors back/volume button sizing across all pages. */
+  --cv-header-clearance: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem);
 
   /* Topbar */
   --cv-topbar-bg:   rgba(12, 10, 20, 0.72);
@@ -34,7 +39,7 @@
   position: fixed;
   inset: 0;
   z-index: 2;               /* sits above bg (z-index 0) but below logo (z-index 9998) */
-  padding-top: var(--cv-header-clearance);
+  padding-top: var(--cv-header-clearance); /* ensures clearance below header + logo, whichever is taller; now scales with the logo */
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -413,11 +418,10 @@
 
 /* --- Mobile portrait (<= 600px) --- */
 
-@media (max-width: 600px) {
+@media (max-width: 950px) {
   :root {
-    /* Push topbar below the fixed back button + volume icon (both end at ~64px).
-       7vw on a 390px phone = only 27px — far too little clearance. */
-    --cv-header-clearance: 72px;
+     /* clamp already handles mobile — no override needed. */
+     --cv-header-clearance: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem);
     /* Constrain image so the side nav buttons always have 40px each */
     --cv-image-max-w: calc(100vw - 80px);
   }

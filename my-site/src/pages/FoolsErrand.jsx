@@ -12,7 +12,7 @@ export default function FoolsErrand() {
 
   return (
     <>
-      <Logo className="subpage-logo" top="2rem" left="50%" width="clamp(16vw, 30vw, 30rem)" center={true} src="/logo/FoolsErrand.png" hoverSrc="/logo/FoolsErrand-hover.png" />
+      <Logo className="subpage-logo" top="0rem" left="50%" width="clamp(16vw, 30vw, 30rem)" center={true} src="/logo/FoolsErrand.png" hoverSrc="/logo/FoolsErrand-hover.png" />
       <BackButton />
       <main>
         <ErrorBoundary>

@@ -1,8 +1,10 @@
 :root {
-  --ui-top-space:   clamp(190px, 9vw, 200px);
+  /* Same formula as all other subpages — button bottom + gap. */
+  --ui-top-space: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem);
   --gallery-offset: clamp(24px, 2vw, 40px);
   --ui-side-space:  clamp(12px, 5vw, 100px);
 }
+
 
 /* Top padding for the flat grid (no section header above it) */
 .gallery-container.jalloseum-grid {

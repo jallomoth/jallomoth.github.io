@@ -1,3 +1,10 @@
+/* Ensure --ui-top-space is always defined for this page regardless of CSS bundle
+   load order (lazy-routing means ArtGallery.css may not be loaded yet). */
+:root {
+  /* Button bottom + gap — same formula as all other subpages. */
+  --ui-top-space: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem);
+}
+
 /* ---- Scroll container with top fade to clear fixed UI elements ---------- */
 
 .commissions-scroll {

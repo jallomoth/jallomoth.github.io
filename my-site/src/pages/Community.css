@@ -8,8 +8,8 @@
     justify-content: center;
     align-items: flex-start;
     min-height: 100dvh;
-    /* clamp: min 110px (clears ~100px logo+back), scales with viewport */
-    padding: clamp(110px, 24vw, 150px) 4vw clamp(24px, 5vw, 48px);
+    /* Button bottom + gap — matches all other subpages. */
+    padding: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem) 4vw clamp(24px, 5vw, 48px);
     box-sizing: border-box;
   }
 }
