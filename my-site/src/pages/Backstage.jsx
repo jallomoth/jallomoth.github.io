@@ -41,8 +41,8 @@ export default function Backstage() {
   const [qaOpen, setQaOpen] = useState(false);
 
   const faqs = [
-    { q: 'Why is the site so noisy ?', a: 'Because Jallomoth loves chaos. You can mute music and SFX via the volume control in the UI.' },
-    { q: 'Is that true ?', a: 'Look it up I don\'t know look it up' },
+    { q: 'Why is the site so noisy ?', a: 'Because Jallomoth loves chaos . You can mute music and SFX via the volume control in the UI' },
+    { q: 'Is that true ?', a: 'I don\'t know look it up I don\'t know' },
   ];
 
   return (
