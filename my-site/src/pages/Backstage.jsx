@@ -143,7 +143,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
           {/* Replace src with the actual image path when ready */}
           <img
             className="backstage-bio-image"
-            src="/images/evbg.png"
+            src="/misc/frog.png"
             alt="evbg"
           />
           <div className="backstage-bio-text">

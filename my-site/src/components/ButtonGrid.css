@@ -1,12 +1,17 @@
 :root {
-  --button-size: 9vw;
-  --button-gap: 5vw;
-  --row-gap: 3vw;
+  /* min(vw, vh) caps growth on wide-but-short screens (ultrawide, TV).
+     On normal 16:9 screens the vw value wins; on wider aspect ratios
+     the vh value kicks in so buttons never overflow the viewport. */
+  --button-size: min(9vw, 18vh);
+  --button-gap:  min(5vw,  10vh);
+  --row-gap:     min(3vw,  5vh);
 }
 
 .button-grid {
   position: fixed;
-  top: 33%;
+  /* max() ensures the grid clears the home logo (height ≈ 10.4vw, top ≈ 6vh)
+     on short viewports while staying at 33% on normal screens. */
+  top: max(33%, calc(6vh + 13vw));
   left: 50%;
   transform: translateX(-50%);
 
@@ -71,8 +76,10 @@
   }
 }
 
-/* For very short viewports, scale down further and push the grid further down */
-@media (max-height: 800px) {
+/* For very short viewports on NARROW screens (mobile landscape), scale down
+   and push the grid further down. Excluded from wide screens (> 950px) where
+   the min(vw, vh) root variables already handle the short-height case. */
+@media (max-height: 800px) and (max-width: 950px) {
   :root {
     --button-size: 18vw;
     --button-gap: 4vw;
