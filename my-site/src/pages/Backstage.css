@@ -152,7 +152,7 @@
   width: clamp(160px, 18vw, 340px);
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border: 2px solid var(--color-accent-glow);
+  border: 2px solid var(--color-vibrant);
   border-radius: 4px;
   background: rgba(179, 161, 255, 0.06);
 }
