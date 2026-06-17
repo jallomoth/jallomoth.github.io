@@ -16,7 +16,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // main background so the two layers look like they belong together.
 const STRENGTH = 15;
 
-export default function JalloButton({ to, onClick, children, className = "", ...rest }) {
+export default function JalloButton({ to, onClick, children, className = "", image, ...rest }) {
   const cls = `jalloseum-hub-link${className ? ` ${className}` : ""}`;
 
   const parallaxRef = useRef(null);
@@ -48,7 +48,7 @@ export default function JalloButton({ to, onClick, children, className = "", ...
   // image origin right, which makes the pattern appear to move RIGHT — true
   // visual inversion of the site background.
   useAnimationFrame(() => {
-    if (prefersReducedMotion || !parallaxRef.current) return;
+    if (prefersReducedMotion || !parallaxRef.current || image) return;
     const tx = pos.current.x * STRENGTH + bgOffsetRef.current.x;
     const ty = pos.current.y * STRENGTH + bgOffsetRef.current.y;
     parallaxRef.current.style.backgroundPosition = `${tx}px ${ty}px`;
@@ -63,10 +63,21 @@ export default function JalloButton({ to, onClick, children, className = "", ...
     </span>
   );
 
+  const imageBgLayer = image ? (
+    <span className="jallo-image-bg" aria-hidden="true">
+      <span
+        className="jallo-image-img"
+        style={{ backgroundImage: `url(${image})` }}
+      />
+    </span>
+  ) : null;
+
+  const bgLayer = image ? imageBgLayer : parallaxLayer;
+
   if (to) {
     return (
       <Link to={to} className={cls} onClick={handleClick} {...rest}>
-        {parallaxLayer}
+        {bgLayer}
         <span className="jallo-btn-content">{children}</span>
       </Link>
     );
@@ -74,7 +85,7 @@ export default function JalloButton({ to, onClick, children, className = "", ...
 
   return (
     <button type="button" className={cls} onClick={handleClick} {...rest}>
-      {parallaxLayer}
+      {bgLayer}
       <span className="jallo-btn-content">{children}</span>
     </button>
   );

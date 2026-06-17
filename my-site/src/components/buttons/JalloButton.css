@@ -64,6 +64,32 @@
   will-change: background-position;
 }
 
+/* ---- Static image background layer ------------------------------------- */
+
+/* Clipping container — same role as .jallo-parallax-bg but no blur filter
+   so the image stays crisp. */
+.jallo-image-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+/* The full-cover image div — backgroundImage is set inline per instance.
+   transform is driven by hover so the browser composites it cheaply. */
+.jallo-image-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: center center;
+}
+
 /* Button text / icon wrapper — sits above the parallax layer in paint order. */
 .jallo-btn-content {
   position: relative;
@@ -163,6 +189,10 @@
      Both are relative to the button's own scale, not the viewport. */
   .jalloseum-hub-link:hover .jallo-btn-content {
     transform: scale(1.08) rotate(-5deg);
+  }
+
+  .jalloseum-hub-link:hover .jallo-image-img {
+    transform: scale(1.08);
   }
 
   .jalloseum-hub-link:hover::before {
