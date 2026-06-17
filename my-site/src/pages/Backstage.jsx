@@ -148,7 +148,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
           />
           <div className="backstage-bio-text">
             <h4 className="backstage-subheading">evbg</h4>
-            <p>Jallomoth.com was hand-battered and fried by one evbg with love 💛 . An L. Ron-Hubbardian Cybergenius from on-high 
+            <p>Jallomoth.com was hand-battered and fried by one evbg with love . An L. Ron-Hubbardian Cybergenius from on-high 
               who has gone by over 10 brazillion names — from Xeno Yellow to 埃博格 . No one knows what planet he came from , 
               but I think it got gentrified by some morally inferior aliens , so don't bring it up around him ok it's kind of a sore subject .
               He coded the entire site in just under 13 hours with nothing but a steamdeck with Trove downloaded on it and a stylus fashioned 
