@@ -3,7 +3,7 @@
 
 // Import only image files as URLs
 const imageModules = import.meta.glob(
-  "../assets/fools-errand/chapters/**/*.{png,jpg,jpeg,webp,gif,svg}",
+  "../assets/fools-errand/chapters/**/*.{png,jpg,jpeg,webp,gif,svg,PNG,JPG,JPEG,WEBP,GIF,SVG}",
   { eager: true, query: "?url", import: "default" }
 );
 
