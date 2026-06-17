@@ -71,42 +71,12 @@
   }
 }
 
-@media (max-height: 800px) {
-  /* Shrink buttons and reduce lift when viewport height is limited so
-     the grid doesn't overlap the logo. Use vh-based sizes to react
-     to available height instead of only width-based sizing. */
-
-  :root {
-    --button-size: 22vh;
-    --button-gap: 3vh;
-    --row-gap: 1.8vh;
-  }
-
-  .button-grid {
-    /* nudge the grid lower on smaller heights so it won't ride up */
-    top: 30%;
-    gap: var(--row-gap);
-    padding: 0;
-  }
-
-  .button-row > * {
-    width: var(--button-size);
-    min-height: var(--button-size);
-  }
-
-  /* reduce the upward translate of the active icon so it doesn't go behind header/logo */
-  .icon-container.active-icon .icon-visual,
-  .button-grid.dragging .icon-container.active-icon .icon-visual {
-    transform: translateY(-0.8vh) scale(1.05);
-  }
-}
-
 /* For very short viewports, scale down further and push the grid further down */
-/* @media (max-height: 700px) {
+@media (max-height: 800px) {
   :root {
-    --button-size: 6vh;
-    --button-gap: 1.8vh;
-    --row-gap: 1.2vh;
+    --button-size: 18vw;
+    --button-gap: 4vw;
+    --row-gap: 8vw;
   }
 
   .button-grid {
@@ -122,7 +92,37 @@
 
   .icon-container.active-icon .icon-visual,
   .button-grid.dragging .icon-container.active-icon .icon-visual {
-    transform: translateY(-0.6vh) scale(1.03);
+    transform: translateY(-0.6vw) scale(1.03);
+  }
+}
+
+/* @media (max-height: 800px) {
+  /* Shrink buttons and reduce lift when viewport height is limited so
+     the grid doesn't overlap the logo. Use vh-based sizes to react
+     to available height instead of only width-based sizing.
+
+  :root {
+    --button-size: 22vh;
+    --button-gap: 3vh;
+    --row-gap: 1.8vh;
+  }
+
+  .button-grid {
+    /* nudge the grid lower on smaller heights so it won't ride up
+    top: 30%;
+    gap: var(--row-gap);
+    padding: 0;
+  }
+
+  .button-row > * {
+    width: var(--button-size);
+    min-height: var(--button-size);
+  }
+
+  /* reduce the upward translate of the active icon so it doesn't go behind header/logo
+  .icon-container.active-icon .icon-visual,
+  .button-grid.dragging .icon-container.active-icon .icon-visual {
+    transform: translateY(-0.8vh) scale(1.05);
   }
 } */
 

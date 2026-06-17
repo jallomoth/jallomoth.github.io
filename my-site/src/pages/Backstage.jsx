@@ -174,7 +174,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
         <div className="backstage-bio backstage-subsection backstage-subsection--accent1">
           <img
             className="backstage-bio-image"
-            src="/images/neveraom.png"
+            src="/misc/neveraom.jpg"
             alt="Neveraom"
           />
           <div className="backstage-bio-text">

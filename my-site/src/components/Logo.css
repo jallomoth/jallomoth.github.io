@@ -43,6 +43,17 @@
   left:   50% !important;
 }
 
+/* On mobile the clamp minimum (44px) always wins since 5vw is ~19px.
+   Override with a fixed smaller height so the logo is less imposing. */
+@media (max-width: 950px) {
+  .subpage-logo {
+    height: 36px !important;
+    width:  calc(36px * 5.78) !important;
+    /* Keep the logo vertically centered with the header buttons */
+    top:    calc(20px + clamp(44px, 5vw, 100px) / 2) !important;
+  }
+}
+
 .logo-container:active {
   cursor: grabbing;
 }
