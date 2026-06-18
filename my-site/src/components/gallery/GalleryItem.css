@@ -43,6 +43,7 @@
 /* --- Image --- */
 .gallery-item img {
   width: 100%;
+  height: auto;
   display: block;
 
   user-select: none;
@@ -52,8 +53,9 @@
 }
 
 /* Loading skeleton shimmer (NTH-14) */
+/* No aspect-ratio override — browser derives it from the width/height HTML
+   attributes set at build time, which prevents layout shifts on load. */
 .gallery-item img:not(.loaded) {
-  aspect-ratio: 4 / 3;
   background: linear-gradient(90deg, #1a1a2e 25%, #2a2a4e 50%, #1a1a2e 75%);
   background-size: 200% 100%;
   animation: gallery-shimmer 1.5s infinite;

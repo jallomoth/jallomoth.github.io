@@ -87,6 +87,8 @@ export default function GalleryItem({
             alt={img.label}
             draggable="false"
             loading="lazy"
+            width={img.width}
+            height={img.height}
             className={imageLoaded ? 'loaded' : ''}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageLoaded(true)}

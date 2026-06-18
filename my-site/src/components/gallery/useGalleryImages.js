@@ -4,6 +4,7 @@
 // arrays are only recomputed when subfolder content actually changes.
 // components/gallery/useGalleryImages.js
 import { useMemo } from "react";
+import galleryDimensions from "virtual:gallery-dimensions";
 
 export default function useGalleryImages(sectionMap, sortOrder) {
   // MUST be static — evaluated at build time by Vite
@@ -36,12 +37,17 @@ export default function useGalleryImages(sectionMap, sortOrder) {
           .replace(/[-_]/g, " ")
           .replace(/\b\w/g, (c) => c.toUpperCase());
 
+        const dimMatch = path.match(/assets\/(.+)$/);
+        const dim = dimMatch ? galleryDimensions[`src/assets/${dimMatch[1]}`] : null;
+
         return {
           src: mod.default,
           label,
           fileName,
           section,
           path,
+          width: dim?.width,
+          height: dim?.height,
         };
       })
       .filter((img) => img.path.includes("/gallery/"))
