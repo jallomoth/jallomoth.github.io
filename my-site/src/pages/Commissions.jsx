@@ -1,15 +1,18 @@
-// Commissions page
+﻿// Commissions page
 import './Commissions.css';
 import Logo from "../components/Logo";
 import BackButton from "../components/buttons/BackButton";
 import usePageTitle from "../hooks/usePageTitle";
 import useJalloseumImages from "../components/gallery/useJalloseumImages";
 import GalleryItem from "../components/gallery/GalleryItem";
+import useImageModal from "../hooks/useImageModal";
+import ImageModal from "../components/ImageModal";
 
 export default function Commissions() {
   usePageTitle("Jallomoth — Commissions");
 
   const commissionImages = useJalloseumImages("Commissions");
+  const modal = useImageModal(commissionImages);
 
   return (
     <>
@@ -51,17 +54,20 @@ export default function Commissions() {
                 key={img.path}
                 img={img}
                 index={i}
+                itemRef={(el) => (modal.itemRefs.current[i] = el)}
                 showTitle={false}
-                onClick={() => {}}
-                isSelected={false}
-                isModalOpen={false}
-                isModalClosing={false}
+                onClick={() => modal.handleThumbClick(img, i)}
+                isSelected={modal.selectedIndex === i}
+                isModalOpen={modal.isModalOpen}
+                isModalClosing={modal.isModalClosing}
               />
             ))}
           </div>
 
         </main>
       </div>
+
+      <ImageModal {...modal} />
     </>
   );
 }
