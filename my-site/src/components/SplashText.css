@@ -7,7 +7,7 @@
   /* Sit below the logo with extra breathing room.
      Logo center: max(3%, 4vh). Logo height ≈ 60vw / 5.78 ≈ 10.38vw.
      Bottom of logo ≈ max(3%, 4vh) + 5.2vw. */
-  top: calc(max(3%, 4vh) + 11vw);
+  top: calc(max(3%, 4vh) + 10.5vw);
 
   /* transform-origin: center center ensures scale() pivots from the element's
      own center. The scale() must live inside the `transform` property (not as
@@ -18,8 +18,8 @@
 
   /* Match milestone popup aesthetics */
   font-family: 'Chelsea Market', system-ui, sans-serif;
-  /* 2.67% of the logo width (60vw) — scales 1:1 with the logo at any viewport size. */
-  font-size: 1.6vw;
+  /* 2.17% of the logo width (60vw) — scales 1:1 with the logo at any viewport size. */
+  font-size: 1.3vw;
   font-style: italic;
   color: #fff;
   text-shadow:
@@ -66,7 +66,7 @@ body.screensaver-active .splash-text {
     /* Logo center: 14px + 8vh. Logo height ≈ 88vw / 5.78 ≈ 15.2vw.
        Bottom ≈ 14px + 8vh + 7.6vw. Add extra gap to match desktop spacing. */
     top: calc(14px + 10vh + 14vw);
-    /* 2.67% of the mobile logo width (88vw) — same proportion as desktop. */
-    font-size: 2.35vw;
+    /* ~2.84% of the mobile logo width (88vw) — slightly larger than desktop proportion. */
+    font-size: 3vw;
   }
 }

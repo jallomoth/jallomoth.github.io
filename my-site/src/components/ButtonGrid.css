@@ -11,7 +11,7 @@
   position: fixed;
   /* max() ensures the grid clears the home logo (height ≈ 10.4vw, top ≈ 6vh)
      on short viewports while staying at 33% on normal screens. */
-  top: max(33%, calc(6vh + 13vw));
+  top: max(33%, calc(6vh + 14vw));
   left: 50%;
   transform: translateX(-50%);
 

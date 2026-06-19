@@ -9,44 +9,48 @@ import "./SplashText.css";
 // Weighted splash text pool.
 // Higher weight = more likely to appear. Weights are relative, not percent.
 // ---------------------------------------------------------------------------
+
+/*
+
+*/
 const SPLASH_TEXTS = [
+
   // --- Common ---
-  { text: "Trans rights!",            weight: 8 },
-  { text: "Heavily into birds",       weight: 6 },
-  { text: "Now with 20% more bits!",  weight: 6 },
-  { text: "Worm on a string!",        weight: 6 },
-  { text: "Jallo said hi!",           weight: 5 },
-  { text: "Touch grass (after this)", weight: 5 },
-  { text: "Rated E for Everyone!",    weight: 5 },
-  { text: "Made with ❤ and spite",    weight: 5 },
-  { text: "Also try Minecraft!",      weight: 4 },
-  { text: "Not affiliated with Mojang", weight: 4 },
-  { text: "Screensaver included!",    weight: 4 },
-  { text: "Now drag the logo",        weight: 4 },
-  { text: "Drag the logo!",           weight: 4 },
-  { text: "Click the logo!",          weight: 4 },
-  { text: "Art goes here!",           weight: 4 },
-  { text: "Honk!",                    weight: 3 },
-  { text: "New high score!",          weight: 3 },
-  { text: "It's a website!",          weight: 3 },
-  { text: "Jallomoth dot com!",       weight: 3 },
+  { text: "Better on PC !", weight: 8 },
+  { text: "Heavily Into Birds", weight: 6 },
+  { text: "Buy 100 Commissions Get Your 1001st Free !", weight: 6 },
+  { text: "Worm on a string ! 🪱", weight: 6 },
+  { text: "Wait for it ...", weight: 5 },
+  { text: "8)", weight: 5 },
+  { text: "As Seen on YouTube !", weight: 5 },
+  { text: "Rate 5 Stars !", weight: 5 },
+  { text: "Go Read Yotsuba&!", weight: 4 },
+  { text: "Keep it Real", weight: 4 },
+  { text: "Cool It , Mister ...", weight: 4 },
+  { text: "Music by Neveraom !", weight: 4 },
+  { text: "Code by evbg !", weight: 4 },
+  { text: "GET BACK HERE SHOCKER !!", weight: 3 },
+  { text: "I Can't Let You Get Close ...", weight: 3 },
+  { text: "See You , Space Cowboy ! ", weight: 3 },
+  { text: "Stay Curious", weight: 3 },
   // --- Uncommon ---
-  { text: "Secretly a cryptid",       weight: 2 },
-  { text: "Buffering…",               weight: 2 },
-  { text: "No refunds!",              weight: 2 },
-  { text: "Open source (kinda)",      weight: 2 },
-  { text: "Brain full of shapes",     weight: 2 },
-  { text: "Bug or feature?",          weight: 2 },
-  { text: "Runs on coffee",           weight: 2 },
-  { text: "Stare into the void!",     weight: 2 },
-  { text: "Hello there!",             weight: 2 },
+  { text: "SHUT UP !!!", weight: 2 },
+  { text: "Get Smart", weight: 2 },
+  { text: "Wipe Your Feet at the Door ! ", weight: 2 },
+  { text: "The Light is Your Guide", weight: 2 },
+  { text: "Mmm ... Hamburger !", weight: 2 },
+  { text: "No Refunds !", weight: 2 },
+  { text: "There's Layers to This Shit .", weight: 2 },
+  { text: "U MIRIN BRAH ?", weight: 2 },
+  { text: "Touch Me ... Midas !!", weight: 2 },
+  { text: "The Future of Awesome !", weight: 1 },
+  { text: "Domo Domo Domo", weight: 1 },
+  { text: "Jallomoth.com ?", weight: 1 },
+  { text: "Probably @ the Movies", weight: 1 },
+  { text: "Mysterious Handy Tool for Unusual Home Adventures With a Twist", weight: 1 },
   // --- Rare ---
-  { text: "?????????????????",        weight: 0.5 },
-  { text: "Wow!",                     weight: 0.5 },
-  { text: "You found me!",            weight: 0.5 },
-  { text: "Is this a Jojo reference?",weight: 0.5 },
-  { text: "404 splash not found",     weight: 0.5 },
-  { text: "Wake up, babe — new splash just dropped", weight: 0.3 },
+  { text: "?????????????????", weight: 0.5 },
+  { text: "...Naughty !", weight: 0.5 },
 ];
 
 function pickWeighted(items) {
