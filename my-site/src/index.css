@@ -21,6 +21,15 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Clears the fixed header row (back button + logo + volume).
+     Buttons sit at top:20px with height clamp(44px,5vw,100px), so their
+     bottom edge is 20px + clamp(44px,5vw,100px). Add 1.5rem breathing room. */
+  --ui-top-space: calc(20px + clamp(44px, 5vw, 100px) + 1.5rem);
+  /* Fade width — gallery content transitions from invisible to fully opaque
+     over this distance, ending exactly where the nav button bar starts. */
+  --gallery-offset:   clamp(24px, 2vw, 40px);
+  --ui-side-space:    clamp(12px, 5vw, 100px);
 }
 
 *,

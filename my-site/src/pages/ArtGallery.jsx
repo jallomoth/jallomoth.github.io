@@ -12,8 +12,6 @@ import usePageTitle from "../hooks/usePageTitle";
 import useImageModal from "../hooks/useImageModal";
 import ImageModal from "../components/ImageModal";
 
-import "./ArtGallery.css";
-
 // Normalize special folder names to their display-label equivalents.
 // Keys are lowercased folder names; values are the canonical display labels.
 const SECTION_MAP = {

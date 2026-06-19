@@ -152,7 +152,7 @@ If you'd like to contact either party for any reason , be it a commission inquee
               who has gone by over 10 brazillion names — from Xeno Yellow to 埃博格 . No one knows what planet he came from , 
               but I think it got gentrified by some morally inferior aliens , so don't bring it up around him ok it's kind of a sore subject .
               He coded the entire site in just under 13 hours with nothing but a steamdeck with Trove downloaded on it and a stylus fashioned 
-              out of the first ever tech deck produced in America & 2 and a half Sillybandz .
+              out of the first ever tech deck produced in America & 2 and a half Beyblades .
               It's rumored that anyone who sees him in real life has a 1/600 chance to be petrified to stone — but if you're lucky ... and pure of heart 
               ... there's a chance his true form may be revealed to you .
               If you encounter any bugs that need squashing or just have a trillion-dollar suggestion for the site to empower our swag and bolster our 

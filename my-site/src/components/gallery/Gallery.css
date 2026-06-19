@@ -226,3 +226,28 @@
   -webkit-user-drag: none;
   pointer-events: none;
 }
+
+/* ---- Mobile ------------------------------------------------------------ */
+
+@media (max-width: 600px) {
+  .gallery-scroll {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) - 4vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) - 2vw),
+      black 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--ui-top-space) + var(--gallery-offset) - 4vw),
+      black calc(var(--ui-top-space) + var(--gallery-offset) - 2vw),
+      black 100%
+    );
+  }
+
+  .gallery-top-shield {
+    height: calc(var(--ui-top-space) + var(--gallery-offset) - 6vw);
+  }
+}
