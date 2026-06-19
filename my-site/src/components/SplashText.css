@@ -13,14 +13,15 @@
      own center. The scale() must live inside the `transform` property (not as
      a standalone CSS `scale` property) so that only the scale step uses this
      origin — keeping the visual center fixed at 50% viewport at every scale value. */
-  transform: translateX(-50%) scale(1);
+  /* skewX fakes italics since Chelsea Market has no italic variant.
+     Applied in the transform so it stays consistent across all browsers. */
+  transform: translateX(-50%) skewX(-18deg) scale(1);
   transform-origin: center center;
 
   /* Match milestone popup aesthetics */
   font-family: 'Chelsea Market', system-ui, sans-serif;
   /* 2.17% of the logo width (60vw) — scales 1:1 with the logo at any viewport size. */
   font-size: 1.3vw;
-  font-style: italic;
   color: #fff;
   text-shadow:
     0 0 18px rgba(179, 161, 255, 0.9),
@@ -41,8 +42,8 @@
 }
 
 @keyframes splashWobble {
-  from { transform: translateX(-50%) scale(0.95); }
-  to   { transform: translateX(-50%) scale(1.09); }
+  from { transform: translateX(-50%) skewX(-18deg) scale(0.95); }
+  to   { transform: translateX(-50%) skewX(-18deg) scale(1.09); }
 }
 
 /* --- Fade conditions --- */

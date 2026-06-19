@@ -12,7 +12,7 @@ import "./Logo.css";
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Distance (px) the logo must be dragged from rest before the splash text fades.
-const SPLASH_FADE_THRESHOLD = 150;
+const SPLASH_FADE_THRESHOLD = 50;
 
 // Milestone click counts that trigger a number popup.
 const MILESTONES = new Set([10, 21, 25, 50, 67, 69, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 7500, 10000]);
