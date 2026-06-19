@@ -383,6 +383,7 @@
   width: 50%;
   background: transparent;
   border: none;
+  outline: none;
   cursor: none !important;
   z-index: 6;
   padding: 0;
