@@ -11,6 +11,9 @@ import "./Logo.css";
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Distance (px) the logo must be dragged from rest before the splash text fades.
+const SPLASH_FADE_THRESHOLD = 150;
+
 // Milestone click counts that trigger a number popup.
 const MILESTONES = new Set([10, 21, 25, 50, 67, 69, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 7500, 10000]);
 
@@ -54,6 +57,9 @@ export default function Logo({
   const isDragging = useRef(false);
   const hoveredRef = useRef(false);
   const hoverScaleRef = useRef(1);
+  // Once the logo is dragged past SPLASH_FADE_THRESHOLD during a single drag,
+  // keep the splash faded until the mouse is released.
+  const splashFadedByDragRef = useRef(false);
 
   const mouse = useRef({ x: 0, y: 0 });
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -133,6 +139,8 @@ export default function Logo({
       if (isDragging.current) {
         isDragging.current = false;
         isGrabbingRef.current = false;
+        splashFadedByDragRef.current = false;
+        document.body.classList.remove('logo-drag-far');
 
         // Boost the velocity that the rAF loop tracked this frame so the fling
         // carries visible momentum against the spring. Without this boost the
@@ -219,6 +227,17 @@ export default function Logo({
 
     prevDragPosRef.current.x = pos.current.x;
     prevDragPosRef.current.y = pos.current.y;
+
+    // Signal the splash text to hide when the logo is dragged far enough.
+    // Latches: once the threshold is crossed during a drag the class stays
+    // until mouseup, even if the logo is dragged back within the threshold.
+    if (isDragging.current) {
+      const dragDist = Math.sqrt(pos.current.x * pos.current.x + pos.current.y * pos.current.y);
+      if (dragDist > SPLASH_FADE_THRESHOLD) {
+        splashFadedByDragRef.current = true;
+        document.body.classList.add('logo-drag-far');
+      }
+    }
 
     if (containerRef.current) {
       // Lerp the hover scale for a smooth grow/shrink without needing a CSS transition.

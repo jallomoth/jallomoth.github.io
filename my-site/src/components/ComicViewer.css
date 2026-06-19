@@ -344,10 +344,13 @@
   user-select: none;
 }
 
+.comic-container.is-fullscreen,
+.comic-container:fullscreen,
+.comic-container:-webkit-full-screen,
 .comic-container.is-fullscreen *,
 .comic-container:fullscreen *,
 .comic-container:-webkit-full-screen * {
-  cursor: auto !important;
+  cursor: none !important;
 }
 
 .comic-container.is-fullscreen .comic-topbar,

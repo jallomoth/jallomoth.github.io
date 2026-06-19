@@ -5,6 +5,7 @@
 // Any mouse movement or keypress wakes everything back up.
 import { useCallback, useEffect, useRef, useState } from "react";
 import Logo from "../components/Logo";
+import SplashText from "../components/SplashText";
 import ButtonGrid from "../components/ButtonGrid";
 import FullscreenButton from "../components/buttons/FullscreenButton";
 import { useAudio } from "../contexts/AudioContext";
@@ -176,7 +177,7 @@ export default function Home() {
   return (
     <>
       <Logo
-        top="max(5%, 6vh)"
+        top="max(3%, 4vh)"
         left="50%"
         width="60vw"
         center={true}
@@ -184,6 +185,7 @@ export default function Home() {
         ssRef={ssRef}
         ssIndex={LOGO_SS_INDEX}
       />
+      <SplashText />
       <main>
         <ButtonGrid ssRef={ssRef} screensaverActive={screensaverActive} />
       </main>

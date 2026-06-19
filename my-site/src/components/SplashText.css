@@ -1,0 +1,72 @@
+/* Minecraft-style splash text — positioned below the home logo. */
+
+.splash-text {
+  position: fixed;
+  left: 50%;
+
+  /* Sit below the logo with extra breathing room.
+     Logo center: max(3%, 4vh). Logo height ≈ 60vw / 5.78 ≈ 10.38vw.
+     Bottom of logo ≈ max(3%, 4vh) + 5.2vw. */
+  top: calc(max(3%, 4vh) + 11vw);
+
+  /* transform-origin: center center ensures scale() pivots from the element's
+     own center. The scale() must live inside the `transform` property (not as
+     a standalone CSS `scale` property) so that only the scale step uses this
+     origin — keeping the visual center fixed at 50% viewport at every scale value. */
+  transform: translateX(-50%) scale(1);
+  transform-origin: center center;
+
+  /* Match milestone popup aesthetics */
+  font-family: 'Chelsea Market', system-ui, sans-serif;
+  /* 2.67% of the logo width (60vw) — scales 1:1 with the logo at any viewport size. */
+  font-size: 1.6vw;
+  font-style: italic;
+  color: #fff;
+  text-shadow:
+    0 0 18px rgba(179, 161, 255, 0.9),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  z-index: 9997; /* below logo (9998) and popups (10000+) */
+
+  opacity: 1;
+  /* Controls fade-back-in speed after drag is released — matches fade-out below. */
+  transition: opacity 0.15s ease;
+
+  /* Minecraft-style scale pulse — uses standalone `scale` property so it
+     composes with the `transform` above instead of overwriting it. */
+  animation: splashWobble 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes splashWobble {
+  from { transform: translateX(-50%) scale(0.95); }
+  to   { transform: translateX(-50%) scale(1.09); }
+}
+
+/* --- Fade conditions --- */
+
+/* Logo dragged far from its resting point — quick fade both ways */
+body.logo-drag-far .splash-text {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Screensaver active — slower fade out */
+body.screensaver-active .splash-text {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* --- Mobile override --- */
+/* On narrow screens the logo uses top: calc(20px + 10vh) and width: 88vw. */
+@media (max-width: 950px) {
+  .splash-text {
+    /* Logo center: 14px + 8vh. Logo height ≈ 88vw / 5.78 ≈ 15.2vw.
+       Bottom ≈ 14px + 8vh + 7.6vw. Add extra gap to match desktop spacing. */
+    top: calc(14px + 10vh + 14vw);
+    /* 2.67% of the mobile logo width (88vw) — same proportion as desktop. */
+    font-size: 2.35vw;
+  }
+}
