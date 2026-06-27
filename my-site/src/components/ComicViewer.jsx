@@ -183,6 +183,16 @@ export default function ComicViewer() {
     });
   }, [chapter.id, pageIndex]);
 
+  // Fire once per chapter visit (initial load + chapter switches) so GA can
+  // show clean per-chapter view counts independently of page reads.
+  useEffect(() => {
+    ReactGA.event({
+      category: "Comic",
+      action: "chapter_view",
+      label: chapter.label,
+    });
+  }, [chapter.id]);
+
   // --- TOUCH SWIPE ---
   useEffect(() => {
     const el = containerRef.current;
